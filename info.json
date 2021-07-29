@@ -1,0 +1,8 @@
+{
+    "name": "RecursiveResourceCalculator",
+    "version": "0.0.1",
+    "title": "Recursive Resource Calculator",
+    "author": "Herddex",
+    "description": "An ingame calculator that can be used to automatically compute all information you need to build a final product at a given rate of production: precise number of machines for each intermediate product, required production rates for all said intermediate products, pollution and energy costs, with options for specyfing module and becon configurations, as well as machine types",
+    "factorio_version": "1.1"
+}
