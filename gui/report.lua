@@ -21,16 +21,35 @@ function Report.new(parent, list, total_production_rates)
         if recipes then
             local machine_flow = report.add{type = "flow"} 
             local category = recipes[1].category
-            local crafting_machine = #global.crafting_machines_for_category[category] == 1 and global.crafting_machines_for_category[category][1] or
-            game.entity_prototypes[global[report.player_index].crafting_machine_buttons[category].elem_value]
+            local crafting_machine
+            if #global.crafting_machines_for_category[category] == 1 then
+                crafting_machine = global.crafting_machines_for_category[category][1]
+            else
+                local crafting_machine_name = global[report.player_index].crafting_machine_buttons[category].elem_value
+                if crafting_machine_name then
+                    crafting_machine = game.entity_prototypes[crafting_machine_name]
+                else
+                    game.get_player(parent.player_index).create_local_flying_text{
+                        text = {
+                            "",
+                            {"hxrrc.preference_not_found_for_category_1"},
+                            category .. ".\n",
+                            {"hxrrc.preference_not_found_for_category_2"},
+                            },
+                        create_at_cursor = true,
+                    }
+                    report.destroy()
+                    return
+                end
+            end
 
             --the machine:
             local crafting_machine_sprite = "item/" .. crafting_machine.name
-            machine_flow.add{type = "sprite", sprite = crafting_machine_sprite}
+            machine_flow.add{type = "sprite", sprite = crafting_machine_sprite, tooltip = crafting_machine.localised_name}
 
             --the machine amount:
             local machine_amount = Decomposer.machine_amount(sprite, production_rate, crafting_machine)
-            machine_flow.add{type = "label", caption = " x " .. Rational.to_string(machine_amount)}
+            machine_flow.add{type = "label", caption = " x " .. Rational.to_string(machine_amount), tooltip = "~" .. tostring(Rational.numerical_approximation(machine_amount)) .. "/s"}
         else
             report.add{type = "empty-widget"}
         end

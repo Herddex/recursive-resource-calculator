@@ -6,11 +6,8 @@ local TopoSort = require "logic/topo_sort"
 
 local Calculator = {}
 
-local function build_preferances_tab(tabbed_pane)
-    local preferences_tab = tabbed_pane.add{type = "tab", caption = "Preferances"}
-    local preferences_table = tabbed_pane.add{type = "table", column_count = 2}
-    tabbed_pane.add_tab(preferences_tab, preferences_table)
-
+local function build_preferances_section(parent)
+    local preferences_table = parent.add{type = "table", column_count = 2}
 
     local crafting_machine_buttons = {} --a dictionary mapping crafting categories to the choose elem buttons that specify which machine should be used for that crafting category
     local crafting_machines_for_category = global.crafting_machines_for_category
@@ -27,6 +24,8 @@ local function build_preferances_tab(tabbed_pane)
         end
     end
     global[preferences_table.player_index].crafting_machine_buttons = crafting_machine_buttons
+    global[preferences_table.player_index].preferences_table = preferences_table
+    preferences_table.visible = false
 end
 
 function Calculator.build(player)
@@ -34,21 +33,32 @@ function Calculator.build(player)
     local main_frame = player.gui.screen.add{
         type = "frame",
         name = "hxrrc_calculator",
+        direction = "vertical",
         caption = {"hxrrc.main_window_title"},
         visible = false,
     }
     main_frame.auto_center = true
     main_frame.style.maximal_height = 950
 
-    --Tabbed pane:
-    local tabbed_pane = main_frame.add{type = "tabbed-pane"}
-    build_preferances_tab(tabbed_pane)
+    --Controls section:
+    local controls_flow = main_frame.add{type = "flow"}
+    local preferences_toggle_button = controls_flow.add {
+        type = "button",
+        name = "hxrrc_preferences_toggle_button",
+        caption = {"hxrrc.preferences"},
+        tooltip = {"hxrrc.toggle_preferences"},
+    }
 
+    local main_flow = main_frame.add{type = "flow"}
+
+    --Preferences section:
+    build_preferances_section(main_flow)
+
+    --Tabbed pane:
+    local tabbed_pane = main_flow.add{type = "tabbed-pane"}
     local compute_tab = tabbed_pane.add{type = "tab", caption = "Calculator"}
     local compute_flow = tabbed_pane.add{type = "flow", direction = "vertical"}
     tabbed_pane.add_tab(compute_tab, compute_flow)
-
-    tabbed_pane.selected_tab_index = 2
 
     --Input section:
     local input_flow = compute_flow.add{type = "flow", direction = "horizontal"}
@@ -59,6 +69,10 @@ function Calculator.build(player)
         tooltip = {"hxrrc.production_rate_input_tooltip"},
         lose_focus_on_confirm = true,
         clear_and_focus_on_right_click = true,
+    }
+    input_flow.add{
+        type = "label",
+        caption = "/s",
     }
     local choose_item_button = input_flow.add {
         type = "choose-elem-button",
@@ -92,10 +106,14 @@ function Calculator.destroy(player)
     player.gui.screen.hxrrc_calculator.destroy()
 end
 
-function Calculator.toggle(player)
+function Calculator.toggle_calculator(player)
     local calculator = player.gui.screen.hxrrc_calculator
     calculator.visible = not calculator.visible
     player.opened = calculator.visible and calculator or nil
+end
+
+function Calculator.toggle_preferences(player)
+    global[player.index].preferences_table.visible = not global[player.index].preferences_table.visible
 end
 
 function Calculator.calculate(player)

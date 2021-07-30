@@ -34,11 +34,11 @@ end)
 
 --Open/close calcualtors:
 script.on_event("hxrrc_toggle_calculator", function(event)
-    Calculator.toggle(game.get_player(event.player_index))
+    Calculator.toggle_calculator(game.get_player(event.player_index))
 end)
 script.on_event(defines.events.on_gui_closed, function(event)
     if event.element and event.element.name == "hxrrc_calculator" and event.element.visible then
-        Calculator.toggle(game.get_player(event.player_index))
+        Calculator.toggle_calculator(game.get_player(event.player_index))
     end
 end)
 
@@ -47,5 +47,7 @@ script.on_event(defines.events.on_gui_click, function(event)
     if event.element.name == "hxrrc_confirmation_button" then
         --Attempt to do the calculation:
         Calculator.calculate(game.get_player(event.player_index))
+    elseif event.element.name == "hxrrc_preferences_toggle_button" then
+        Calculator.toggle_preferences(game.get_player(event.player_index))
     end
 end)
