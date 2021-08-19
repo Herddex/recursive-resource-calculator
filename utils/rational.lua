@@ -1,6 +1,8 @@
---a Lua module for pozitive rational numbers
+--a Lua module for rational numbers
 
 local function gcd(a, b)
+    if a < 0 then a = -a end
+    if b < 0 then b = -b end
     while b ~= 0 do
         local c = a
         a = b
@@ -38,16 +40,26 @@ rational_metatable.__mul = function(a, b)
 end
 
 rational_metatable.__div = function(a, b)
-    return new_rational(a.numerator * b.denominator, a.denominator * b.numerator)
+    local numerator = a.numerator * b.denominator
+    local denominator = a.denominator * b.numerator
+    if denominator < 0 then
+        numerator = -numerator
+        denominator = -denominator
+    end
+    return new_rational(numerator, denominator)
 end
 
---Attempts to parse the given division string ("integer/integer") and build a rational number out of it. If succesful, the number is returned. Otherwise, nil is returned
-local function from_division_string(division)
-    local slash_position = string.find(division, "/", 1, true)
+rational_metatable.__unm = function(a)
+    return new_rational(-a.numerator, a.denominator)
+end
+
+--Attempts to parse the given division_string ("integer/integer") and build a rational number out of it. If succesful, the number is returned. Otherwise, nil is returned
+local function from_division_string(division_string)
+    local slash_position = string.find(division_string, "/", 1, true)
     if not slash_position then return nil end
 
-    local numerator = tonumber(string.sub(division, 1, slash_position - 1))
-    local denominator = tonumber(string.sub(division, slash_position + 1))
+    local numerator = tonumber(string.sub(division_string, 1, slash_position - 1))
+    local denominator = tonumber(string.sub(division_string, slash_position + 1))
     if not numerator or not denominator or numerator <= 0 or denominator <= 0 then return nil end
 
     return new_rational(numerator, denominator)
@@ -89,6 +101,8 @@ local function to_decimal_string(rational)
 
     if denominator == 1 then
         local numerator = rational.numerator
+        if numerator < 0 then numerator = -numerator end
+
         local power_of_10 = power_of_2 --assume the two powers are equal for now
 
         --Compute the correct power if they are actually different
@@ -106,29 +120,42 @@ local function to_decimal_string(rational)
         local remainder = math.fmod(numerator, p)
         local integer_part = (numerator - remainder) / p
         
-        return integer_part .. "." .. string.format("%0" .. power_of_10 .. "d", remainder)
+        return (rational.numerator < 0 and "-" or "") .. integer_part .. "." .. string.format("%0" .. power_of_10 .. "d", remainder)
     end
 end
 
 Rational = {}
 
---Attempts to build and return a rational number from parsing the given string. Accepted formats are integers (example: 5), integer ratios (example: 2/3), and finite decimal numbers (example: 1.6). On failure, nil is returned
-function Rational.from_string(format)
-    return from_integer(format) or from_decimal_string(format) or from_division_string(format)
+function Rational.reset_metatable(rational) --used for resetting the metatables of rational numbers (which are tables); Factorio does not save metatables from one game session to another, making this task necessary sometimes.
+    setmetatable(rational, rational_metatable)
 end
 
---Returns either the finite decimal representation, if possible, or the fraction representation ("integer/integer"), otherwise, of the given rational number. If the number happens to be an integer, then it's returned directly as such, with no fractional part. If the input is not a rational number, nil is returned
+--Attempts to build and return a rational number from parsing the given string. Accepted formats are integers (example: 5), integer ratios (example: 2/3), and finite decimal numbers (example: 1.6). Optionally, a "-" sign is also accepted in front of all these formats. On failure, nil is returned
+function Rational.from_string(rational_number_string)
+    local negative = rational_number_string[1] == '-'
+    if negative then rational_number_string = string.sub(rational_number_string, 2) end
+
+    local rational = from_integer(rational_number_string) or from_decimal_string(rational_number_string) or from_division_string(rational_number_string)
+
+    if rational and negative then
+        rational.numerator = -rational.numerator
+    end
+
+    return rational
+end
+
+--Returns either the finite decimal representation, if possible, or the fraction representation ("integer/integer"), otherwise, of the given rational number. If the number happens to be an integer, then it's returned directly as such, with no fractional part.
 function Rational.to_string(rational)
-    local numerator = tostring(rational.numerator)
-    if rational.denominator == 1 then return numerator end
+    local numerator_string = tostring(rational.numerator)
+    if rational.denominator == 1 then return numerator_string end
 
     local possible_decimal_representation = to_decimal_string(rational)
-    if possible_decimal_representation and type(possible_decimal_representation) == "string" then
+    if possible_decimal_representation then
         return possible_decimal_representation
     end
 
-    local denominator = tostring(rational.denominator)
-    return numerator .. "/" .. denominator
+    local denominator_string = tostring(rational.denominator)
+    return numerator_string .. "/" .. denominator_string
 end
 
 --Returns the Lua number approximation of the rational number

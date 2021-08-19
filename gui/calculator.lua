@@ -1,156 +1,152 @@
-local Decomposer = require "logic/decomposer"
-local Rational = require "utils/rational"
-local Report = require "report"
-local Set = require "utils/set"
-local TopoSort = require "logic/topo_sort"
-
+local Sheet = require "sheet"
+local Totals = require "totals"
 local Calculator = {}
 
-local function build_preferances_section(parent)
-    local preferences_table = parent.add{type = "table", column_count = 2}
-
-    local crafting_machine_buttons = {} --a dictionary mapping crafting categories to the choose elem buttons that specify which machine should be used for that crafting category
-    local crafting_machines_for_category = global.crafting_machines_for_category
-    for category, crafting_machines_list in pairs(crafting_machines_for_category) do
-        if #crafting_machines_list > 1 then --no sense displaying a button for categories with only one choice
-            local button = preferences_table.add{
-                type = "choose-elem-button",
-                elem_type = "entity",
-                entity = global.saved_crafting_machine_names and global.saved_crafting_machine_names[category] and game.entity_prototypes[global.saved_crafting_machine_names[category]] and global.saved_crafting_machine_names[category] or crafting_machines_for_category[category][1].name, --if we had a saved crafting machine preference for this category in the previous configuration and this crafting machine still exists, then continue to use this preferance; otherwise, just pick a default one (the first one found in the current configuration of the game)
-                elem_filters = {{filter = "crafting-category", crafting_category = category}}
-            }
-            crafting_machine_buttons[category] = button
-            preferences_table.add{type = "label", caption = category}
-        end
+local function initialize_crafting_machine_preferences(player_index)
+    local crafting_machine_preferences = {}
+    for category, crafting_machine_prototype_list in pairs(global.crafting_machines_by_category) do
+        crafting_machine_preferences[category] = crafting_machine_prototype_list[1]       
     end
-    global[preferences_table.player_index].crafting_machine_buttons = crafting_machine_buttons
-    global[preferences_table.player_index].preferences_table = preferences_table
-    preferences_table.visible = false
+    global[player_index].crafting_machine_preferences = crafting_machine_preferences
+end
+
+local function initialize_recipe_preferences(player_index)
+    local recipe_preferences = {}
+    for item_or_fluid_full_name, recipe_prototype_list in pairs(global.recipes) do
+        recipe_preferences[item_or_fluid_full_name] = recipe_prototype_list[1]
+    end
+    global[player_index].recipe_preferences = recipe_preferences
 end
 
 function Calculator.build(player)
+    global[player.index] = {}
+    
     --Main frame:
-    local main_frame = player.gui.screen.add{
+    initialize_crafting_machine_preferences(player.index)
+    initialize_recipe_preferences(player.index)
+    local calculator = player.gui.screen.add{
         type = "frame",
         name = "hxrrc_calculator",
-        direction = "vertical",
-        caption = {"hxrrc.main_window_title"},
+        caption = {"hxrrc.calculator_title"},
         visible = false,
     }
-    main_frame.auto_center = true
-    main_frame.style.maximal_height = 950
+    global[player.index].calculator = calculator
+    calculator.auto_center = true
+    calculator.style.maximal_height = 800
+    calculator.style.maximal_width = 1700
+    local main_scroll_area = calculator.add{type = "scroll-pane", direction = "horizontal", name = "main_scroll_area"}
+    local main_scroll_area_flow = main_scroll_area.add{type = "flow", direction = "horizontal", name = "main_scroll_area_flow"}
 
-    --Controls section:
-    local controls_flow = main_frame.add{type = "flow"}
-    local preferences_toggle_button = controls_flow.add {
+    --Sheet section:
+    local sheet_section = main_scroll_area_flow.add{type = "flow", direction = "vertical", name = "sheet_section"}
+    global[player.index].sheet_section = sheet_section
+    sheet_section.style.horizontally_stretchable = true
+    --Sheet addition, removal and totals section switching buttons: 
+    local sheet_buttons_flow = sheet_section.add{type = "flow"}
+    sheet_buttons_flow.style.horizontal_align = "right"
+    sheet_buttons_flow.style.horizontally_stretchable = true
+    sheet_buttons_flow.add{
         type = "button",
-        name = "hxrrc_preferences_toggle_button",
-        caption = {"hxrrc.preferences"},
-        tooltip = {"hxrrc.toggle_preferences"},
+        name = "hxrrc_switch_sections_button",
+        caption = {"hxrrc.totals"},
+        tooltip = {"hxrrc.switch_to_totals_section"},
     }
-
-    local main_flow = main_frame.add{type = "flow"}
-
-    --Preferences section:
-    build_preferances_section(main_flow)
-
-    --Tabbed pane:
-    local tabbed_pane = main_flow.add{type = "tabbed-pane"}
-    local compute_tab = tabbed_pane.add{type = "tab", caption = "Calculator"}
-    local compute_flow = tabbed_pane.add{type = "flow", direction = "vertical"}
-    tabbed_pane.add_tab(compute_tab, compute_flow)
-
-    --Input section:
-    local input_flow = compute_flow.add{type = "flow", direction = "horizontal"}
-    input_flow.style.vertical_align = "center"
-
-    local input_textfield = input_flow.add{
-        type = "textfield",
-        tooltip = {"hxrrc.production_rate_input_tooltip"},
-        lose_focus_on_confirm = true,
-        clear_and_focus_on_right_click = true,
-    }
-    input_flow.add{
-        type = "label",
-        caption = "/s",
-    }
-    local choose_item_button = input_flow.add {
-        type = "choose-elem-button",
-        tooltip = {"hxrrc.item_input_tooltip"},
-        elem_type = "item",
-    }
-    local confirmation_button = input_flow.add {
+    local new_sheet_button = sheet_buttons_flow.add{
         type = "button",
-        name = "hxrrc_confirmation_button",
-        caption = {"hxrrc.confirmation_button"},
+        name = "hxrrc_new_sheet_button",
+        caption = {"hxrrc.new_sheet"},
+        tooltip = {"hxrrc.add_new_sheet"},
     }
+    local delete_sheet_button = sheet_buttons_flow.add{
+        type = "button",
+        name = "hxrrc_delete_sheet_button",
+        caption = {"hxrrc.delete_sheet"},
+        tooltip = {"hxrrc.delete_selected_sheet"},
+    }
+    --Sheet pane and first sheet:
+    local sheet_pane = sheet_section.add{type = "tabbed-pane", name = "sheet_pane"}
+    Sheet.new(sheet_pane)
+    sheet_pane.selected_tab_index = 1    
 
-    --Output section:
-    local scroll_pane = compute_flow.add{type = "scroll-pane"}
-    local output_flow = scroll_pane.add{type = "flow", direction = "horizontal"}
-    output_flow.style.horizontally_stretchable = true
-    output_flow.style.vertically_stretchable = true
-
-    --Store the widgets to which we will use references later:
-    global[player.index].textfield = input_textfield
-    global[player.index].item_button = choose_item_button
-    global[player.index].output_flow = output_flow
+    --Totals section:
+    local totals_section = Totals.new(main_scroll_area_flow)
+    global[player.index].totals_section = totals_section
+    totals_section.visible = false
+    
+    local totals_main_flow = totals_section.add{type = "flow", direction = "vertical"}
+    totals_main_flow.add{
+        type = "button",
+        name = "hxrrc_switch_sections_button",
+        caption = {"hxrrc.sheets"},
+        tooltip = {"hxrrc.switch_to_sheets_section"},
+    }
+    global[player.index].totals_table_flow = totals_main_flow.add{type = "flow"}
+    global[player.index].total_production_rates = {}
 end
 
 function Calculator.destroy(player)
-    local saved_crafting_machine_names = {} --a dictionary mapping previously existing crafting categories to their previously existing preffered crafting machine name
-    for category, button in pairs(global[player.index].crafting_machine_buttons) do
-        saved_crafting_machine_names[category] = button.elem_value
-    end
-    global.saved_crafting_machine_names = saved_crafting_machine_names
+    global[player.index] = nil
     player.gui.screen.hxrrc_calculator.destroy()
 end
 
-function Calculator.toggle_calculator(player)
+function Calculator.toggle(player)
     local calculator = player.gui.screen.hxrrc_calculator
     calculator.visible = not calculator.visible
     player.opened = calculator.visible and calculator or nil
 end
 
-function Calculator.toggle_preferences(player)
-    global[player.index].preferences_table.visible = not global[player.index].preferences_table.visible
+function Calculator.switch_sections(player_index)
+    global[player_index].totals_section.visible = not global[player_index].totals_section.visible
+    global[player_index].sheet_section.visible = not global[player_index].sheet_section.visible
 end
 
-function Calculator.calculate(player)
-    local production_rate = Rational.from_string(global[player.index].textfield.text)
-    local item_name = global[player.index].item_button.elem_value
-    
-    --Handle incorrect input:
-    error_message = {""}
-    if production_rate == nil then
-        error_message[#error_message + 1] = {"hxrrc.invalid_production_rate_error"}
+function Calculator.on_gui_click(event)
+    if event.element.name == "hxrrc_compute_button" then
+        Sheet.calculate(event.element)
+        global[event.player_index].calculator.force_auto_center()
+    elseif event.element.name == "hxrrc_switch_sections_button" then
+        Calculator.switch_sections(event.player_index)
+    elseif event.element.name == "hxrrc_new_sheet_button" then
+        Sheet.new(event.element.parent.parent.sheet_pane)
+        global[event.player_index].calculator.force_auto_center()
+    elseif event.element.name == "hxrrc_delete_sheet_button" then
+        Sheet.delete_selected_sheet(event.element.parent.parent.sheet_pane)
+        global[event.player_index].calculator.force_auto_center()
     end
-    if item_name == nil then
-        error_message[#error_message + 1] = {"hxrrc.item_not_chosen_error"}
-    end
+end
 
-    if #error_message > 1 then
-        --Invalid request
-        player.create_local_flying_text{text = error_message, create_at_cursor = true}
-    else
-        --Fulfill request
-        local output_flow = global[player.index].output_flow
-        output_flow.clear()
-
-        local total_production_rates = {}
-        local inbound_dependencies = {}
-        local outbound_dependencies = {}
-        local full_prototype_name = "item/" .. item_name
-        inbound_dependencies[full_prototype_name] = Set.new()
-        outbound_dependencies[full_prototype_name] = Set.new()
-        
-        Decomposer.decompose(production_rate, full_prototype_name, total_production_rates, inbound_dependencies, outbound_dependencies)
-
-        local list = TopoSort.topo_sort(inbound_dependencies, outbound_dependencies)
-        Report.new(output_flow, list, total_production_rates)
+--Will bind all categories that the new crafting machine operates with to the new crafting machine and update all the gui data accordingly
+local function update_crafting_machines(player_index, name_of_new_crafting_machine)
+    local crafting_machine_prototype = game.entity_prototypes[name_of_new_crafting_machine]
+    for category, _ in pairs(crafting_machine_prototype.crafting_categories) do
+        global[player_index].crafting_machine_preferences[category] = crafting_machine_prototype
     end
 
-    player.gui.screen.hxrrc_calculator.force_auto_center()
+    for _, sheet_and_flow in ipairs(game.get_player(player_index).gui.screen.hxrrc_calculator.main_scroll_area.main_scroll_area_flow.sheet_section.sheet_pane.tabs) do
+        Sheet.update_crafting_machines(sheet_and_flow.content)
+    end
+    Totals.update_crafting_machines(global[player_index].totals_table_flow)
+end
+
+function Calculator.on_gui_elem_changed(event)
+    if event.element.name == "hxrrc_choose_crafting_machine_button" then
+        local new_value = event.element.elem_value
+        local category = event.element.elem_filters[1].crafting_category
+        event.element.elem_value = global[event.player_index].crafting_machine_preferences[category].name --reset the button to its previous value for now, in order not to mess with updating later and to also prevent it from being emptied
+
+        if not new_value then
+            game.get_player(event.player_index).create_local_flying_text{text = {"hxrrc.cannot_empty_a_choose_crafting_machine_button_error"}, create_at_cursor = true}
+        elseif new_value ~= event.element.elem_value then --if the value has truly changed
+            update_crafting_machines(event.player_index, new_value)
+        end
+    elseif event.element.name == "hxrrc_choose_recipe_button" then
+        --Update the recipe preference:
+        global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
+        local sheet_pane = global[event.player_index].sheet_section.sheet_pane
+        for sheet_index, _ in ipairs(sheet_pane.tabs) do
+            Sheet.calculate(nil, sheet_pane, sheet_index)
+        end
+    end
 end
 
 return Calculator
