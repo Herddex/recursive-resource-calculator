@@ -1,7 +1,8 @@
 local Rational = require "utils/rational"
+local ModuleGUI = require "modulegui"
 local Decomposer = require "logic/decomposer"
 
-Report = {}
+local Report = {}
 
 local function set_machine_amount_for_label(label, machine_amount)
     local rational_string = Rational.to_string(machine_amount)
@@ -10,23 +11,26 @@ local function set_machine_amount_for_label(label, machine_amount)
     label.tags = {amount = rational_string}
 end
 
---Receives an ordered topologically sorted list of items, as well as a dictionary mapping each said item to a production rate, to build the final intermediate items' production rates report
+local function add_header(report, caption)
+    local header = report.add{type = "flow"}
+    header.style.horizontally_stretchable = true
+    header.style.horizontal_align = "center"
+    local label = header.add{type = "label", caption = caption}
+    label.style.right_padding = 4
+end
+
+--Receives a dictionary mapping each item/fluid to a production rate, to build the final intermediate items' production rates report
 function Report.new(parent, production_rates)
-    local report = parent.add{type = "table", name = "report", column_count = 3, draw_horizontal_lines = true, draw_vertical_lines = true}
+    local report = parent.add{type = "table", name = "report", column_count = 4, draw_horizontal_lines = true, draw_vertical_lines = true}
 
     --Headers:
-    report.add{
-        type = "label",
-        caption = {"hxrrc.production_rates_table_header"}
-    }
-    report.add{
-        type = "label",
-        caption = {"hxrrc.machine_counts_table_header"},
-    }
-    report.add{
-        type = "label",
-        caption = {"hxrrc.recipes_used_table_header"},
-    }
+    for _, caption in ipairs({
+        {"hxrrc.production_rates_table_header"},
+        {"hxrrc.machine_counts_table_header"},
+        {"hxrrc.modules"},
+        {"hxrrc.recipes_used_table_header"}}) do
+            add_header(report, caption) 
+    end
 
     for item_or_fluid_full_name, production_rate in pairs(production_rates) do
         --Item/fluid and its production rate cell:
@@ -44,11 +48,13 @@ function Report.new(parent, production_rates)
         local recipes = global.recipes[item_or_fluid_full_name]
         local recipe = global[report.player_index].recipe_preferences[item_or_fluid_full_name]
         if recipes then
-            --Crafting machine cell:
+            --Crafting machine and module cells:
             if production_rate.numerator < 0 then
-                report.add{type = "label", caption = {"hxrrc.byproduct"}} --byproduct that has to be pulled out of the system, no sense conveying how to make more of it trough crafting machines.
-            elseif not recipe then --the item is not a byproduct, but the player has no recipe selected, so no crafting machines can be shown
+                report.add{type = "label", caption = {"hxrrc.byproduct"}} --byproduct that has to be pulled out of the system
+                report.add{type = "empty-widget"}
+            elseif not recipe then --the item is not a byproduct, but the player has no recipe selected
                 report.add{type = "label", caption = {"hxrrc.unselected_recipe"}}
+                report.add{type = "empty-widget"}
             else --the player has a recipe selected and the item/fluid has a positive production rate, so a crafting machine cell will be placed
                 local machine_cell = report.add{type = "flow"}
                 machine_cell.style.horizontally_stretchable = true
@@ -70,6 +76,9 @@ function Report.new(parent, production_rates)
                 local machine_amount = Decomposer.machine_amount(item_or_fluid_full_name, production_rate, crafting_machine, report.player_index)
                 local label = machine_cell.add{type = "label", name = "label"}
                 set_machine_amount_for_label(label, machine_amount)
+
+                --Module cell:
+                ModuleGUI.new(report, recipe.name)
             end
 
             --Recipe cell:
@@ -95,7 +104,8 @@ function Report.new(parent, production_rates)
             }
         else
             report.add{type = "label", caption = {"hxrrc.raw_resource"}}
-            report.add{type = "label", caption = {"hxrrc.raw_resource"}}
+            report.add{type = "empty-widget"}
+            report.add{type = "empty-widget"}
         end
     end
 end
@@ -108,7 +118,7 @@ end
 function Report.update_crafting_machines(report)
     local entity_prototypes = game.entity_prototypes
     local cell_array = report.children
-    for i = 5, #cell_array, 3 do
+    for i = 6, #cell_array, 4 do
         local machine_cell = cell_array[i]
         if machine_cell.type == "flow" then
             local machine_button = machine_cell.hxrrc_choose_crafting_machine_button

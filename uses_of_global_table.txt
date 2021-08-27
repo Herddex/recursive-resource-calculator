@@ -1,14 +1,15 @@
-Created in Cacher.cache_recipes_and_dependencies():
+Cacher.cache_recipes():
     global.recipes - dictionary of ItemOrFluidFullName (eg. "item/iron-plate" or "fluid/petroleum-gas") to array[LuaRecipePrototype], the list of all recipes that have that item or fluid as a product.
+
+Cacher.cache_crafting_machines():
+    global.crafting_machines_by_category - dictionary of string (valid crafting category) to array[LuaEntityPrototype] (all the crafting machines that operate on that category)
+
+Initializer.initialize():
+    global[player_index].crafting_machine_preferences - dictionary of string (valid crafting category) to LuaEntityPrototype (the chosen crafting machine for that category);
     
-    global.inbound_dependencies - ...
+    global[player_index].recipe_preferences - dictionary of ItemOrFluidFullName to LuaRecipePrototype, the recipe of choice for the item/fluid with that name;
     
-    global.outbound_dependencies - ...
+    global[player_index].module_preferences_by_recipe_name - a sort of array that stores the names of the chosen modules on positive indexes (1, 2, 3, and so on), the same order as they are shown in the respective gui, and stores their respective counts on negative indexes (-1 for the first module, -2 for the second, and so on);
 
-Created in Cacher.cache_crafting_machines():
-    global.crafting_machines_by_category - ...
-
-global[player_index].recipe_preferences - dictionary of ItemOrFluidFullName to LuaRecipePrototype, the recipe of choice of the given player for the item/fluid with that name
-
-Created in Calculator.build():
+Calculator.build():
     global[player_index].sheet_section - the sheet section of the calculator belonging to the player; it has the "sheet_button_flow" flow and the "sheet_pane" tabbed pane as children in this order

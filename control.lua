@@ -24,7 +24,6 @@ script.on_event(defines.events.on_player_removed, function(event)
 end)
 script.on_event("hxrrc_reset_calculator", function(event)
     Calculator.destroy(game.get_player(event.player_index))
-    Cacher.cache()
     Calculator.build(game.get_player(event.player_index))
 end)
 
@@ -40,3 +39,4 @@ end)
 
 script.on_event(defines.events.on_gui_click, Calculator.on_gui_click)
 script.on_event(defines.events.on_gui_elem_changed, Calculator.on_gui_elem_changed)
+script.on_event(defines.events.on_gui_confirmed, Calculator.on_gui_confirmed)

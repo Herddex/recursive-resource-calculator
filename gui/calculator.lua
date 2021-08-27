@@ -1,29 +1,13 @@
 local Sheet = require "sheet"
 local Totals = require "totals"
+local ModuleGUI = require "modulegui"
+local Initializer = require "logic/initializer"
 local Calculator = {}
 
-local function initialize_crafting_machine_preferences(player_index)
-    local crafting_machine_preferences = {}
-    for category, crafting_machine_prototype_list in pairs(global.crafting_machines_by_category) do
-        crafting_machine_preferences[category] = crafting_machine_prototype_list[1]       
-    end
-    global[player_index].crafting_machine_preferences = crafting_machine_preferences
-end
-
-local function initialize_recipe_preferences(player_index)
-    local recipe_preferences = {}
-    for item_or_fluid_full_name, recipe_prototype_list in pairs(global.recipes) do
-        recipe_preferences[item_or_fluid_full_name] = recipe_prototype_list[1]
-    end
-    global[player_index].recipe_preferences = recipe_preferences
-end
-
 function Calculator.build(player)
-    global[player.index] = {}
-    
+    Initializer.initialize_player_data(player.index)
+
     --Main frame:
-    initialize_crafting_machine_preferences(player.index)
-    initialize_recipe_preferences(player.index)
     local calculator = player.gui.screen.add{
         type = "frame",
         name = "hxrrc_calculator",
@@ -115,7 +99,7 @@ function Calculator.on_gui_click(event)
     end
 end
 
---Will bind all categories that the new crafting machine operates with to the new crafting machine and update all the gui data accordingly
+--Will associate all categories that the new crafting machine belongs to to the new crafting machine and update all the gui data accordingly
 local function update_crafting_machines(player_index, name_of_new_crafting_machine)
     local crafting_machine_prototype = game.entity_prototypes[name_of_new_crafting_machine]
     for category, _ in pairs(crafting_machine_prototype.crafting_categories) do
@@ -128,8 +112,22 @@ local function update_crafting_machines(player_index, name_of_new_crafting_machi
     Totals.update_crafting_machines(global[player_index].totals_table_flow)
 end
 
+local function recompute_everything(player_index)
+    local profiler = game.create_profiler()
+    local sheet_pane = global[player_index].sheet_section.sheet_pane
+    for sheet_index, _ in ipairs(sheet_pane.tabs) do
+        Sheet.calculate(nil, sheet_pane, sheet_index)
+    end
+    profiler.stop()
+    game.print({"", "Recomputation took ", profiler})
+end
+
 function Calculator.on_gui_elem_changed(event)
-    if event.element.name == "hxrrc_choose_crafting_machine_button" then
+    if event.element.name == "hxrrc_choose_recipe_button" then
+        --Update the recipe preference:
+        global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
+        recompute_everything(event.player_index)
+    elseif event.element.name == "hxrrc_choose_crafting_machine_button" then
         local new_value = event.element.elem_value
         local category = event.element.elem_filters[1].crafting_category
         event.element.elem_value = global[event.player_index].crafting_machine_preferences[category].name --reset the button to its previous value for now, in order not to mess with updating later and to also prevent it from being emptied
@@ -139,13 +137,16 @@ function Calculator.on_gui_elem_changed(event)
         elseif new_value ~= event.element.elem_value then --if the value has truly changed
             update_crafting_machines(event.player_index, new_value)
         end
-    elseif event.element.name == "hxrrc_choose_recipe_button" then
-        --Update the recipe preference:
-        global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
-        local sheet_pane = global[event.player_index].sheet_section.sheet_pane
-        for sheet_index, _ in ipairs(sheet_pane.tabs) do
-            Sheet.calculate(nil, sheet_pane, sheet_index)
-        end
+    elseif event.element.tags.is_hxrrc_choose_module_button then
+        ModuleGUI.on_gui_elem_changed(event)
+        recompute_everything(event.player_index)
+    end
+end
+
+function Calculator.on_gui_confirmed(event)
+    if event.element.tags.is_hxrrc_module_count_textfield then
+        ModuleGUI.on_gui_confirmed(event)
+        recompute_everything(event.player_index)
     end
 end
 
