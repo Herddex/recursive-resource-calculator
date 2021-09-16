@@ -1,10 +1,9 @@
 local Calculator = require "gui/calculator"
-local Rational = require "utils/rational"
 local Cacher = require "logic/cacher"
 
---Create/Destroy calucators:
 script.on_init(function()
     Cacher.cache()
+    global.computation_stack = {}
     for _, player in pairs(game.players) do
         Calculator.build(player)
     end
@@ -26,8 +25,6 @@ script.on_event("hxrrc_reset_calculator", function(event)
     Calculator.destroy(game.get_player(event.player_index))
     Calculator.build(game.get_player(event.player_index))
 end)
-
---Open/close calculator:
 script.on_event("hxrrc_toggle_calculator", function(event)
     Calculator.toggle(game.get_player(event.player_index))
 end)
@@ -40,3 +37,4 @@ end)
 script.on_event(defines.events.on_gui_click, Calculator.on_gui_click)
 script.on_event(defines.events.on_gui_elem_changed, Calculator.on_gui_elem_changed)
 script.on_event(defines.events.on_gui_confirmed, Calculator.on_gui_confirmed)
+script.on_event(defines.events.on_tick, Calculator.on_tick)

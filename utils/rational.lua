@@ -53,6 +53,20 @@ rational_metatable.__unm = function(a)
     return new_rational(-a.numerator, a.denominator)
 end
 
+rational_metatable.__le = function(a, b)
+    local common_denominator = a.denominator * b.denominator / gcd(a.denominator, b.denominator)
+    return common_denominator / a.denominator * a.numerator <= common_denominator / b.denominator * b.numerator
+end
+
+rational_metatable.__lt = function(a, b)
+    local common_denominator = a.denominator * b.denominator / gcd(a.denominator, b.denominator)
+    return common_denominator / a.denominator * a.numerator < common_denominator / b.denominator * b.numerator
+end
+
+rational_metatable.__eq = function(a, b)
+    return a.denominator == b.denominator and a.numerator == b.numerator
+end
+
 --Attempts to parse the given division_string ("integer/integer") and build a rational number out of it. If succesful, the number is returned. Otherwise, nil is returned
 local function from_division_string(division_string)
     local slash_position = string.find(division_string, "/", 1, true)
@@ -60,7 +74,7 @@ local function from_division_string(division_string)
 
     local numerator = tonumber(string.sub(division_string, 1, slash_position - 1))
     local denominator = tonumber(string.sub(division_string, slash_position + 1))
-    if not numerator or not denominator or numerator <= 0 or denominator <= 0 then return nil end
+    if not numerator or not denominator then return nil end
 
     return new_rational(numerator, denominator)
 end
@@ -72,7 +86,7 @@ local function from_decimal_string(decimal)
 
     local fractional_part_length = string.len(decimal) - dot_position
     local numerator = tonumber(string.sub(decimal, 1, dot_position - 1) .. string.sub(decimal, dot_position + 1))
-    if not numerator or numerator <= 0 then return nil end
+    if not numerator then return nil end
 
     return new_rational(numerator, 10 ^ fractional_part_length)
 end
@@ -80,7 +94,7 @@ end
 --Builds and returns a rational number from the given integer number. If the input was not an integer, nil is returned instead
 local function from_integer(format)
     local number = tonumber(format)
-    if not number or math.floor(number) ~= number or number <= 0 then return nil end
+    if not number or math.floor(number) ~= number then return nil end
     return new_rational(number, 1)
 end
 
@@ -162,5 +176,15 @@ end
 function Rational.numerical_approximation(rational)
     return rational.numerator / rational.denominator
 end
+
+function Rational.from_double(double)
+    return Rational.from_string(tostring(double))
+end
+
+function Rational.from_double_with_two_decimals_precision(double)
+    return Rational.from_string(string.format("%.2f", double))
+end
+
+Rational.module_multiplyer_minimum_value = new_rational(1, 5)
 
 return Rational

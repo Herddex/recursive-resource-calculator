@@ -3,6 +3,7 @@
         "global",
         "game",
         "script",
-        "defines"
+        "defines",
+        "data"
     ]
 }

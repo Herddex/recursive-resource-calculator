@@ -1,7 +1,7 @@
 local Report = require "report"
 local Totals = require "totals"
-local Set = require "utils/set"
 local Rational = require "utils/rational"
+local Decomposer = require "logic/decomposer"
 
 local Sheet = {}
 
@@ -16,7 +16,7 @@ function Sheet.new(sheet_pane)
     local input_flow = sheet_flow.add{type = "flow", name = "input_flow", direction = "horizontal"}
     input_flow.style.vertical_align = "center"
 
-    local input_textfield = input_flow.add{
+    input_flow.add{
         type = "textfield",
         name = "hxrrc_input_textfield",
         tooltip = {"hxrrc.production_rate_input_tooltip"},
@@ -27,7 +27,7 @@ function Sheet.new(sheet_pane)
         type = "label",
         caption = "/s",
     }
-    local choose_item_button = input_flow.add{
+    input_flow.add{
         type = "choose-elem-button",
         name = "item_input_button",
         tooltip = {"hxrrc.item_input_tooltip"},
@@ -66,8 +66,6 @@ local function update_totals_table_after_change(sheet_flow, new_production_rates
             end
         end
     end
-
-    Totals.update(global[sheet_flow.player_index].totals_table_flow)
 end
 
 function Sheet.delete_selected_sheet(sheet_pane)

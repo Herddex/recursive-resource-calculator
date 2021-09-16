@@ -16,8 +16,6 @@ function Calculator.build(player)
     }
     global[player.index].calculator = calculator
     calculator.auto_center = true
-    calculator.style.maximal_height = 800
-    calculator.style.maximal_width = 1700
     local main_scroll_area = calculator.add{type = "scroll-pane", direction = "horizontal", name = "main_scroll_area"}
     local main_scroll_area_flow = main_scroll_area.add{type = "flow", direction = "horizontal", name = "main_scroll_area_flow"}
 
@@ -25,8 +23,8 @@ function Calculator.build(player)
     local sheet_section = main_scroll_area_flow.add{type = "flow", direction = "vertical", name = "sheet_section"}
     global[player.index].sheet_section = sheet_section
     sheet_section.style.horizontally_stretchable = true
-    --Sheet addition, removal and totals section switching buttons: 
-    local sheet_buttons_flow = sheet_section.add{type = "flow"}
+    --Sheet addition, removal and totals section switching buttons:
+    local sheet_buttons_flow = sheet_section.add{type = "flow", direction = "horizontal"}
     sheet_buttons_flow.style.horizontal_align = "right"
     sheet_buttons_flow.style.horizontally_stretchable = true
     sheet_buttons_flow.add{
@@ -35,13 +33,13 @@ function Calculator.build(player)
         caption = {"hxrrc.totals"},
         tooltip = {"hxrrc.switch_to_totals_section"},
     }
-    local new_sheet_button = sheet_buttons_flow.add{
+    sheet_buttons_flow.add{
         type = "button",
         name = "hxrrc_new_sheet_button",
         caption = {"hxrrc.new_sheet"},
         tooltip = {"hxrrc.add_new_sheet"},
     }
-    local delete_sheet_button = sheet_buttons_flow.add{
+    sheet_buttons_flow.add{
         type = "button",
         name = "hxrrc_delete_sheet_button",
         caption = {"hxrrc.delete_sheet"},
@@ -50,7 +48,7 @@ function Calculator.build(player)
     --Sheet pane and first sheet:
     local sheet_pane = sheet_section.add{type = "tabbed-pane", name = "sheet_pane"}
     Sheet.new(sheet_pane)
-    sheet_pane.selected_tab_index = 1    
+    sheet_pane.selected_tab_index = 1
 
     --Totals section:
     local totals_section = Totals.new(main_scroll_area_flow)
@@ -90,6 +88,9 @@ function Calculator.on_gui_click(event)
         global[event.player_index].calculator.force_auto_center()
     elseif event.element.name == "hxrrc_switch_sections_button" then
         Calculator.switch_sections(event.player_index)
+        if global[event.player_index].totals_section.visible then
+            Totals.update(global[event.player_index].totals_table_flow)
+        end
     elseif event.element.name == "hxrrc_new_sheet_button" then
         Sheet.new(event.element.parent.parent.sheet_pane)
         global[event.player_index].calculator.force_auto_center()
@@ -109,17 +110,19 @@ local function update_crafting_machines(player_index, name_of_new_crafting_machi
     for _, sheet_and_flow in ipairs(game.get_player(player_index).gui.screen.hxrrc_calculator.main_scroll_area.main_scroll_area_flow.sheet_section.sheet_pane.tabs) do
         Sheet.update_crafting_machines(sheet_and_flow.content)
     end
-    Totals.update_crafting_machines(global[player_index].totals_table_flow)
+    if global[player_index].totals_section.visible then
+        Totals.update_crafting_machines(global[player_index].totals_table_flow)
+    end
 end
 
 local function recompute_everything(player_index)
-    local profiler = game.create_profiler()
     local sheet_pane = global[player_index].sheet_section.sheet_pane
     for sheet_index, _ in ipairs(sheet_pane.tabs) do
-        Sheet.calculate(nil, sheet_pane, sheet_index)
+        global.computation_stack[#global.computation_stack+1] = {call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
     end
-    profiler.stop()
-    game.print({"", "Recomputation took ", profiler})
+    if global[player_index].totals_section.visible then
+        global.computation_stack[#global.computation_stack+1] = {call = Totals.update, parameters = {global[player_index].totals_table_flow}}
+    end
 end
 
 function Calculator.on_gui_elem_changed(event)
@@ -137,16 +140,23 @@ function Calculator.on_gui_elem_changed(event)
         elseif new_value ~= event.element.elem_value then --if the value has truly changed
             update_crafting_machines(event.player_index, new_value)
         end
-    elseif event.element.tags.is_hxrrc_choose_module_button then
+    elseif event.element.name == "hxrrc_choose_module_button" then
         ModuleGUI.on_gui_elem_changed(event)
         recompute_everything(event.player_index)
     end
 end
 
 function Calculator.on_gui_confirmed(event)
-    if event.element.tags.is_hxrrc_module_count_textfield then
+    if event.element.name == "hxrrc_module_count_textfield" then
         ModuleGUI.on_gui_confirmed(event)
         recompute_everything(event.player_index)
+    end
+end
+
+function Calculator.on_tick()
+    if #global.computation_stack > 0 then
+        local call_and_parameters = table.remove(global.computation_stack)
+        call_and_parameters.call(table.unpack(call_and_parameters.parameters))
     end
 end
 
