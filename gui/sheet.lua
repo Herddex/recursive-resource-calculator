@@ -101,11 +101,12 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         input_flow = sheet_flow.input_flow
     end
 
-    local production_rate = tonumber(input_flow.hxrrc_input_textfield.text) / 60
+    local production_rate = tonumber(input_flow.hxrrc_input_textfield.text)
     if not production_rate then
         game.get_player(sheet_flow.player_index).create_local_flying_text{text = {"hxrrc.invalid_production_rate_error"}, create_at_cursor = true}
         return
     end
+    production_rate = production_rate  / 60
     
     update_sheet_title(sheet_pane, sheet_index)
     local output_flow = input_flow.parent.output_flow
