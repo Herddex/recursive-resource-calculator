@@ -19,14 +19,14 @@ end
 local function initialize_module_preferences(player_index)
     local module_preferences_by_recipe_name = {}
     for recipe_name, _ in pairs(game.recipe_prototypes) do
-        module_preferences_by_recipe_name[recipe_name] = {}
-        module_preferences_by_recipe_name[recipe_name].effects = {consumption = {bonus = 0}, speed = {bonus = 0}, productivity = {bonus = 0}, pollution = {bonus = 0}}
+        module_preferences_by_recipe_name[recipe_name] = {effects = {consumption = {bonus = 0}, speed = {bonus = 0}, productivity = {bonus = 0}, pollution = {bonus = 0}}}
     end
     global[player_index].module_preferences_by_recipe_name = module_preferences_by_recipe_name
 end
 
 function Initializer.initialize_player_data(player_index)
     global[player_index] = {}
+    global[player_index].backlogged_computation_count = 0
     initialize_crafting_machine_preferences(player_index)
     initialize_recipe_preferences(player_index)
     initialize_module_preferences(player_index)

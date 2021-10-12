@@ -1,12 +1,9 @@
 local Sheet = require "sheet"
 local Totals = require "totals"
 local ModuleGUI = require "modulegui"
-local Initializer = require "logic/initializer"
 local Calculator = {}
 
 function Calculator.build(player)
-    Initializer.initialize_player_data(player.index)
-
     --Main frame:
     local calculator = player.gui.screen.add{
         type = "frame",
@@ -67,7 +64,6 @@ function Calculator.build(player)
 end
 
 function Calculator.destroy(player)
-    global[player.index] = nil
     player.gui.screen.hxrrc_calculator.destroy()
 end
 
@@ -100,36 +96,37 @@ function Calculator.on_gui_click(event)
     end
 end
 
+function Calculator.recompute_everything(player_index)
+    local sheet_pane = global[player_index].sheet_section.sheet_pane
+    
+    if global[player_index].totals_section.visible then
+        global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = Totals.update, parameters = {global[player_index].totals_table_flow}}
+        global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
+    end
+    
+    for sheet_index, _ in ipairs(sheet_pane.tabs) do
+        global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
+        global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
+    end
+    
+    global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = global[player_index].calculator.force_auto_center, parameters = {}}
+    global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
+end
+
 --Will associate all categories that the new crafting machine belongs to to the new crafting machine and update all the gui data accordingly
 local function update_crafting_machines(player_index, name_of_new_crafting_machine)
     local crafting_machine_prototype = game.entity_prototypes[name_of_new_crafting_machine]
     for category, _ in pairs(crafting_machine_prototype.crafting_categories) do
         global[player_index].crafting_machine_preferences[category] = crafting_machine_prototype
     end
-
-    for _, sheet_and_flow in ipairs(game.get_player(player_index).gui.screen.hxrrc_calculator.main_scroll_area.main_scroll_area_flow.sheet_section.sheet_pane.tabs) do
-        Sheet.update_crafting_machines(sheet_and_flow.content)
-    end
-    if global[player_index].totals_section.visible then
-        Totals.update_crafting_machines(global[player_index].totals_table_flow)
-    end
-end
-
-local function recompute_everything(player_index)
-    local sheet_pane = global[player_index].sheet_section.sheet_pane
-    for sheet_index, _ in ipairs(sheet_pane.tabs) do
-        global.computation_stack[#global.computation_stack+1] = {call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
-    end
-    if global[player_index].totals_section.visible then
-        global.computation_stack[#global.computation_stack+1] = {call = Totals.update, parameters = {global[player_index].totals_table_flow}}
-    end
+    Calculator.recompute_everything(player_index)
 end
 
 function Calculator.on_gui_elem_changed(event)
     if event.element.name == "hxrrc_choose_recipe_button" then
         --Update the recipe preference:
         global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
-        recompute_everything(event.player_index)
+        Calculator.recompute_everything(event.player_index)
     elseif event.element.name == "hxrrc_choose_crafting_machine_button" then
         local new_value = event.element.elem_value
         local category = event.element.elem_filters[1].crafting_category
@@ -142,14 +139,14 @@ function Calculator.on_gui_elem_changed(event)
         end
     elseif event.element.name == "hxrrc_choose_module_button" then
         ModuleGUI.on_gui_elem_changed(event)
-        recompute_everything(event.player_index)
+        Calculator.recompute_everything(event.player_index)
     end
 end
 
 function Calculator.on_gui_confirmed(event)
     if event.element.name == "hxrrc_module_count_textfield" then
         ModuleGUI.on_gui_confirmed(event)
-        recompute_everything(event.player_index)
+        Calculator.recompute_everything(event.player_index)
     end
 end
 
@@ -157,6 +154,8 @@ function Calculator.on_tick()
     if #global.computation_stack > 0 then
         local call_and_parameters = table.remove(global.computation_stack)
         call_and_parameters.call(table.unpack(call_and_parameters.parameters))
+        local player_index = call_and_parameters.player_index
+        game.get_player(player_index).gui.screen.hxrrc_calculator.enabled = global[player_index].backlogged_computation_count == 0
     end
 end
 

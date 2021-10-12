@@ -3,6 +3,7 @@ Cacher.cache_recipes():
 
 Cacher.cache_crafting_machines():
     global.crafting_machines_by_category - dictionary of string (valid crafting category) to array[LuaEntityPrototype] (all the crafting machines that operate on that category)
+    global.pollution_per_minute_of_crafting_machines - dictionary of LuaEntityPrototype (its keys are all the crafting machine prototypes in the game at the time of caching) to double (the base pollution per minute of that machine)
 
 Initializer.initialize():
     global[player_index].crafting_machine_preferences - dictionary of string (valid crafting category) to LuaEntityPrototype (the chosen crafting machine for that category);

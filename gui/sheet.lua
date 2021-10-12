@@ -1,6 +1,4 @@
 local Report = require "report"
-local Totals = require "totals"
-local Rational = require "utils/rational"
 local Decomposer = require "logic/decomposer"
 
 local Sheet = {}
@@ -20,12 +18,15 @@ function Sheet.new(sheet_pane)
         type = "textfield",
         name = "hxrrc_input_textfield",
         tooltip = {"hxrrc.production_rate_input_tooltip"},
+        numeric = true,
+        allow_decimal = true,
+        allow_negative = false,
         lose_focus_on_confirm = true,
         clear_and_focus_on_right_click = true,
     }
     input_flow.add{
         type = "label",
-        caption = "/s",
+        caption = "/m",
     }
     input_flow.add{
         type = "choose-elem-button",
@@ -49,17 +50,13 @@ local function update_totals_table_after_change(sheet_flow, new_production_rates
     local old_production_rates = sheet_flow.tags
     local total_production_rates = global[sheet_flow.player_index].total_production_rates
     for prototype_name, old_rate in pairs(old_production_rates) do
-        Rational.reset_metatable(old_rate)
-        Rational.reset_metatable(total_production_rates[prototype_name]) --since the rates (which are rational numbers which are tables) were possibly saved in a game save file, the metatables have to be reset before computations since Factorio does not save those.
-        
         total_production_rates[prototype_name] = total_production_rates[prototype_name] - old_rate
-        if total_production_rates[prototype_name].numerator == 0 then total_production_rates[prototype_name] = nil end --delete the item/fluid entirely if it's associated production rate becomes 0
+        if math.abs(total_production_rates[prototype_name]) < 0.0000001 then total_production_rates[prototype_name] = nil end --delete the item/fluid entirely if it's associated production rate becomes 0
     end
 
     if new_production_rates then -- if there is even new data to speak of
         for prototype_name, new_rate in pairs(new_production_rates) do
             if total_production_rates[prototype_name] then
-                Rational.reset_metatable(total_production_rates[prototype_name]) --reset the metatables again for the total production rates, in case they contain an item/fluid that wasn't accounted for in the previous loop; new_production_rates doens't need this step because it was created in the current game session anyway;
                 total_production_rates[prototype_name] = total_production_rates[prototype_name] + new_rate --add the new rate to the running count
             else
                 total_production_rates[prototype_name] = new_rate
@@ -104,7 +101,7 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         input_flow = sheet_flow.input_flow
     end
 
-    local production_rate = Rational.from_string(input_flow.hxrrc_input_textfield.text)
+    local production_rate = tonumber(input_flow.hxrrc_input_textfield.text) / 60
     if not production_rate then
         game.get_player(sheet_flow.player_index).create_local_flying_text{text = {"hxrrc.invalid_production_rate_error"}, create_at_cursor = true}
         return
@@ -128,12 +125,6 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
     else --No item selected, so the sheet should be cleared
         update_totals_table_after_change(sheet_flow)
         sheet_flow.tags = {}
-    end
-end
-
-function Sheet.update_crafting_machines(sheet_flow)
-    if sheet_flow.output_flow.report then
-        Report.update_crafting_machines(sheet_flow.output_flow.report)
     end
 end
 

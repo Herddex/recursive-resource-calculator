@@ -39,26 +39,40 @@ local function add_module_data(main_module_flow)
     local label_flow = main_module_flow.add{type = "flow", direction = "vertical"}
     local module_preferences = global[main_module_flow.player_index].module_preferences_by_recipe_name[main_module_flow.tags.recipe_name]
     for _, effect in ipairs{"consumption", "speed", "productivity", "pollution"} do
-        label_flow.add{type = "label", caption = effect .. ": " .. string.format("%.0f", module_preferences.effects[effect].bonus * 100) .. "%"}
+        local bonus = module_preferences.effects[effect].bonus
+        if math.abs(bonus) >= 0.01 then
+            label_flow.add{type = "label", caption = {"", {"hxrrc." .. effect}, ": ", string.format("%+.0f", (bonus > -0.8 and bonus or -0.8) * 100) .. "%"}}
+        end
     end
 end
 
-function ModuleGUI.new(parent, recipe_name)
-    local main_module_flow = parent.add{type = "flow", direction = "horizontal"}
-    main_module_flow.tags = {recipe_name = recipe_name}
+function ModuleGUI.new(parent, recipe_name, allowed_effects)
+    if allowed_effects then
+        local an_allowed_effect = false
+        for _, value in pairs(allowed_effects) do
+            if(value) then an_allowed_effect = true end
+        end
+        if an_allowed_effect then
+            local main_module_flow = parent.add{type = "flow", direction = "horizontal"}
+            main_module_flow.tags = {recipe_name = recipe_name}
 
-    local module_gui = main_module_flow.add{type = "flow", direction = "horizontal"}
-    module_gui.tags = {recipe_name = recipe_name}
-    module_gui.style.horizontally_stretchable = true
-    module_gui.style.right_padding = 4
+            local module_gui = main_module_flow.add{type = "flow", direction = "horizontal"}
+            module_gui.tags = {recipe_name = recipe_name}
+            module_gui.style.right_padding = 4
 
-    local modules = global[module_gui.player_index].module_preferences_by_recipe_name[recipe_name]
-    for index, module_name in ipairs(modules) do
-        add_module_slot(module_gui, module_name, modules[-index])
+            local modules = global[module_gui.player_index].module_preferences_by_recipe_name[recipe_name]
+            for index, module_name in ipairs(modules) do
+                add_module_slot(module_gui, module_name, modules[-index])
+            end
+            add_module_slot(module_gui)
+
+            add_module_data(main_module_flow)
+        else
+            parent.add{type = "empty-widget"}
+        end
+    else
+        parent.add{type = "empty-widget"}
     end
-    add_module_slot(module_gui)
-
-    --add_module_data(main_module_flow)
 end
 
 function ModuleGUI.on_gui_elem_changed(event)

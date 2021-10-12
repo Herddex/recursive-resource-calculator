@@ -1,21 +1,39 @@
 local Calculator = require "gui/calculator"
 local Cacher = require "logic/cacher"
+local Initializer = require "logic/initializer"
+local Reinitializer = require "logic/reinitializer"
 
 script.on_init(function()
     Cacher.cache()
     global.computation_stack = {}
     for _, player in pairs(game.players) do
+        Initializer.initialize_player_data(player.index)
         Calculator.build(player)
     end
 end)
 script.on_event(defines.events.on_player_created, function(event)
+    Initializer.initialize_player_data(event.player_index)
     Calculator.build(game.get_player(event.player_index))
 end)
-script.on_configuration_changed(function(config_changed_data)
+
+local function check_for_deleted_modules()
+    for _, module in pairs(global.modules_by_name) do
+        if not module.valid then
+            modules_were_deleted = true
+            return
+        end
+    end
+    modules_were_deleted = false
+    return
+end
+
+script.on_configuration_changed(function()
+    global.computation_stack = {}
+    check_for_deleted_modules()
     Cacher.cache()
     for _, player in pairs(game.players) do
-        Calculator.destroy(player)
-        Calculator.build(player)
+        Reinitializer.reinitialize(player.index)
+        Calculator.recompute_everything(player.index)
     end
 end)
 script.on_event(defines.events.on_player_removed, function(event)

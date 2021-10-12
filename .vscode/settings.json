@@ -4,6 +4,9 @@
         "game",
         "script",
         "defines",
-        "data"
+        "data",
+        "modules_were_deleted",
+        "serpent",
+        "log"
     ]
 }
