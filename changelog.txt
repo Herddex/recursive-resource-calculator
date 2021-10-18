@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2021.10.18
+  Bugfixes:
+    - Fixed the infinite recursion / stack overflow crash that occured with some recipes of some
+      overhaul mods, by no longer allowing the Decomposer to enter cycles.
+  Minor Features:
+    - Due to the above change, recipes with the allow_decomposition property set to false can now
+      be used by the mod as well.
+  Locale:
+    - Added a tooltip to the choose_recipe_button to better inform the player about how the recipe
+      can be unselected. This replaces the default tooltip (which displays the recipe itself).
+  Other:
+    - Removed the keybind for "completely" resetting the calculator (CTRL + ALT + C by default),
+      because it was only useful for debugging and I don't need it anymore.
+    - Removed the "Possible performance issues" disclaimer from the mod portal's long description.
+      I believe it to be a non issue now because of some optimizations I had made before the
+      initial release. If this problem resurfaces, I might add the disclaimer back in.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2021.10.15
+  Info:
+    - Initial release

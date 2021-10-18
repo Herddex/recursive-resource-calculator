@@ -11,6 +11,7 @@ script.on_init(function()
         Calculator.build(player)
     end
 end)
+
 script.on_event(defines.events.on_player_created, function(event)
     Initializer.initialize_player_data(event.player_index)
     Calculator.build(game.get_player(event.player_index))
@@ -36,16 +37,15 @@ script.on_configuration_changed(function()
         Calculator.recompute_everything(player.index)
     end
 end)
+
 script.on_event(defines.events.on_player_removed, function(event)
     Calculator.destroy(game.get_player(event.player_index))
 end)
-script.on_event("hxrrc_reset_calculator", function(event)
-    Calculator.destroy(game.get_player(event.player_index))
-    Calculator.build(game.get_player(event.player_index))
-end)
+
 script.on_event("hxrrc_toggle_calculator", function(event)
     Calculator.toggle(game.get_player(event.player_index))
 end)
+
 script.on_event(defines.events.on_gui_closed, function(event)
     if event.element and event.element.name == "hxrrc_calculator" and event.element.visible then
         Calculator.toggle(game.get_player(event.player_index))
@@ -53,6 +53,9 @@ script.on_event(defines.events.on_gui_closed, function(event)
 end)
 
 script.on_event(defines.events.on_gui_click, Calculator.on_gui_click)
+
 script.on_event(defines.events.on_gui_elem_changed, Calculator.on_gui_elem_changed)
+
 script.on_event(defines.events.on_gui_confirmed, Calculator.on_gui_confirmed)
+
 script.on_event(defines.events.on_tick, Calculator.on_tick)
