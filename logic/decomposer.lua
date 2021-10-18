@@ -23,7 +23,13 @@ function Decomposer.module_effect_multiplier(player_index, recipe_name, effect)
     return multiplier > 0.2 and multiplier or 0.2
 end
 
-function Decomposer.decompose(product_production_rate, full_product_name, production_rates, player_index)
+function Decomposer.decompose(product_production_rate, full_product_name, production_rates, player_index, set_of_current_branch)
+    if set_of_current_branch[full_product_name] then
+        --Cycle detected
+        return
+    end
+    set_of_current_branch[full_product_name] = true
+
     production_rates[full_product_name] = production_rates[full_product_name] and production_rates[full_product_name] + product_production_rate or product_production_rate  
     local recipe = global[player_index].recipe_preferences[full_product_name]
     if recipe then
@@ -45,9 +51,11 @@ function Decomposer.decompose(product_production_rate, full_product_name, produc
             local full_ingridient_name = ingredient.type .. "/" .. ingredient.name
             local ingredient_amount = ingredient.amount
             local ingredient_production_rate = ingredient_amount * recipes_per_second
-            Decomposer.decompose(ingredient_production_rate, full_ingridient_name, production_rates, player_index)
+            Decomposer.decompose(ingredient_production_rate, full_ingridient_name, production_rates, player_index, set_of_current_branch)
         end
     end
+
+    set_of_current_branch[full_product_name] = nil
 end
 --Returns the number of machines of the type crafting_machine needed to achieve the specified production rate of the given item/fluid given by its full_product_name 
 function Decomposer.machine_amount(full_product_name, product_production_rate, crafting_machine, player_index)

@@ -90,6 +90,7 @@ function Report.new(parent, production_rates)
             local recipe_cell = report.add{type = "flow"}
             recipe_cell.style.horizontally_stretchable = true
             recipe_cell.add{
+                tooltip = {"hxrrc.empty_the_recipe_button"},
                 type = "choose-elem-button",
                 elem_type = "recipe",
                 name = "hxrrc_choose_recipe_button",
@@ -100,12 +101,7 @@ function Report.new(parent, production_rates)
                         filter = type == "item" and "has-product-item" or "has-product-fluid",
                         elem_filters = {{filter = "name", name = short_name}},
                     },
-                    {
-                        filter = "allow-decomposition",
-                        mode = "and",
-                    }
                 },
-                enabled = #recipes > 1,
             }
         else
             report.add{type = "label", caption = {"hxrrc.undecomposable"}}

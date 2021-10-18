@@ -29,20 +29,12 @@ local function has_product(recipe_prototype, product_full_name)
 end
 
 local function reinitialize_recipe_preferences(player_index)
-    local recipes = global.recipes
     local recipe_preferences = global[player_index].recipe_preferences
-    
-    --initialize the recipes of new items:
-    for item_or_fluid_full_name, recipe_prototype_list in pairs(recipes) do
-        if not recipe_preferences[item_or_fluid_full_name] then
-            recipe_preferences[item_or_fluid_full_name] = recipe_prototype_list[1]
-        end
-    end
 
-    --reset the recipes of current items if their preferred recipe was deleted and delete items without recipes:
+    --remove recipes that are no longer valid:
     for item_or_fluid_full_name, recipe_prototype in pairs(recipe_preferences) do
-        if not recipe_prototype.valid or not recipe_prototype.allow_decomposition or not has_product(recipe_prototype, item_or_fluid_full_name) then
-            recipe_preferences[item_or_fluid_full_name] = recipes[item_or_fluid_full_name] and recipes[item_or_fluid_full_name][1] or nil
+        if not recipe_prototype.valid or not has_product(recipe_prototype, item_or_fluid_full_name) then
+            recipe_preferences[item_or_fluid_full_name] = nil
         end
     end
 end
@@ -77,7 +69,7 @@ local function reinitialize_module_preferences(player_index)
                     local module_prototype = modules_by_name[module_name]
                     for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
                         if module_prototype.module_effects[effect] then
-                            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus 
+                            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus
                         end
                     end
                 end

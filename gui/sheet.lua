@@ -117,7 +117,7 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         local production_rates = {}
         local full_prototype_name = "item/" .. item_name
         
-        Decomposer.decompose(production_rate, full_prototype_name, production_rates, sheet_flow.player_index)
+        Decomposer.decompose(production_rate, full_prototype_name, production_rates, sheet_flow.player_index, {})
 
         update_totals_table_after_change(sheet_flow, production_rates)
         sheet_flow.tags = production_rates --save the results as the "tags" table of the sheet_flow, so that they can be used by the next call to the function just above

@@ -4,14 +4,12 @@ local Cacher = {}
 local function cache_recipes()
     local recipes = {}
     for _, recipe_prototype in pairs(game.recipe_prototypes) do
-        if recipe_prototype.allow_decomposition then
-            for _, product in ipairs(recipe_prototype.products) do
-                local product_full_name = product.type .. "/" .. product.name
-                if recipes[product_full_name] then
-                    recipes[product_full_name][#recipes[product_full_name] + 1] = recipe_prototype
-                else
-                    recipes[product_full_name] = {recipe_prototype}
-                end
+        for _, product in ipairs(recipe_prototype.products) do
+            local product_full_name = product.type .. "/" .. product.name
+            if recipes[product_full_name] then
+                recipes[product_full_name][#recipes[product_full_name] + 1] = recipe_prototype
+            else
+                recipes[product_full_name] = {recipe_prototype}
             end
         end
     end

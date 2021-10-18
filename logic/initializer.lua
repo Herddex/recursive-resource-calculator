@@ -11,7 +11,9 @@ end
 local function initialize_recipe_preferences(player_index)
     local recipe_preferences = {}
     for item_or_fluid_full_name, recipe_prototype_list in pairs(global.recipes) do
-        recipe_preferences[item_or_fluid_full_name] = recipe_prototype_list[1]
+        if #recipe_prototype_list == 1 then
+            recipe_preferences[item_or_fluid_full_name] = recipe_prototype_list[1]
+        end
     end
     global[player_index].recipe_preferences = recipe_preferences
 end
