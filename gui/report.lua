@@ -54,36 +54,39 @@ function Report.new(parent, production_rates)
             elseif not recipe then --the item is not a byproduct, but the player has no recipe selected
                 report.add{type = "label", caption = {"hxrrc.unselected_recipe"}}
                 report.add{type = "empty-widget"}
-            else --the player has a recipe selected and the item/fluid has a positive production rate, so a crafting machine cell will be placed
-                local machine_cell = report.add{type = "flow"}
-                machine_cell.style.horizontally_stretchable = true
-                
+            else --the player has a recipe selected and the item/fluid has a positive production rate
                 local category = recipe.category
                 local crafting_machine = global[player_index].crafting_machine_preferences[category]
+                if not crafting_machine then --the recipe only supports manual crafting:
+                    report.add{type = "label", caption = {"hxrrc.not_automatically_craftable"}}
+                    report.add{type = "empty-widget"}
+                else --a machine and module cell will be added:
+                    local machine_cell = report.add{type = "flow"}
+                    machine_cell.style.horizontally_stretchable = true
+                    --the machine:
+                    machine_cell.add{
+                        type = "choose-elem-button",
+                        name = "hxrrc_choose_crafting_machine_button",
+                        elem_type = "entity",
+                        entity = crafting_machine.name,
+                        elem_filters = {{filter = "crafting-category", crafting_category = category}},
+                        enabled = #global.crafting_machines_by_category[category] > 1,
+                    }
 
-                --the machine:
-                machine_cell.add{
-                    type = "choose-elem-button",
-                    name = "hxrrc_choose_crafting_machine_button",
-                    elem_type = "entity",
-                    entity = crafting_machine.name,
-                    elem_filters = {{filter = "crafting-category", crafting_category = category}},
-                    enabled = #global.crafting_machines_by_category[category] > 1,
-                }
+                    --the machine amount:
+                    local machine_amount = Decomposer.machine_amount(item_or_fluid_full_name, production_rate, crafting_machine, player_index)
+                    local label = machine_cell.add{type = "label", name = "label"}
+                    label.caption = " x " .. machine_amount
 
-                --the machine amount:
-                local machine_amount = Decomposer.machine_amount(item_or_fluid_full_name, production_rate, crafting_machine, player_index)
-                local label = machine_cell.add{type = "label", name = "label"}
-                label.caption = " x " .. machine_amount
-
-                --consumption and pollution calculations:
-                local energy_consumption_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "consumption")
-                total_energy_usage = total_energy_usage + crafting_machine.energy_usage * 60 * machine_amount * energy_consumption_multiplier
-                assert(global.pollution_per_minute_of_crafting_machines[crafting_machine.name])
-                total_pollution = total_pollution + global.pollution_per_minute_of_crafting_machines[crafting_machine.name] * machine_amount * Decomposer.module_effect_multiplier(player_index, recipe.name, "pollution") * energy_consumption_multiplier
-                
-                --Module cell:
-                ModuleGUI.new(report, recipe.name, crafting_machine.allowed_effects)
+                    --consumption and pollution calculations:
+                    local energy_consumption_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "consumption")
+                    total_energy_usage = total_energy_usage + crafting_machine.energy_usage * 60 * machine_amount * energy_consumption_multiplier
+                    assert(global.pollution_per_minute_of_crafting_machines[crafting_machine.name])
+                    total_pollution = total_pollution + global.pollution_per_minute_of_crafting_machines[crafting_machine.name] * machine_amount * Decomposer.module_effect_multiplier(player_index, recipe.name, "pollution") * energy_consumption_multiplier
+                    
+                    --Module cell:
+                    ModuleGUI.new(report, recipe.name, crafting_machine.allowed_effects)
+                end
             end
 
             --Recipe cell:
