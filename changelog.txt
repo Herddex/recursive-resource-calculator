@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2021.11.14
+  Bugfixes:
+    - Fixed a crash related to items/fluids that had production rates of zero, usually caused by
+      "barelling" and "unbarelling" recipes. Entries with production rates of zero will be
+      eliminated from now on.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.2
 Date: 2021.10.21
   Bugfixes:
@@ -10,7 +17,7 @@ Date: 2021.10.21
 Version: 1.0.1
 Date: 2021.10.18
   Bugfixes:
-    - Fixed the infinite recursion / stack overflow crash that occured with some recipes of some
+    - Fixed the infinite recursion crash that occured with some recipes of some
       overhaul mods, by no longer allowing the Decomposer to enter cycles.
   Minor Features:
     - Recipes with the allow_decomposition property set to false can now be used by the mod too.
@@ -20,9 +27,9 @@ Date: 2021.10.18
   Other:
     - Removed the keybind for "completely" resetting the calculator (CTRL + ALT + C by default),
       because it was only useful for debugging and I don't need it anymore.
-    - Removed the "Possible performance issues" disclaimer from the mod portal's long description.
+    - Removed the "Possible performance issues" disclaimer from the mod portal's description.
       I believe it to be a non issue now because of some optimizations I had made before the
-      initial release. If this problem resurfaces, I might add the disclaimer back in.
+      initial release.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2021.10.15

@@ -50,8 +50,10 @@ local function update_totals_table_after_change(sheet_flow, new_production_rates
     local old_production_rates = sheet_flow.tags
     local total_production_rates = global[sheet_flow.player_index].total_production_rates
     for prototype_name, old_rate in pairs(old_production_rates) do
-        total_production_rates[prototype_name] = total_production_rates[prototype_name] - old_rate
-        if math.abs(total_production_rates[prototype_name]) < 0.0000001 then total_production_rates[prototype_name] = nil end --delete the item/fluid entirely if it's associated production rate becomes 0
+        if total_production_rates[prototype_name] then
+            total_production_rates[prototype_name] = total_production_rates[prototype_name] - old_rate
+            if math.abs(total_production_rates[prototype_name]) < 0.000001 then total_production_rates[prototype_name] = nil end --delete the item/fluid entirely if it's associated production rate becomes 0
+        end
     end
 
     if new_production_rates then -- if there is even new data to speak of
@@ -106,8 +108,8 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         game.get_player(sheet_flow.player_index).create_local_flying_text{text = {"hxrrc.invalid_production_rate_error"}, create_at_cursor = true}
         return
     end
-    production_rate = production_rate  / 60
-    
+    production_rate = production_rate / 60
+
     update_sheet_title(sheet_pane, sheet_index)
     local output_flow = input_flow.parent.output_flow
     output_flow.clear()
@@ -116,8 +118,15 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
     if item_name then
         local production_rates = {}
         local full_prototype_name = "item/" .. item_name
-        
+
         Decomposer.decompose(production_rate, full_prototype_name, production_rates, sheet_flow.player_index, {})
+
+        --Delete production rates which have the value 0:
+        for prototype_name, production_rate in pairs(production_rates) do
+            if production_rate == 0 then
+                production_rates[prototype_name] = nil
+            end
+        end
 
         update_totals_table_after_change(sheet_flow, production_rates)
         sheet_flow.tags = production_rates --save the results as the "tags" table of the sheet_flow, so that they can be used by the next call to the function just above

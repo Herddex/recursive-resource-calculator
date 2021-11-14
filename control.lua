@@ -25,7 +25,6 @@ local function check_for_deleted_modules()
         end
     end
     modules_were_deleted = false
-    return
 end
 
 script.on_configuration_changed(function()
