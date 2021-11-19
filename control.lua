@@ -58,3 +58,7 @@ script.on_event(defines.events.on_gui_elem_changed, Calculator.on_gui_elem_chang
 script.on_event(defines.events.on_gui_confirmed, Calculator.on_gui_confirmed)
 
 script.on_event(defines.events.on_tick, Calculator.on_tick)
+
+script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
+    Calculator.recompute_everything(event.player_index)
+end)

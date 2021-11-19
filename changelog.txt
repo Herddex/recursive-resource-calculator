@@ -1,3 +1,11 @@
+Version: 1.0.4
+Date: 2021.11.19
+  Changes:
+    - Numbers shown in the report now use a fixed decimal precision instead of the default
+      behaviour of displaying all the representable decimal digits of the number, except for
+      trailing zeroes (which caused really long and ugly numbers to be shown in many cases,
+      especially when using modules). Precision is set to 3 by default, but it can be set between 1
+      and 6 inclusive in the Mod Settings. The setting is per save.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.3
 Date: 2021.11.14
@@ -24,12 +32,9 @@ Date: 2021.10.18
   Locale:
     - Added a tooltip to the choose_recipe_button to better inform the player about how the recipe
       can be unselected. This replaces the default tooltip (which displays the recipe itself).
-  Other:
+  Changes:
     - Removed the keybind for "completely" resetting the calculator (CTRL + ALT + C by default),
-      because it was only useful for debugging and I don't need it anymore.
-    - Removed the "Possible performance issues" disclaimer from the mod portal's description.
-      I believe it to be a non issue now because of some optimizations I had made before the
-      initial release.
+      because it was only useful for debugging and it's not needed anymore.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2021.10.15

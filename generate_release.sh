@@ -10,3 +10,4 @@ cp data.lua $dir_name/data.lua
 cp info.json $dir_name/info.json
 cp LICENSE $dir_name/LICENSE
 cp thumbnail.png $dir_name/thumbnail.png
+cp settings.lua $dir_name/settings.lua

@@ -31,6 +31,8 @@ function Report.new(parent, production_rates)
     local total_energy_usage = 0
     local total_pollution = 0
 
+    local precision = settings.get_player_settings(player_index)["hxrrc-displayed-floating-point-precision"].value
+
     for item_or_fluid_full_name, production_rate in pairs(production_rates) do
         --Item/fluid and its production rate cell:
         local item_cell = report.add{type = "flow"}
@@ -42,7 +44,7 @@ function Report.new(parent, production_rates)
         local prototype = type == "item" and game.item_prototypes[short_name] or game.fluid_prototypes[short_name]
         item_cell.add{type = "sprite", sprite = item_or_fluid_full_name, tooltip = prototype.localised_name}
         
-        item_cell.add{type = "label", caption = production_rate .. " /s "}
+        item_cell.add{type = "label", caption = string.format("%." .. precision .. "f /s", production_rate)}
 
         local recipes = global.recipes[item_or_fluid_full_name]
         local recipe = global[player_index].recipe_preferences[item_or_fluid_full_name]
@@ -76,12 +78,11 @@ function Report.new(parent, production_rates)
                     --the machine amount:
                     local machine_amount = Decomposer.machine_amount(item_or_fluid_full_name, production_rate, crafting_machine, player_index)
                     local label = machine_cell.add{type = "label", name = "label"}
-                    label.caption = " x " .. machine_amount
+                    label.caption = string.format(" x %." .. precision .. "f", machine_amount)
 
                     --consumption and pollution calculations:
                     local energy_consumption_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "consumption")
                     total_energy_usage = total_energy_usage + crafting_machine.energy_usage * 60 * machine_amount * energy_consumption_multiplier
-                    assert(global.pollution_per_minute_of_crafting_machines[crafting_machine.name])
                     total_pollution = total_pollution + global.pollution_per_minute_of_crafting_machines[crafting_machine.name] * machine_amount * Decomposer.module_effect_multiplier(player_index, recipe.name, "pollution") * energy_consumption_multiplier
                     
                     --Module cell:
@@ -114,8 +115,8 @@ function Report.new(parent, production_rates)
     end
 
     --setting the total energy consumption and total pollution properly:
-    report.consumption_flow.add{type = "label", caption = (total_energy_usage / 1000000) .. "MW"}
-    report.pollution_flow.add{type = "label", caption = (total_pollution * 60) .. "/m"}
+    report.consumption_flow.add{type = "label", caption = string.format("%." .. precision .. "f MW", total_energy_usage / 1000000)}
+    report.pollution_flow.add{type = "label", caption = string.format("%." .. precision .. "f /m", total_pollution * 60)}
 end
 
 return Report
