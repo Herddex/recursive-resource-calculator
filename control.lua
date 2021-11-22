@@ -38,7 +38,7 @@ script.on_configuration_changed(function()
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)
-    Calculator.destroy(game.get_player(event.player_index))
+    global[event.player_index] = nil
 end)
 
 script.on_event("hxrrc_toggle_calculator", function(event)
