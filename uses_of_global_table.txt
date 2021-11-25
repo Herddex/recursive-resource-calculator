@@ -13,7 +13,9 @@ Initializer.initialize():
     global[player_index].module_preferences_by_recipe_name - a dictionary of recipe names to tables that store the names of the chosen modules for that recipe on positive indexes (1, 2, 3, and so on), the same order as they are shown in the respective gui, their respective counts on negative indexes (-1 for the first module, -2 for the second, and so on) and the combined effects of the modules in a Types/Effect table stored in the field "effect";
 
 Calculator.build():
+    global[player_index].calculator = the player's calculator (the main frame)
     global[player_index].sheet_section - the sheet section of the calculator belonging to the player; it has the "sheet_button_flow" flow and the "sheet_pane" tabbed pane as children in this order
+    global[player_index].totals_section, global[player.index].totals_table_flow, global[player.index].total_production_rates = the player's totals section and related content
 
 control.lua:
     global.computation_stack - a stack (array) of tabels with fields "call" (function) and "parameters" (array). At each tick, one table will be popped off of the stack and the associated function call made with the stored parameters

@@ -1,4 +1,4 @@
-local Report = require "report"
+local Report = require "gui/report"
 local Totals = {}
 
 --Build a new totals section into the given parent gui element and returns it

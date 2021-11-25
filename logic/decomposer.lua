@@ -57,7 +57,7 @@ function Decomposer.decompose(product_production_rate, full_product_name, produc
 
     set_of_current_branch[full_product_name] = nil
 end
---Returns the number of machines of the type crafting_machine needed to achieve the specified production rate of the given item/fluid given by its full_product_name 
+--Returns the number of machines of the type crafting_machine needed to achieve the specified production rate of the given item/fluid given by its full_product_name
 function Decomposer.machine_amount(full_product_name, product_production_rate, crafting_machine, player_index)
     local recipe = global[player_index].recipe_preferences[full_product_name]
     local speed_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "speed")

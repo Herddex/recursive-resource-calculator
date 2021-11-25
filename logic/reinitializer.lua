@@ -39,7 +39,19 @@ local function reinitialize_recipe_preferences(player_index)
     end
 end
 
+local function check_for_deleted_modules()
+    local modules_were_deleted = false
+    for _, module in pairs(global.modules_by_name) do
+        if not module.valid then
+            modules_were_deleted = true
+            return
+        end
+    end
+    return modules_were_deleted
+end
+
 local function reinitialize_module_preferences(player_index)
+    local modules_were_deleted = check_for_deleted_modules()
     local module_preferences = global[player_index].module_preferences_by_recipe_name
     local modules_by_name = global.modules_by_name
     for recipe_name, _ in pairs(game.recipe_prototypes) do

@@ -1,4 +1,4 @@
-local ModuleGUI = require "modulegui"
+local ModuleGUI = require "gui/modulegui"
 local Decomposer = require "logic/decomposer"
 
 local Report = {}

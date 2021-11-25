@@ -1,6 +1,6 @@
-local Sheet = require "sheet"
-local Totals = require "totals"
-local ModuleGUI = require "modulegui"
+local Sheet = require "gui/sheet"
+local Totals = require "gui/totals"
+local ModuleGUI = require "gui/modulegui"
 local Calculator = {}
 
 function Calculator.build(player)

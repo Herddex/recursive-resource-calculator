@@ -1,7 +1,40 @@
-local Report = require "report"
+local Report = require "gui/report"
 local Decomposer = require "logic/decomposer"
 
 local Sheet = {}
+
+--Populates the given input flow. The last two arguments are optional and are considered nil by default
+function Sheet.populate_input_flow(input_flow, textfield_text, item_input_button_value)
+    input_flow.add{
+        type = "textfield",
+        name = "hxrrc_input_textfield",
+        tooltip = {"hxrrc.production_rate_input_tooltip"},
+        text = textfield_text,
+        numeric = true,
+        allow_decimal = true,
+        allow_negative = false,
+        lose_focus_on_confirm = true,
+        clear_and_focus_on_right_click = true,
+    }
+    input_flow.add{
+        type = "drop-down",
+        name = "hxrrc_time_unit_dropdown",
+        selected_index = 1,
+        items = {"/m", "/s"}
+    }
+    input_flow.add{
+        type = "choose-elem-button",
+        name = "item_input_button",
+        tooltip = {"hxrrc.item_input_tooltip"},
+        elem_type = "item",
+        item = item_input_button_value,
+    }
+    input_flow.add{
+        type = "button",
+        name = "hxrrc_compute_button",
+        caption = {"hxrrc.compute_button_caption"},
+    }
+end
 
 function Sheet.new(sheet_pane)
     local sheet = sheet_pane.add{type = "tab", caption = {"hxrrc.empty_sheet"}}
@@ -13,32 +46,7 @@ function Sheet.new(sheet_pane)
     --Input section:
     local input_flow = sheet_flow.add{type = "flow", name = "input_flow", direction = "horizontal"}
     input_flow.style.vertical_align = "center"
-
-    input_flow.add{
-        type = "textfield",
-        name = "hxrrc_input_textfield",
-        tooltip = {"hxrrc.production_rate_input_tooltip"},
-        numeric = true,
-        allow_decimal = true,
-        allow_negative = false,
-        lose_focus_on_confirm = true,
-        clear_and_focus_on_right_click = true,
-    }
-    input_flow.add{
-        type = "label",
-        caption = "/m",
-    }
-    input_flow.add{
-        type = "choose-elem-button",
-        name = "item_input_button",
-        tooltip = {"hxrrc.item_input_tooltip"},
-        elem_type = "item",
-    }
-    input_flow.add{
-        type = "button",
-        name = "hxrrc_compute_button",
-        caption = {"hxrrc.compute_button_caption"},
-    }
+    Sheet.populate_input_flow(input_flow)
 
     --Output section:
     local output_flow = sheet_flow.add{type = "flow", name = "output_flow"}
@@ -108,7 +116,9 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         game.get_player(sheet_flow.player_index).create_local_flying_text{text = {"hxrrc.invalid_production_rate_error"}, create_at_cursor = true}
         return
     end
-    production_rate = production_rate / 60
+    if input_flow.hxrrc_time_unit_dropdown.get_item(input_flow.hxrrc_time_unit_dropdown.selected_index) == '/m' then
+        production_rate = production_rate / 60
+    end
 
     update_sheet_title(sheet_pane, sheet_index)
     local output_flow = input_flow.parent.output_flow
