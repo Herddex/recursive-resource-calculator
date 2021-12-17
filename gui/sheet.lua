@@ -111,11 +111,7 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         input_flow = sheet_flow.input_flow
     end
 
-    local production_rate = tonumber(input_flow.hxrrc_input_textfield.text)
-    if not production_rate then
-        game.get_player(sheet_flow.player_index).create_local_flying_text{text = {"hxrrc.invalid_production_rate_error"}, create_at_cursor = true}
-        return
-    end
+    local production_rate = tonumber(input_flow.hxrrc_input_textfield.text) or 0
     if input_flow.hxrrc_time_unit_dropdown.get_item(input_flow.hxrrc_time_unit_dropdown.selected_index) == '/m' then
         production_rate = production_rate / 60
     end
@@ -125,7 +121,7 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
     output_flow.clear()
 
     local item_name = input_flow.item_input_button.elem_value
-    if item_name then
+    if item_name and production_rate ~= 0 then
         local production_rates = {}
         local full_prototype_name = "item/" .. item_name
 
@@ -142,7 +138,7 @@ function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
         sheet_flow.tags = production_rates --save the results as the "tags" table of the sheet_flow, so that they can be used by the next call to the function just above
 
         Report.new(output_flow, production_rates)
-    else --No item selected, so the sheet should be cleared
+    else --No item selected or production rate of 0, so the sheet should be cleared
         update_totals_table_after_change(sheet_flow)
         sheet_flow.tags = {}
     end

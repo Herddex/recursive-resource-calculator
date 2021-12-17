@@ -55,5 +55,7 @@ script.on_event(defines.events.on_gui_confirmed, Calculator.on_gui_confirmed)
 script.on_event(defines.events.on_tick, Calculator.on_tick)
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
-    Calculator.recompute_everything(event.player_index)
+    if event.setting == "hxrrc-displayed-floating-point-precision" then
+        Calculator.recompute_everything(event.player_index)
+    end
 end)

@@ -151,7 +151,7 @@ function Calculator.on_gui_confirmed(event)
 end
 
 function Calculator.on_tick()
-    if #global.computation_stack > 0 then
+    if global.computation_stack[1] then
         local call_and_parameters = table.remove(global.computation_stack)
         call_and_parameters.call(table.unpack(call_and_parameters.parameters))
         local player_index = call_and_parameters.player_index

@@ -87,7 +87,7 @@ function ModuleGUI.on_gui_elem_changed(event)
         local module_prototype = game.item_prototypes[module_preferences[index]]
         for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
             if module_prototype.module_effects[effect] then
-                module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus 
+                module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus
             end
         end
         --a button that was not the last one was emptied, so the module data must be shifted to fill the gap, and the button must be deleted along with its textfield buddy
@@ -101,16 +101,16 @@ function ModuleGUI.on_gui_elem_changed(event)
 
     elseif choose_module_button.elem_value then
         if index == #module_gui.children then
-            --the last module slot was set, so its textfiled must be enabled, the module's count set to 0, and a new one must be added
+            --the last module slot was set, so its textfiled must be enabled, the module's count set to 1 by default, and a new one must be added
             module_slot.hxrrc_module_count_textfield.enabled = true
-            module_preferences[-index] = 0
+            module_preferences[-index] = 1
             add_module_slot(module_gui)
         else
             --a previous module was replaced
             local module_prototype = game.item_prototypes[module_preferences[index]]
             for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
                 if module_prototype.module_effects[effect] then
-                    module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus 
+                    module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus
                 end
             end
         end
@@ -136,7 +136,7 @@ function ModuleGUI.on_gui_confirmed(event)
     local delta = new_value - module_preferences[-index]
     for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
         if module_prototype.module_effects[effect] then
-            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus + delta * module_prototype.module_effects[effect].bonus 
+            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus + delta * module_prototype.module_effects[effect].bonus
         end
     end
 

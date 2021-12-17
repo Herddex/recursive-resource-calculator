@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.7
+Date: 2021.11.30
+  Bugfixes:
+    - Empty input textfields in the calculator's sheets will no longer trigger an
+      "Invalid production rate" error on (re)calculation. They will just be interpreted as
+      production rates of zero.
+  Changes:
+    - Default module counts are now set to 1 instead of 0.
+    - Byproducts in reports no longer have a choose-recipe-button in their row, since it is
+      redundant in that case anyway.
+  Locale:
+    - Added Czech and Romanian localizations.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.6
 Date: 2021.11.25
   Minor Features:
