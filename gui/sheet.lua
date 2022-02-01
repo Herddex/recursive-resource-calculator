@@ -36,6 +36,11 @@ function Sheet.populate_input_flow(input_flow, textfield_text, item_input_button
     }
 end
 
+event_handlers.on_gui_click["hxrrc_compute_button"] = function(event)
+    Sheet.calculate(event.element)
+    global[event.player_index].calculator.force_auto_center()
+end
+
 function Sheet.new(sheet_pane)
     local sheet = sheet_pane.add{type = "tab", caption = {"hxrrc.empty_sheet"}}
     local sheet_flow = sheet_pane.add{type = "flow", direction = "vertical"}

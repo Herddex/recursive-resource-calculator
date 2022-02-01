@@ -1,3 +1,8 @@
+event_handlers = {}
+event_handlers.on_gui_click = {}
+event_handlers.on_gui_confirmed = {}
+event_handlers.on_gui_elem_changed = {}
+
 local Calculator = require "gui/calculator"
 local Cacher = require "logic/cacher"
 local Initializer = require "logic/initializer"
@@ -46,13 +51,27 @@ script.on_event(defines.events.on_gui_closed, function(event)
     end
 end)
 
-script.on_event(defines.events.on_gui_click, Calculator.on_gui_click)
+--Register handlers for which event.element.name exists
+for _, event_type in ipairs({
+    "on_gui_click",
+    "on_gui_elem_changed",
+    "on_gui_confirmed",
+    }) do
+    script.on_event(defines.events[event_type], function(event)
+        local handler = event_handlers[event_type][event.element.name]
+        if handler then handler(event) end
+    end)
+end
 
-script.on_event(defines.events.on_gui_elem_changed, Calculator.on_gui_elem_changed)
-
-script.on_event(defines.events.on_gui_confirmed, Calculator.on_gui_confirmed)
-
-script.on_event(defines.events.on_tick, Calculator.on_tick)
+--Do each sheet calculation in its own tick
+script.on_event(defines.events.on_tick, function()
+    if global.computation_stack[1] then
+        local call_and_parameters = table.remove(global.computation_stack)
+        call_and_parameters.call(table.unpack(call_and_parameters.parameters))
+        local player_index = call_and_parameters.player_index
+        game.get_player(player_index).gui.screen.hxrrc_calculator.enabled = global[player_index].backlogged_computation_count == 0
+    end
+end)
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
     if event.setting == "hxrrc-displayed-floating-point-precision" then

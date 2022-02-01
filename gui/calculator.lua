@@ -63,37 +63,29 @@ function Calculator.build(player)
     global[player.index].total_production_rates = {}
 end
 
-function Calculator.destroy(player)
-    player.gui.screen.hxrrc_calculator.destroy()
+event_handlers.on_gui_click["hxrrc_switch_sections_button"] = function(event)
+    global[event.player_index].totals_section.visible = not global[event.player_index].totals_section.visible
+    global[event.player_index].sheet_section.visible = not global[event.player_index].sheet_section.visible
+    if global[event.player_index].totals_section.visible then
+        Totals.update(global[event.player_index].totals_table_flow)
+    end
+    global[event.player_index].calculator.force_auto_center()
+end
+
+event_handlers.on_gui_click["hxrrc_new_sheet_button"] = function(event)
+    Sheet.new(event.element.parent.parent.sheet_pane)
+    global[event.player_index].calculator.force_auto_center()
+end
+
+event_handlers.on_gui_click["hxrrc_delete_sheet_button"] = function(event)
+    Sheet.delete_selected_sheet(event.element.parent.parent.sheet_pane)
+    global[event.player_index].calculator.force_auto_center()
 end
 
 function Calculator.toggle(player)
     local calculator = player.gui.screen.hxrrc_calculator
     calculator.visible = not calculator.visible
     player.opened = calculator.visible and calculator or nil
-end
-
-function Calculator.switch_sections(player_index)
-    global[player_index].totals_section.visible = not global[player_index].totals_section.visible
-    global[player_index].sheet_section.visible = not global[player_index].sheet_section.visible
-end
-
-function Calculator.on_gui_click(event)
-    if event.element.name == "hxrrc_compute_button" then
-        Sheet.calculate(event.element)
-        global[event.player_index].calculator.force_auto_center()
-    elseif event.element.name == "hxrrc_switch_sections_button" then
-        Calculator.switch_sections(event.player_index)
-        if global[event.player_index].totals_section.visible then
-            Totals.update(global[event.player_index].totals_table_flow)
-        end
-    elseif event.element.name == "hxrrc_new_sheet_button" then
-        Sheet.new(event.element.parent.parent.sheet_pane)
-        global[event.player_index].calculator.force_auto_center()
-    elseif event.element.name == "hxrrc_delete_sheet_button" then
-        Sheet.delete_selected_sheet(event.element.parent.parent.sheet_pane)
-        global[event.player_index].calculator.force_auto_center()
-    end
 end
 
 function Calculator.recompute_everything(player_index)
@@ -122,41 +114,32 @@ local function update_crafting_machines(player_index, name_of_new_crafting_machi
     Calculator.recompute_everything(player_index)
 end
 
-function Calculator.on_gui_elem_changed(event)
-    if event.element.name == "hxrrc_choose_recipe_button" then
-        --Update the recipe preference:
-        global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
-        Calculator.recompute_everything(event.player_index)
-    elseif event.element.name == "hxrrc_choose_crafting_machine_button" then
-        local new_value = event.element.elem_value
-        local category = event.element.elem_filters[1].crafting_category
-        event.element.elem_value = global[event.player_index].crafting_machine_preferences[category].name --reset the button to its previous value for now, in order not to mess with updating later and to also prevent it from being emptied
+event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = function(event)
+    --Update the recipe preference:
+    global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
+    Calculator.recompute_everything(event.player_index)
+end
 
-        if not new_value then
-            game.get_player(event.player_index).create_local_flying_text{text = {"hxrrc.cannot_empty_a_choose_crafting_machine_button_error"}, create_at_cursor = true}
-        elseif new_value ~= event.element.elem_value then --if the value has truly changed
-            update_crafting_machines(event.player_index, new_value)
-        end
-    elseif event.element.name == "hxrrc_choose_module_button" then
-        ModuleGUI.on_gui_elem_changed(event)
-        Calculator.recompute_everything(event.player_index)
+event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = function(event)
+    local new_value = event.element.elem_value
+    local category = event.element.elem_filters[1].crafting_category
+    event.element.elem_value = global[event.player_index].crafting_machine_preferences[category].name --reset the button to its previous value for now, in order not to mess with updating later and to also prevent it from being emptied
+
+    if not new_value then
+        game.get_player(event.player_index).create_local_flying_text{text = {"hxrrc.cannot_empty_a_choose_crafting_machine_button_error"}, create_at_cursor = true}
+    elseif new_value ~= event.element.elem_value then --if the value has truly changed
+        update_crafting_machines(event.player_index, new_value)
     end
 end
 
-function Calculator.on_gui_confirmed(event)
-    if event.element.name == "hxrrc_module_count_textfield" then
-        ModuleGUI.on_gui_confirmed(event)
-        Calculator.recompute_everything(event.player_index)
-    end
+event_handlers.on_gui_elem_changed["hxrrc_choose_module_button"] = function(event)
+    ModuleGUI.on_gui_elem_changed(event)
+    Calculator.recompute_everything(event.player_index)
 end
 
-function Calculator.on_tick()
-    if global.computation_stack[1] then
-        local call_and_parameters = table.remove(global.computation_stack)
-        call_and_parameters.call(table.unpack(call_and_parameters.parameters))
-        local player_index = call_and_parameters.player_index
-        game.get_player(player_index).gui.screen.hxrrc_calculator.enabled = global[player_index].backlogged_computation_count == 0
-    end
+event_handlers.on_gui_confirmed["hxrrc_module_count_textfield"] = function(event)
+    ModuleGUI.on_gui_confirmed(event)
+    Calculator.recompute_everything(event.player_index)
 end
 
 return Calculator

@@ -3,18 +3,19 @@ local Reinitializer = {}
 local function reinitialize_crafting_machine_preferences(player_index)
     local crafting_machines_by_category = global.crafting_machines_by_category
     local crafting_machine_preferences = global[player_index].crafting_machine_preferences
-    
-    --initialize new categories:
-    for category, crafting_machine_list in pairs(crafting_machines_by_category) do
-        if not crafting_machine_preferences[category] then
-            crafting_machine_preferences[category] = crafting_machine_list[1]
+
+    for category, preferred_crafting_machine in pairs(crafting_machine_preferences) do
+        if not crafting_machines_by_category[category] then
+            crafting_machine_preferences[category] = nil --delete the category if there's no machine that satisfies it
+        elseif not preferred_crafting_machine.valid then
+            crafting_machine_preferences[category] = crafting_machines_by_category[category][1] --reset the preference if the current one became invalid
         end
     end
 
-    --reset the crafting machines of current categories if their preferred crafting machine was deleted and delete categories without crafting machines:
-    for category, preferred_crafting_machine in pairs(crafting_machine_preferences) do
-        if not preferred_crafting_machine.valid then
-            preferred_crafting_machine[category] = crafting_machines_by_category[category] and crafting_machines_by_category[category][1] or nil
+    --initialize new category preferences:
+    for category, crafting_machine_list in pairs(crafting_machines_by_category) do
+        if not crafting_machine_preferences[category] then
+            crafting_machine_preferences[category] = crafting_machine_list[1]
         end
     end
 end
