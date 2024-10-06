@@ -5,27 +5,6 @@ local compute_power_and_pollution = require "logic.compute_power_and_pollution"
 
 local Sheet = {}
 
-local function update_totals_table_after_change(sheet_flow, new_production_rates) --subtracts from the global[player_index].total_production_rates table the rates that were just cleared from the sheet's previous computation (if there are any) and (if new_production_rates is not nil) adds the new ones that were just computed to that table instead.
-    local old_production_rates = sheet_flow.tags
-    local total_production_rates = global[sheet_flow.player_index].total_production_rates
-    for prototype_name, old_rate in pairs(old_production_rates) do
-        if total_production_rates[prototype_name] then
-            total_production_rates[prototype_name] = total_production_rates[prototype_name] - old_rate
-            if math.abs(total_production_rates[prototype_name]) < 0.000001 then total_production_rates[prototype_name] = nil end --delete the item/fluid entirely if it's associated production rate becomes 0
-        end
-    end
-
-    if new_production_rates then -- if there is even new data to speak of
-        for prototype_name, new_rate in pairs(new_production_rates) do
-            if total_production_rates[prototype_name] then
-                total_production_rates[prototype_name] = total_production_rates[prototype_name] + new_rate --add the new rate to the running count
-            else
-                total_production_rates[prototype_name] = new_rate
-            end
-        end
-    end
-end
-
 local function update_sheet_title(sheet_pane, sheet_index)
     local sheet_and_flow = sheet_pane.tabs[sheet_index]
     local item_name = sheet_and_flow.content.input_container.children[1].hxrrc_desired_item_button.elem_value
@@ -64,7 +43,6 @@ function Sheet.delete_selected_sheet(sheet_pane)
         tab_and_sheet.tab.destroy()
 
         local sheet_flow = tab_and_sheet.content
-        update_totals_table_after_change(sheet_flow)
         sheet_flow.destroy()
 
         sheet_pane.selected_tab_index = 1
@@ -90,10 +68,8 @@ function Sheet.calculate(compute_button, sheet_pane, sheet_index)
     output_flow.clear()
 
     local desired_production_rates_by_full_item_name = InputContainer.get_desired_production_rates_by_full_item_name(sheet_flow.input_container)
-    
+
     if not desired_production_rates_by_full_item_name then --Empty sheet
-        update_totals_table_after_change(sheet_flow)
-        sheet_flow.tags = {}
         return
     end
 
@@ -105,9 +81,6 @@ function Sheet.calculate(compute_button, sheet_pane, sheet_index)
             production_rates[product_full_name] = nil
         end
     end
-
-    update_totals_table_after_change(sheet_flow, production_rates)
-    sheet_flow.tags = production_rates --save the results as the "tags" table of the sheet_flow, so that they can be used by the next call to the function just above
 
     local energy_consumption, pollution = compute_power_and_pollution(sheet_flow.player_index, production_rates)
     Report.new(output_flow, production_rates, energy_consumption, pollution)
@@ -127,7 +100,6 @@ function Sheet._repair_old_sheets()
             local item = old_input_flow.item_input_button.elem_value
 
             old_input_flow.destroy()
-
 
             local input_container = InputContainer.build_and_add_to(sheet_flow)
             InputContainer._add_existing_row(input_container, rate_text, selected_index, item)

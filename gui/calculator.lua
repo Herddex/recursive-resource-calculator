@@ -1,5 +1,4 @@
 local Sheet = require "gui/sheet"
-local Totals = require "gui/totals"
 local ModuleGUI = require "gui/modulegui"
 local Calculator = {}
 
@@ -20,16 +19,10 @@ function Calculator.build(player)
     local sheet_section = main_scroll_area_flow.add{type = "flow", direction = "vertical", name = "sheet_section"}
     global[player.index].sheet_section = sheet_section
     sheet_section.style.horizontally_stretchable = true
-    --Sheet addition, removal and totals section switching buttons:
+    --Sheet addition and removal buttons:
     local sheet_buttons_flow = sheet_section.add{type = "flow", direction = "horizontal"}
     sheet_buttons_flow.style.horizontal_align = "right"
     sheet_buttons_flow.style.horizontally_stretchable = true
-    sheet_buttons_flow.add{
-        type = "button",
-        name = "hxrrc_switch_sections_button",
-        caption = {"hxrrc.totals"},
-        tooltip = {"hxrrc.switch_to_totals_section"},
-    }
     sheet_buttons_flow.add{
         type = "button",
         name = "hxrrc_new_sheet_button",
@@ -46,30 +39,6 @@ function Calculator.build(player)
     local sheet_pane = sheet_section.add{type = "tabbed-pane", name = "sheet_pane"}
     Sheet.new(sheet_pane)
     sheet_pane.selected_tab_index = 1
-
-    --Totals section:
-    local totals_section = Totals.new(main_scroll_area_flow)
-    global[player.index].totals_section = totals_section
-    totals_section.visible = false
-    
-    local totals_main_flow = totals_section.add{type = "flow", direction = "vertical"}
-    totals_main_flow.add{
-        type = "button",
-        name = "hxrrc_switch_sections_button",
-        caption = {"hxrrc.sheets"},
-        tooltip = {"hxrrc.switch_to_sheets_section"},
-    }
-    global[player.index].totals_table_flow = totals_main_flow.add{type = "flow"}
-    global[player.index].total_production_rates = {}
-end
-
-event_handlers.on_gui_click["hxrrc_switch_sections_button"] = function(event)
-    global[event.player_index].totals_section.visible = not global[event.player_index].totals_section.visible
-    global[event.player_index].sheet_section.visible = not global[event.player_index].sheet_section.visible
-    if global[event.player_index].totals_section.visible then
-        Totals.update(global[event.player_index].totals_table_flow)
-    end
-    global[event.player_index].calculator.force_auto_center()
 end
 
 event_handlers.on_gui_click["hxrrc_new_sheet_button"] = function(event)
@@ -90,17 +59,12 @@ end
 
 function Calculator.recompute_everything(player_index)
     local sheet_pane = global[player_index].sheet_section.sheet_pane
-    
-    if global[player_index].totals_section.visible then
-        global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = Totals.update, parameters = {global[player_index].totals_table_flow}}
-        global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
-    end
-    
+
     for sheet_index, _ in ipairs(sheet_pane.tabs) do
         global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
         global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
     end
-    
+
     global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = global[player_index].calculator.force_auto_center, parameters = {}}
     global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
 end

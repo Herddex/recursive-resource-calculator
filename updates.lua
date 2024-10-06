@@ -17,7 +17,23 @@ function Updates.update_from(old_version)
     end
 end
 
+local function remove_totals_section()
+    for _, player in pairs(game.players) do
+        local player_index = player.index
+        global[player_index].totals_section.destroy()
+        global[player_index].totals_section = nil
+        global[player_index].totals_table_flow = nil
+        global[player_index].total_production_rates = nil
+        global[player_index].sheet_section.visible = true
+        global[player_index].sheet_section.children[1].children[1].destroy()
+        for _, tab_and_content in ipairs(global[player_index].sheet_section.sheet_pane.tabs) do
+            tab_and_content.content.tags = {}
+        end
+    end
+end
+
 Updates["1.1.0"] = function()
+    remove_totals_section()
     Sheet._repair_old_sheets()
 end
 
