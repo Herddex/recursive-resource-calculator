@@ -4,13 +4,13 @@ event_handlers.on_gui_confirmed = {}
 event_handlers.on_gui_elem_changed = {}
 
 local Calculator = require "gui/calculator"
-local Cacher = require "logic/cacher"
+local Indexer = require "logic/indexer"
 local Initializer = require "logic/initializer"
 local Reinitializer = require "logic/reinitializer"
 local Updates = require "updates"
 
 script.on_init(function()
-    Cacher.cache()
+    Indexer.run()
     global.computation_stack = {}
     for player_index, player in pairs(game.players) do
         Initializer.initialize_player_data(player_index)
@@ -25,7 +25,7 @@ script.on_configuration_changed(function(configuration_changed_data)
     end
 
     global.computation_stack = {}
-    Cacher.cache()
+    Indexer.run()
     for _, player in pairs(game.players) do
         Reinitializer.reinitialize(player.index)
         Calculator.recompute_everything(player.index)

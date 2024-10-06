@@ -1,63 +1,9 @@
 local Report = require "gui/report"
 local Decomposer = require "logic/decomposer"
+local InputContainer = require "gui.input_container"
+local compute_power_and_pollution = require "logic.compute_power_and_pollution"
 
 local Sheet = {}
-
---Populates the given input flow. The last two arguments are optional and are considered nil by default
-function Sheet.populate_input_flow(input_flow, textfield_text, item_input_button_value)
-    input_flow.add{
-        type = "textfield",
-        name = "hxrrc_input_textfield",
-        tooltip = {"hxrrc.production_rate_input_tooltip"},
-        text = textfield_text,
-        numeric = true,
-        allow_decimal = true,
-        allow_negative = false,
-        lose_focus_on_confirm = true,
-        clear_and_focus_on_right_click = true,
-    }
-    input_flow.add{
-        type = "drop-down",
-        name = "hxrrc_time_unit_dropdown",
-        selected_index = 1,
-        items = {"/m", "/s"}
-    }
-    input_flow.add{
-        type = "choose-elem-button",
-        name = "item_input_button",
-        tooltip = {"hxrrc.item_input_tooltip"},
-        elem_type = "item",
-        item = item_input_button_value,
-    }
-    input_flow.add{
-        type = "button",
-        name = "hxrrc_compute_button",
-        caption = {"hxrrc.compute_button_caption"},
-    }
-end
-
-event_handlers.on_gui_click["hxrrc_compute_button"] = function(event)
-    Sheet.calculate(event.element)
-    global[event.player_index].calculator.force_auto_center()
-end
-
-function Sheet.new(sheet_pane)
-    local sheet = sheet_pane.add{type = "tab", caption = {"hxrrc.empty_sheet"}}
-    local sheet_flow = sheet_pane.add{type = "flow", direction = "vertical"}
-    sheet_pane.add_tab(sheet, sheet_flow)
-
-    sheet_flow.style.horizontal_align = "center"
-
-    --Input section:
-    local input_flow = sheet_flow.add{type = "flow", name = "input_flow", direction = "horizontal"}
-    input_flow.style.vertical_align = "center"
-    Sheet.populate_input_flow(input_flow)
-
-    --Output section:
-    local output_flow = sheet_flow.add{type = "flow", name = "output_flow"}
-    output_flow.style.horizontally_stretchable = true
-    output_flow.style.vertically_stretchable = true
-end
 
 local function update_totals_table_after_change(sheet_flow, new_production_rates) --subtracts from the global[player_index].total_production_rates table the rates that were just cleared from the sheet's previous computation (if there are any) and (if new_production_rates is not nil) adds the new ones that were just computed to that table instead.
     local old_production_rates = sheet_flow.tags
@@ -80,6 +26,37 @@ local function update_totals_table_after_change(sheet_flow, new_production_rates
     end
 end
 
+local function update_sheet_title(sheet_pane, sheet_index)
+    local sheet_and_flow = sheet_pane.tabs[sheet_index]
+    local item_name = sheet_and_flow.content.input_container.children[1].hxrrc_desired_item_button.elem_value
+    sheet_and_flow.tab.caption = item_name and game.item_prototypes[item_name].localised_name or {"hxrrc.empty_sheet"}
+end
+
+local function add_compute_button(sheet_flow)
+    sheet_flow.add{
+        type = "button",
+        name = "hxrrc_compute_button",
+        caption = {"hxrrc.compute_button_caption"},
+    }
+end
+
+function Sheet.new(sheet_pane)
+    local sheet = sheet_pane.add{type = "tab", caption = {"hxrrc.empty_sheet"}}
+    local sheet_flow = sheet_pane.add{type = "flow", direction = "vertical"}
+    sheet_pane.add_tab(sheet, sheet_flow)
+
+    sheet_flow.style.horizontal_align = "center"
+
+    --Input section:
+    InputContainer.build_and_add_to(sheet_flow)
+    add_compute_button(sheet_flow)
+
+    --Output section:
+    local output_flow = sheet_flow.add{type = "flow", name = "output_flow"}
+    output_flow.style.horizontally_stretchable = true
+    output_flow.style.vertically_stretchable = true
+end
+
 function Sheet.delete_selected_sheet(sheet_pane)
     if #sheet_pane.tabs > 1 then
         local tab_and_sheet = sheet_pane.tabs[sheet_pane.selected_tab_index]
@@ -96,57 +73,76 @@ function Sheet.delete_selected_sheet(sheet_pane)
     end
 end
 
-local function update_sheet_title(sheet_pane, sheet_index)
-    local sheet_and_flow = sheet_pane.tabs[sheet_index]
-    local item_name = sheet_and_flow.content.input_flow.item_input_button.elem_value
-    sheet_and_flow.tab.caption = item_name and game.item_prototypes[item_name].localised_name or {"hxrrc.empty_sheet"}
-end
-
---Performs the calculator computation for the sheet that either owns the passed input_flow_element or belongs to the given sheet_pane and has the given sheet_index (if input_flow_element is not nil, the two other arguments are ignored; if it is nil, the other two arguments are used and thus must be specified)
-function Sheet.calculate(input_flow_element, sheet_pane, sheet_index)
-    local input_flow, sheet_flow
-    if input_flow_element then
-        input_flow = input_flow_element.parent
-        sheet_flow = input_flow.parent
+--Performs the calculator computation for the sheet that either owns the passed compute_button or belongs to the given sheet_pane and has the given sheet_index (if compute_button is not nil, the two other arguments are ignored; if it is nil, the other two arguments are used and thus must be specified)
+function Sheet.calculate(compute_button, sheet_pane, sheet_index)
+    local sheet_flow
+    if compute_button then
+        sheet_flow = compute_button.parent
         sheet_pane = sheet_flow.parent
         sheet_index = sheet_pane.selected_tab_index
     else
         local sheet_and_flow = sheet_pane.tabs[sheet_index]
         sheet_flow = sheet_and_flow.content
-        input_flow = sheet_flow.input_flow
-    end
-
-    local production_rate = tonumber(input_flow.hxrrc_input_textfield.text) or 0
-    if input_flow.hxrrc_time_unit_dropdown.get_item(input_flow.hxrrc_time_unit_dropdown.selected_index) == '/m' then
-        production_rate = production_rate / 60
     end
 
     update_sheet_title(sheet_pane, sheet_index)
-    local output_flow = input_flow.parent.output_flow
+    local output_flow = sheet_flow.output_flow
     output_flow.clear()
 
-    local item_name = input_flow.item_input_button.elem_value
-    if item_name and production_rate ~= 0 then
-        local production_rates = {}
-        local full_prototype_name = "item/" .. item_name
-
-        Decomposer.decompose(production_rate, full_prototype_name, production_rates, sheet_flow.player_index, {})
-
-        --Delete production rates which have the value 0:
-        for prototype_name, production_rate in pairs(production_rates) do
-            if production_rate == 0 then
-                production_rates[prototype_name] = nil
-            end
-        end
-
-        update_totals_table_after_change(sheet_flow, production_rates)
-        sheet_flow.tags = production_rates --save the results as the "tags" table of the sheet_flow, so that they can be used by the next call to the function just above
-
-        Report.new(output_flow, production_rates)
-    else --No item selected or production rate of 0, so the sheet should be cleared
+    local desired_production_rates_by_full_item_name = InputContainer.get_desired_production_rates_by_full_item_name(sheet_flow.input_container)
+    
+    if not desired_production_rates_by_full_item_name then --Empty sheet
         update_totals_table_after_change(sheet_flow)
         sheet_flow.tags = {}
+        return
     end
+
+    local production_rates = Decomposer.decompose(desired_production_rates_by_full_item_name, sheet_flow.player_index)
+
+    --Delete production rates which have the value 0:
+    for product_full_name, rate in pairs(production_rates) do
+        if rate == 0 then
+            production_rates[product_full_name] = nil
+        end
+    end
+
+    update_totals_table_after_change(sheet_flow, production_rates)
+    sheet_flow.tags = production_rates --save the results as the "tags" table of the sheet_flow, so that they can be used by the next call to the function just above
+
+    local energy_consumption, pollution = compute_power_and_pollution(sheet_flow.player_index, production_rates)
+    Report.new(output_flow, production_rates, energy_consumption, pollution)
+end
+
+--GUI change added in 1.1.0: the sheets' input flow element was replaced with a new input container that supports multiple desired items with their respective production rates.
+--Note: Before 1.0.6 time_unit_dropdown elements did not exist
+function Sheet._repair_old_sheets()
+    for player_index, _ in pairs(game.players) do
+        for _, tab_and_contents in ipairs(global[player_index].sheet_section.sheet_pane.tabs) do
+            local sheet_flow = tab_and_contents.content
+            local old_input_flow = sheet_flow.input_flow
+
+            local rate_text = old_input_flow.hxrrc_input_textfield.text
+            local old_time_unit_dropdown = old_input_flow.hxrrc_time_unit_dropdown
+            local selected_index = old_time_unit_dropdown and old_time_unit_dropdown.selected_index or 2
+            local item = old_input_flow.item_input_button.elem_value
+
+            old_input_flow.destroy()
+
+
+            local input_container = InputContainer.build_and_add_to(sheet_flow)
+            InputContainer._add_existing_row(input_container, rate_text, selected_index, item)
+
+            add_compute_button(sheet_flow)
+
+            sheet_flow.swap_children(1, 2)
+            sheet_flow.swap_children(2, 3)
+        end
+    end
+end
+
+event_handlers.on_gui_click["hxrrc_compute_button"] = function(event)
+    Sheet.calculate(event.element)
+    global[event.player_index].calculator.force_auto_center()
 end
 
 return Sheet
