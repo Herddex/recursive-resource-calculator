@@ -3,7 +3,7 @@ event_handlers.on_gui_click = {}
 event_handlers.on_gui_confirmed = {}
 event_handlers.on_gui_elem_changed = {}
 
-local Calculator = require "gui/calculator"
+local Calculator = require "gui.calculator"
 local Indexer = require "logic/indexer"
 local Initializer = require "logic/initializer"
 local Reinitializer = require "logic/reinitializer"
@@ -15,6 +15,9 @@ script.on_init(function()
     for player_index, player in pairs(game.players) do
         Initializer.initialize_player_data(player_index)
         Calculator.build(player)
+        global[player_index].trigger_recalc = function ()
+            Calculator.recompute_everything(player_index)
+        end
     end
 end)
 

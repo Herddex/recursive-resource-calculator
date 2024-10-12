@@ -1,21 +1,19 @@
 local Reinitializer = {}
 
-local function reinitialize_crafting_machine_preferences(player_index)
-    local crafting_machines_by_category = global.crafting_machines_by_category
-    local crafting_machine_preferences = global[player_index].crafting_machine_preferences
-
-    for category, preferred_crafting_machine in pairs(crafting_machine_preferences) do
-        if not crafting_machines_by_category[category] then
-            crafting_machine_preferences[category] = nil --delete the category if there's no machine that satisfies it
-        elseif not preferred_crafting_machine.valid then
-            crafting_machine_preferences[category] = crafting_machines_by_category[category][1] --reset the preference if the current one became invalid
+local function reinitialize_chosen_crafting_machines(player_index)
+    local machine_name_by_recipe_name = global[player_index].names_of_chosen_crafting_machines_by_recipe_name
+    for recipe_name, crafting_machine_name in pairs(machine_name_by_recipe_name) do
+        local recipe = game.recipe_prototypes[recipe_name]
+        if not recipe then
+            machine_name_by_recipe_name[recipe_name] = nil
+        elseif not game.entity_prototypes[crafting_machine_name] then
+            machine_name_by_recipe_name[recipe_name] = global.crafting_machines_by_category[recipe.category][1].name
         end
     end
 
-    --initialize new category preferences:
-    for category, crafting_machine_list in pairs(crafting_machines_by_category) do
-        if not crafting_machine_preferences[category] then
-            crafting_machine_preferences[category] = crafting_machine_list[1]
+    for recipe_name, recipe in pairs(game.recipe_prototypes) do
+        if not machine_name_by_recipe_name[recipe_name] then
+            machine_name_by_recipe_name[recipe_name] = global.crafting_machines_by_category[recipe.category][1].name
         end
     end
 end
@@ -92,7 +90,7 @@ local function reinitialize_module_preferences(player_index)
 end
 
 function Reinitializer.reinitialize(player_index)
-    reinitialize_crafting_machine_preferences(player_index)
+    reinitialize_chosen_crafting_machines(player_index)
     reinitialize_recipe_preferences(player_index)
     reinitialize_module_preferences(player_index)
 end

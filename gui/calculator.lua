@@ -69,31 +69,10 @@ function Calculator.recompute_everything(player_index)
     global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
 end
 
---Will associate all categories that the new crafting machine belongs to to the new crafting machine and update all the gui data accordingly
-local function update_crafting_machines(player_index, name_of_new_crafting_machine)
-    local crafting_machine_prototype = game.entity_prototypes[name_of_new_crafting_machine]
-    for category, _ in pairs(crafting_machine_prototype.crafting_categories) do
-        global[player_index].crafting_machine_preferences[category] = crafting_machine_prototype
-    end
-    Calculator.recompute_everything(player_index)
-end
-
 event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = function(event)
     --Update the recipe preference:
     global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
     Calculator.recompute_everything(event.player_index)
-end
-
-event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = function(event)
-    local new_value = event.element.elem_value
-    local category = event.element.elem_filters[1].crafting_category
-    event.element.elem_value = global[event.player_index].crafting_machine_preferences[category].name --reset the button to its previous value for now, in order not to mess with updating later and to also prevent it from being emptied
-
-    if not new_value then
-        game.get_player(event.player_index).create_local_flying_text{text = {"hxrrc.cannot_empty_a_choose_crafting_machine_button_error"}, create_at_cursor = true}
-    elseif new_value ~= event.element.elem_value then --if the value has truly changed
-        update_crafting_machines(event.player_index, new_value)
-    end
 end
 
 event_handlers.on_gui_elem_changed["hxrrc_choose_module_button"] = function(event)

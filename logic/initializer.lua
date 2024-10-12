@@ -1,11 +1,11 @@
 local Initializer = {}
 
-local function initialize_used_crafting_machines(player_index)
-    local used_crafting_machines_by_category = {}
-    for category, crafting_machine_prototype_list in pairs(global.crafting_machines_by_category) do
-        used_crafting_machines_by_category[category] = crafting_machine_prototype_list[1]
+local function initialize_chosen_crafting_machines(player_index)
+    local machine_names_by_recipe_name = {}
+    for recipe_name, recipe in pairs(game.recipe_prototypes) do
+        machine_names_by_recipe_name[recipe_name] = global.crafting_machines_by_category[recipe.category][1].name
     end
-    global[player_index].crafting_machine_preferences = used_crafting_machines_by_category
+    global[player_index].names_of_chosen_crafting_machines_by_recipe_name = machine_names_by_recipe_name
 end
 
 local function initialize_used_recipes(player_index)
@@ -29,7 +29,7 @@ end
 function Initializer.initialize_player_data(player_index)
     global[player_index] = {}
     global[player_index].backlogged_computation_count = 0
-    initialize_used_crafting_machines(player_index)
+    initialize_chosen_crafting_machines(player_index)
     initialize_used_recipes(player_index)
     initialize_module_effects(player_index)
 end

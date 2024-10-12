@@ -1,9 +1,9 @@
 local Decomposer = require "logic/decomposer"
 
 local function compute_for_product(product_full_name, production_rate, recipe, player_index)
-    local category = recipe.category
     local energy_consumption_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "consumption")
-    local crafting_machine = global[player_index].crafting_machine_preferences[category]
+    local crafting_machine_name = global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
+    local crafting_machine = game.entity_prototypes[crafting_machine_name]
 
     local machine_amount = Decomposer.machine_amount(product_full_name, production_rate, crafting_machine, player_index)
     energy_consumption = crafting_machine.energy_usage * 60 * machine_amount * energy_consumption_multiplier
