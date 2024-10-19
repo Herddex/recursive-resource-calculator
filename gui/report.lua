@@ -91,7 +91,7 @@ local function add_row(report, product_full_name, production_rate)
 
     local player_index = report.player_index
     local recipes = global.recipe_lists_by_product_full_name[product_full_name]
-    local recipe = global[player_index].recipe_preferences[product_full_name]
+    local recipe = global[player_index].recipes_by_product_full_name[product_full_name]
     if recipes then
         --Crafting machine and module cells:
         if production_rate < 0 then
@@ -169,8 +169,34 @@ local function handle_crafting_machine_change(event)
     end
 end
 
-event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = function(event)
-    handle_crafting_machine_change(event)
+local function handle_recipe_binding_change(event)
+    local pi = event.player_index
+    local button = event.element
+    local product_full_name = button.tags.product_full_name
+    local old_recipe = global[pi].recipes_by_product_full_name[product_full_name]
+    local name_of_old_recipe = old_recipe and old_recipe.name
+    local name_of_new_recipe = button.elem_value
+
+    if name_of_old_recipe == name_of_new_recipe then
+        return
+    elseif name_of_new_recipe and global[pi].product_names_by_recipe_name[name_of_new_recipe] then
+        game.get_player(pi).create_local_flying_text{text = {"hxrrc.recipe_already_used_by_another_product_error"}, create_at_cursor = true}
+        button.elem_value = name_of_old_recipe
+        return
+    end
+
+    global[pi].recipes_by_product_full_name[product_full_name] = name_of_new_recipe and game.recipe_prototypes[name_of_new_recipe]
+    if name_of_new_recipe then
+        global[pi].product_names_by_recipe_name[name_of_new_recipe] = product_full_name
+    end
+    if name_of_old_recipe then
+        global[pi].product_names_by_recipe_name[name_of_old_recipe] = nil
+    end
+
+    global[pi].trigger_recalc()
 end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = handle_crafting_machine_change
+event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = handle_recipe_binding_change
 
 return Report

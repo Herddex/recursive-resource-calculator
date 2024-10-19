@@ -1,4 +1,4 @@
-local Sheet = require "gui/sheet"
+local Sheet = require "gui.sheet"
 local ModuleGUI = require "gui/modulegui"
 local Calculator = {}
 
@@ -67,12 +67,6 @@ function Calculator.recompute_everything(player_index)
 
     global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = global[player_index].calculator.force_auto_center, parameters = {}}
     global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
-end
-
-event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = function(event)
-    --Update the recipe preference:
-    global[event.player_index].recipe_preferences[event.element.tags.product_full_name] = game.recipe_prototypes[event.element.elem_value]
-    Calculator.recompute_everything(event.player_index)
 end
 
 event_handlers.on_gui_elem_changed["hxrrc_choose_module_button"] = function(event)

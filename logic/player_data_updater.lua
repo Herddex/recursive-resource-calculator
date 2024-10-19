@@ -1,4 +1,4 @@
-local Reinitializer = {}
+local PlayerDataUpdater = {}
 
 local function reinitialize_chosen_crafting_machines(player_index)
     local machine_name_by_recipe_name = global[player_index].names_of_chosen_crafting_machines_by_recipe_name
@@ -27,15 +27,27 @@ local function has_product(recipe_prototype, product_full_name)
     return false
 end
 
-local function reinitialize_recipe_preferences(player_index)
-    local recipe_preferences = global[player_index].recipe_preferences
+local function rebuild_inverse_recipe_bindings(player_index)
+    local product_names_by_recipe_name = {}
+
+    for product_full_name, recipe in pairs(global[player_index].recipes_by_product_full_name) do
+        product_names_by_recipe_name[recipe.name] = product_full_name
+    end
+
+    global[player_index].product_names_by_recipe_name = product_names_by_recipe_name
+end
+
+local function update_recipe_bindings(player_index)
+    local recipes_by_product_full_name = global[player_index].recipes_by_product_full_name
 
     --remove recipes that are no longer valid:
-    for item_or_fluid_full_name, recipe_prototype in pairs(recipe_preferences) do
+    for item_or_fluid_full_name, recipe_prototype in pairs(recipes_by_product_full_name) do
         if not recipe_prototype.valid or not has_product(recipe_prototype, item_or_fluid_full_name) then
-            recipe_preferences[item_or_fluid_full_name] = nil
+            recipes_by_product_full_name[item_or_fluid_full_name] = nil
         end
     end
+
+    rebuild_inverse_recipe_bindings(player_index)
 end
 
 local function check_for_deleted_modules()
@@ -89,10 +101,10 @@ local function reinitialize_module_preferences(player_index)
     end
 end
 
-function Reinitializer.reinitialize(player_index)
+function PlayerDataUpdater.reinitialize(player_index)
     reinitialize_chosen_crafting_machines(player_index)
-    reinitialize_recipe_preferences(player_index)
+    update_recipe_bindings(player_index)
     reinitialize_module_preferences(player_index)
 end
 
-return Reinitializer
+return PlayerDataUpdater

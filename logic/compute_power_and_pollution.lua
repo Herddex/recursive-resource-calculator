@@ -19,7 +19,7 @@ return function(player_index, production_rates)
     local total_pollution = 0
 
     for product_full_name, production_rate in pairs(production_rates) do
-        local recipe = global[player_index].recipe_preferences[product_full_name]
+        local recipe = global[player_index].recipes_by_product_full_name[product_full_name]
         if recipe then
             local energy_usage, pollution = compute_for_product(product_full_name, production_rate, recipe, player_index)
             total_energy_usage = total_energy_usage + energy_usage

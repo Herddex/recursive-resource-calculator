@@ -31,7 +31,7 @@ function Decomposer.decompose_recursive(product_production_rate, full_product_na
     set_of_current_branch[full_product_name] = true
 
     production_rates[full_product_name] = production_rates[full_product_name] and production_rates[full_product_name] + product_production_rate or product_production_rate  
-    local recipe = global[player_index].recipe_preferences[full_product_name]
+    local recipe = global[player_index].recipes_by_product_full_name[full_product_name]
     if recipe then
         local productivity_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "productivity")
         --Get the product and possible byproducts:
@@ -68,7 +68,7 @@ end
 
 --Returns the number of machines of the type crafting_machine needed to achieve the specified production rate of the given item/fluid given by its full_product_name
 function Decomposer.machine_amount(full_product_name, product_production_rate, crafting_machine, player_index)
-    local recipe = global[player_index].recipe_preferences[full_product_name]
+    local recipe = global[player_index].recipes_by_product_full_name[full_product_name]
     local speed_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "speed")
     local productivity_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "productivity") * (crafting_machine.base_productivity + 1)
     local product = get_products(recipe, full_product_name)

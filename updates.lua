@@ -1,7 +1,8 @@
 --Handles control-side migrations from older versions of the mod
 --When updating the mod, all the update functions in this file that correspond to versions greater than the old version will be executed in order from the oldest version to the newest version
-local Sheet = require "gui/sheet"
+local Sheet = require "gui.sheet"
 local Calculator = require "gui.calculator"
+local PlayerData = require "logic.player_data"
 
 local Updates = {}
 local versions = {"1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.0.6", "1.0.7", "1.0.8", "1.1.0"}
@@ -33,10 +34,12 @@ local function remove_totals_section()
     end
 end
 
-local function change_old_crafting_machine_preferences()
+local function update_old_preferences()
     for player_index, _ in pairs(game.players) do
         global[player_index].crafting_machine_preferences = nil
         global[player_index].names_of_chosen_crafting_machines_by_recipe_name = {}
+        global[player_index].recipe_preferences = nil
+        PlayerData.initialize_recipe_bindings(player_index)
     end
 end
 
@@ -51,7 +54,7 @@ end
 Updates["1.1.0"] = function()
     remove_totals_section()
     Sheet._repair_old_sheets()
-    change_old_crafting_machine_preferences()
+    update_old_preferences()
     set_up_global_recalc_trigger()
 end
 

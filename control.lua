@@ -4,16 +4,16 @@ event_handlers.on_gui_confirmed = {}
 event_handlers.on_gui_elem_changed = {}
 
 local Calculator = require "gui.calculator"
-local Indexer = require "logic/indexer"
-local Initializer = require "logic/initializer"
-local Reinitializer = require "logic/reinitializer"
+local Indexer = require "logic.indexer"
+local PlayerData = require "logic.player_data"
+local PlayerDataUpdater = require "logic.player_data_updater"
 local Updates = require "updates"
 
 script.on_init(function()
     Indexer.run()
     global.computation_stack = {}
     for player_index, player in pairs(game.players) do
-        Initializer.initialize_player_data(player_index)
+        PlayerData.initialize_player_data(player_index)
         Calculator.build(player)
         global[player_index].trigger_recalc = function ()
             Calculator.recompute_everything(player_index)
@@ -22,21 +22,22 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function(configuration_changed_data)
+    Indexer.run()
+
     local rrc_version_change = configuration_changed_data.mod_changes.RecursiveResourceCalculator
     if rrc_version_change then
         Updates.update_from(rrc_version_change.old_version)
     end
 
     global.computation_stack = {}
-    Indexer.run()
     for _, player in pairs(game.players) do
-        Reinitializer.reinitialize(player.index)
+        PlayerDataUpdater.reinitialize(player.index)
         Calculator.recompute_everything(player.index)
     end
 end)
 
 script.on_event(defines.events.on_player_created, function(event)
-    Initializer.initialize_player_data(event.player_index)
+    PlayerData.initialize_player_data(event.player_index)
     Calculator.build(game.get_player(event.player_index))
 end)
 
