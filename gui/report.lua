@@ -1,4 +1,4 @@
-local ModuleGUI = require "gui/modulegui"
+local ModuleGUI = require "gui.modulegui"
 local Decomposer = require "logic/decomposer"
 
 local Report = {}
@@ -48,22 +48,14 @@ local function add_item_cell(report, product_full_name, production_rate)
 
     local prototype = type == "item" and game.item_prototypes[short_name] or game.fluid_prototypes[short_name]
     item_cell.add{type = "sprite", sprite = product_full_name, tooltip = prototype.localised_name}
-    
+
     item_cell.add{type = "label", caption = format_by_precision(production_rate, report.player_index) .. " /s"}
 end
 
-local function add_undecomposed_product_widgets(report, explanation_caption)
-    report.add{type = "label", caption = explanation_caption}
-    report.add{type = "empty-widget"}
-    report.add{type = "empty-widget"}
-end
-
 local function add_byproduct_widgets(report)
-    add_undecomposed_product_widgets(report, {"hxrrc.byproduct"})
-end
-
-local function add_undecomposable_product_widgets(report)
-    add_undecomposed_product_widgets(report, {"hxrrc.undecomposable"})
+    report.add{type = "label", caption = {"hxrrc.byproduct"}}
+    report.add{type = "empty-widget"}
+    report.add{type = "empty-widget"}
 end
 
 local function add_recipe_cell(report, product_full_name, recipe)
@@ -86,63 +78,74 @@ local function add_recipe_cell(report, product_full_name, recipe)
     }
 end
 
-local function add_row(report, product_full_name, production_rate)
-    add_item_cell(report, product_full_name, production_rate)
+local function add_machine_cell(report, crafting_machine, recipe, recipe_rate)
+    local pi = report.player_index
+    local machine_cell = report.add{type = "flow"}
+    machine_cell.style.horizontally_stretchable = true
+    --the machine:
+    machine_cell.add{
+        type = "choose-elem-button",
+        name = "hxrrc_choose_crafting_machine_button",
+        elem_type = "entity",
+        entity = crafting_machine.name,
+        elem_filters = {{filter = "crafting-category", crafting_category = recipe.category}},
+        enabled = #global.crafting_machines_by_category[recipe.category] > 1,
+    }
 
-    local player_index = report.player_index
-    local recipes = global.recipe_lists_by_product_full_name[product_full_name]
-    local recipe = global[player_index].recipes_by_product_full_name[product_full_name]
-    if recipes then
-        --Crafting machine and module cells:
-        if production_rate < 0 then
-            add_byproduct_widgets(report)
-        else
-            if not recipe then --the item is not a byproduct, but the player has no recipe selected
-                report.add{type = "label", caption = {"hxrrc.unselected_recipe"}}
-                report.add{type = "empty-widget"}
-            else --the player has a recipe selected and the item/fluid has a positive production rate
-                local crafting_machine_name = global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
-                if not crafting_machine_name then --the recipe only supports manual crafting:
-                    report.add{type = "label", caption = {"hxrrc.not_automatically_craftable"}}
-                    report.add{type = "empty-widget"}
-                else --a machine and a module cell will be added:
-                    local machine_cell = report.add{type = "flow"}
-                    machine_cell.style.horizontally_stretchable = true
-                    --the machine:
-                    machine_cell.add{
-                        type = "choose-elem-button",
-                        name = "hxrrc_choose_crafting_machine_button",
-                        elem_type = "entity",
-                        entity = crafting_machine_name,
-                        elem_filters = {{filter = "crafting-category", crafting_category = recipe.category}},
-                        enabled = #global.crafting_machines_by_category[recipe.category] > 1,
-                    }
-
-                    --the machine amount:
-                    local crafting_machine = game.entity_prototypes[crafting_machine_name]
-                    local machine_amount = Decomposer.machine_amount(product_full_name, production_rate, crafting_machine, player_index)
-                    local label = machine_cell.add{type = "label", name = "label"}
-                    label.caption = " x " .. format_by_precision( machine_amount, player_index)
-
-                    --Module cell:
-                    ModuleGUI.new(report, recipe.name, crafting_machine.allowed_effects)
-                end
-            end
-            add_recipe_cell(report, product_full_name, recipe)
-        end
-    else
-        add_undecomposable_product_widgets(report)
-    end
-
+    --the machine amount:
+    local machine_amount = Decomposer.machine_amount(recipe, recipe_rate, crafting_machine, pi)
+    local label = machine_cell.add{type = "label", name = "label"}
+    label.caption = " x " .. format_by_precision( machine_amount, pi)
 end
 
-function Report.new(parent, production_rates, energy_consumption, pollution)
+local function add_row_for_solved_product(report, product_full_name, product_rate, recipe_rate)
+    local pi = report.player_index
+    local recipe = global[pi].recipes_by_product_full_name[product_full_name]
+
+    add_item_cell(report, product_full_name, product_rate)
+
+    --Crafting machine and module cells:
+    local crafting_machine_name = global[pi].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
+    if not crafting_machine_name then --the recipe only supports manual crafting:
+        report.add{type = "label", caption = {"hxrrc.not_automatically_craftable"}}
+        report.add{type = "empty-widget"}
+    else
+        local crafting_machine = game.entity_prototypes[crafting_machine_name]
+        add_machine_cell(report, crafting_machine, recipe, recipe_rate)
+        ModuleGUI.new(report, recipe.name, crafting_machine.allowed_effects)
+    end
+
+    add_recipe_cell(report, product_full_name, recipe)
+end
+
+local function add_row_for_unsolved_product(report, unsolved_product_full_name, unsolved_product_rate)
+    add_item_cell(report, unsolved_product_full_name, unsolved_product_rate)
+
+    if unsolved_product_rate < 0 then
+        add_byproduct_widgets(report)
+    else --TODO See what happens for undecomposable products
+        report.add{type = "label", caption = {"hxrrc.unselected_recipe"}}
+        report.add{type = "empty-widget"}
+        add_recipe_cell(report, unsolved_product_full_name)
+    end
+end
+
+function Report.new(parent, recipe_rates_by_recipe_name, product_rates_by_product_full_name, energy_consumption, pollution)
     local report = parent.add{type = "table", name = "report", column_count = 4, draw_horizontal_lines = true, draw_vertical_lines = true}
+    local pi = report.player_index
 
     setup_headers(report, energy_consumption, pollution)
 
-    for product_full_name, production_rate in pairs(production_rates) do
-        add_row(report, product_full_name, production_rate)
+    for recipe_name, recipe_rate in pairs(recipe_rates_by_recipe_name) do
+        local product_full_name = global[pi].product_full_names_by_recipe_name[recipe_name]
+        local product_rate = product_rates_by_product_full_name[product_full_name]
+        add_row_for_solved_product(report, product_full_name, product_rate, recipe_rate)
+    end
+
+    for product_full_name, product_rate in pairs(product_rates_by_product_full_name) do
+        if not global[pi].recipes_by_product_full_name[product_full_name] then
+            add_row_for_unsolved_product(report, product_full_name, product_rate)
+        end
     end
 end
 
@@ -153,7 +156,7 @@ local function get_recipe_name_associated_to(choose_crafting_machine_button)
     return recipe_cell.hxrrc_choose_recipe_button.elem_value
 end
 
-local function handle_crafting_machine_change(event)
+function Report.handle_crafting_machine_change(event)
     local player_index = event.player_index
     local choose_crafting_machine_button = event.element
     local recipe_name = get_recipe_name_associated_to(choose_crafting_machine_button)
@@ -163,13 +166,17 @@ local function handle_crafting_machine_change(event)
     if not name_of_new_machine then
         game.get_player(player_index).create_local_flying_text{text = {"hxrrc.cannot_empty_a_choose_crafting_machine_button_error"}, create_at_cursor = true}
         choose_crafting_machine_button.elem_value = name_of_old_machine
-    elseif name_of_new_machine ~= name_of_old_machine then
-        global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name] = name_of_new_machine
-        global[player_index].trigger_recalc()
+        return false
+    elseif name_of_new_machine == name_of_old_machine then
+        return false
     end
+
+    global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name] = name_of_new_machine
+
+    return true
 end
 
-local function handle_recipe_binding_change(event)
+function Report.handle_recipe_binding_change(event)
     local pi = event.player_index
     local button = event.element
     local product_full_name = button.tags.product_full_name
@@ -178,25 +185,22 @@ local function handle_recipe_binding_change(event)
     local name_of_new_recipe = button.elem_value
 
     if name_of_old_recipe == name_of_new_recipe then
-        return
-    elseif name_of_new_recipe and global[pi].product_names_by_recipe_name[name_of_new_recipe] then
+        return false
+    elseif name_of_new_recipe and global[pi].product_full_names_by_recipe_name[name_of_new_recipe] then
         game.get_player(pi).create_local_flying_text{text = {"hxrrc.recipe_already_used_by_another_product_error"}, create_at_cursor = true}
         button.elem_value = name_of_old_recipe
-        return
+        return false
     end
 
     global[pi].recipes_by_product_full_name[product_full_name] = name_of_new_recipe and game.recipe_prototypes[name_of_new_recipe]
     if name_of_new_recipe then
-        global[pi].product_names_by_recipe_name[name_of_new_recipe] = product_full_name
+        global[pi].product_full_names_by_recipe_name[name_of_new_recipe] = product_full_name
     end
     if name_of_old_recipe then
-        global[pi].product_names_by_recipe_name[name_of_old_recipe] = nil
+        global[pi].product_full_names_by_recipe_name[name_of_old_recipe] = nil
     end
 
-    global[pi].trigger_recalc()
+    return true
 end
-
-event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = handle_crafting_machine_change
-event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = handle_recipe_binding_change
 
 return Report

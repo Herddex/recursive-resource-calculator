@@ -31,7 +31,7 @@ function PlayerData.initialize_recipe_bindings(player_index)
     end
 
     global[player_index].recipes_by_product_full_name = recipes_by_product_full_name
-    global[player_index].product_names_by_recipe_name = product_full_names_by_recipe_name
+    global[player_index].product_full_names_by_recipe_name = product_full_names_by_recipe_name
 end
 
 function PlayerData.initialize_player_data(player_index)

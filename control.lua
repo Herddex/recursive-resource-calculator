@@ -9,15 +9,17 @@ local PlayerData = require "logic.player_data"
 local PlayerDataUpdater = require "logic.player_data_updater"
 local Updates = require "updates"
 
+local function set_up_new_player(player)
+    local pi = player.index
+    PlayerData.initialize_player_data(pi)
+    Calculator.build(player)
+end
+
 script.on_init(function()
     Indexer.run()
     global.computation_stack = {}
-    for player_index, player in pairs(game.players) do
-        PlayerData.initialize_player_data(player_index)
-        Calculator.build(player)
-        global[player_index].trigger_recalc = function ()
-            Calculator.recompute_everything(player_index)
-        end
+    for _, player in pairs(game.players) do
+        set_up_new_player(player)
     end
 end)
 
@@ -37,8 +39,7 @@ script.on_configuration_changed(function(configuration_changed_data)
 end)
 
 script.on_event(defines.events.on_player_created, function(event)
-    PlayerData.initialize_player_data(event.player_index)
-    Calculator.build(game.get_player(event.player_index))
+    set_up_new_player(game.get_player(event.player_index))
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)

@@ -28,13 +28,13 @@ local function has_product(recipe_prototype, product_full_name)
 end
 
 local function rebuild_inverse_recipe_bindings(player_index)
-    local product_names_by_recipe_name = {}
+    local product_full_names_by_recipe_name = {}
 
     for product_full_name, recipe in pairs(global[player_index].recipes_by_product_full_name) do
-        product_names_by_recipe_name[recipe.name] = product_full_name
+        product_full_names_by_recipe_name[recipe.name] = product_full_name
     end
 
-    global[player_index].product_names_by_recipe_name = product_names_by_recipe_name
+    global[player_index].product_full_names_by_recipe_name = product_full_names_by_recipe_name
 end
 
 local function update_recipe_bindings(player_index)

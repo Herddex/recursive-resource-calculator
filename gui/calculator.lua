@@ -1,5 +1,6 @@
+local Report = require "gui.report"
 local Sheet = require "gui.sheet"
-local ModuleGUI = require "gui/modulegui"
+local ModuleGUI = require "gui.modulegui"
 local Calculator = {}
 
 function Calculator.build(player)
@@ -77,6 +78,18 @@ end
 event_handlers.on_gui_confirmed["hxrrc_module_count_textfield"] = function(event)
     ModuleGUI.on_gui_confirmed(event)
     Calculator.recompute_everything(event.player_index)
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = function(event)
+    if Report.handle_recipe_binding_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = function(event)
+    if Report.handle_crafting_machine_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
 end
 
 return Calculator

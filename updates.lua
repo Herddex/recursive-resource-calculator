@@ -43,19 +43,10 @@ local function update_old_preferences()
     end
 end
 
-local function set_up_global_recalc_trigger()
-    for player_index, _ in pairs(game.players) do
-        global[player_index].trigger_recalc = function ()
-            Calculator.recompute_everything(player_index)
-        end
-    end
-end
-
 Updates["1.1.0"] = function()
     remove_totals_section()
     Sheet._repair_old_sheets()
     update_old_preferences()
-    set_up_global_recalc_trigger()
 end
 
 return Updates

@@ -1,5 +1,5 @@
-local Report = require "gui/report"
-local Decomposer = require "logic/decomposer"
+local Report = require "gui.report"
+local Solver = require "logic.solver"
 local InputContainer = require "gui.input_container"
 local compute_power_and_pollution = require "logic.compute_power_and_pollution"
 
@@ -64,26 +64,26 @@ function Sheet.calculate(compute_button, sheet_pane, sheet_index)
     end
 
     update_sheet_title(sheet_pane, sheet_index)
-    local output_flow = sheet_flow.output_flow
-    output_flow.clear()
 
-    local desired_production_rates_by_full_item_name = InputContainer.get_desired_production_rates_by_full_item_name(sheet_flow.input_container)
+    local production_rates_by_product_full_name = InputContainer.get_desired_production_rates_by_full_item_name(sheet_flow.input_container)
 
-    if not desired_production_rates_by_full_item_name then --Empty sheet
+    if not production_rates_by_product_full_name then --Empty sheet
+        sheet_flow.output_flow.clear()
         return
     end
 
-    local production_rates = Decomposer.decompose(desired_production_rates_by_full_item_name, sheet_flow.player_index)
-
-    --Delete production rates which have the value 0:
-    for product_full_name, rate in pairs(production_rates) do
-        if rate == 0 then
-            production_rates[product_full_name] = nil
-        end
+    local recipe_rates_by_recipe_name, product_rates_by_product_full_name = Solver.solve_for(production_rates_by_product_full_name, sheet_flow.player_index)
+    if not recipe_rates_by_recipe_name then
+        --Matrix unsolved
+        game.get_player(sheet_flow.player_index).create_local_flying_text{text = {"hxrrc.system_with_no_solution_error"}, create_at_cursor = true}
+        return
     end
 
-    local energy_consumption, pollution = compute_power_and_pollution(sheet_flow.player_index, production_rates)
-    Report.new(output_flow, production_rates, energy_consumption, pollution)
+    local energy_consumption, pollution = compute_power_and_pollution(sheet_flow.player_index, recipe_rates_by_recipe_name)
+    
+    local output_flow = sheet_flow.output_flow
+    output_flow.clear()
+    Report.new(output_flow, recipe_rates_by_recipe_name, product_rates_by_product_full_name, energy_consumption, pollution)
 end
 
 --GUI change added in 1.1.0: the sheets' input flow element was replaced with a new input container that supports multiple desired items with their respective production rates.

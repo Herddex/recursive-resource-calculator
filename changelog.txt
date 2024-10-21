@@ -1,4 +1,23 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2024.10.21
+  Major Features:
+    - Added the ability to solve "complex" recipe systems. Limitations:
+      1) The calculator will show an error message whenever a unique solution does not exist.
+      2) The calculator now requires that each involved product be assigned a unique recipe, and
+      that each used recipe is associated to a unique product. Selecting recipes in the correct
+      order is therefore required to handle complex recipe systems.
+  Minor Features:
+    - Sheets can now have multiple final products set.
+    - Removed "Totals" section, as its functionality can now be achieved by setting all final
+      products in one sheet.
+    - Changed crafting machine selection to be unique per recipe, instead of unique per crafting
+      category, as this caused some annoying behavior with some mods.
+  Optimizations:
+    - The calculator now uses Sparse Gaussian Elimination instead of the old recursive
+      decomposition algorithm, to allow for solving "complex" recipe systems.
+      This also significantly improves performance.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.8
 Date: 2021.12.30
   Bugfixes:
@@ -34,7 +53,7 @@ Version: 1.0.4
 Date: 2021.11.19
   Changes:
     - Numbers shown in the report now use a fixed decimal precision instead of the default
-      behaviour of displaying all the representable decimal digits of the number, except for
+      behavior of displaying all the representable decimal digits of the number, except for
       trailing zeroes (which caused really long and ugly numbers to be shown in many cases,
       especially when using modules). Precision is set to 3 by default, but it can be set between 1
       and 6 inclusive in the Mod Settings. The setting is per save.
@@ -43,7 +62,7 @@ Version: 1.0.3
 Date: 2021.11.14
   Bugfixes:
     - Fixed a crash related to items/fluids that had production rates of zero, usually caused by
-      "barelling" and "unbarelling" recipes. Entries with production rates of zero will be
+      "barreling" and "un-barreling" recipes. Entries with production rates of zero will be
       eliminated from now on.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.2
@@ -57,7 +76,7 @@ Date: 2021.10.21
 Version: 1.0.1
 Date: 2021.10.18
   Bugfixes:
-    - Fixed the infinite recursion crash that occured with some recipes of some
+    - Fixed the infinite recursion crash that occurred with some recipes of some
       overhaul mods, by no longer allowing the Decomposer to enter cycles.
   Minor Features:
     - Recipes with the allow_decomposition property set to false can now be used by the mod too.
