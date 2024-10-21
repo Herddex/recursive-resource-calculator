@@ -1,13 +1,13 @@
 local Decomposer = {}
 
 function Decomposer.module_effect_multiplier(player_index, recipe_name, effect)
-    local multiplier = global[player_index].module_preferences_by_recipe_name[recipe_name].effects[effect].bonus + 1
+    local multiplier = storage[player_index].module_preferences_by_recipe_name[recipe_name].effects[effect].bonus + 1
     return multiplier > 0.2 and multiplier or 0.2
 end
 
 function Decomposer.machine_amount(recipe, recipe_rate, crafting_machine, player_index)
     local speed_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "speed")
-    local crafting_speed = crafting_machine.crafting_speed * speed_multiplier
+    local crafting_speed = crafting_machine.get_crafting_speed() * speed_multiplier
     return recipe_rate * recipe.energy / crafting_speed
 end
 

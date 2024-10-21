@@ -17,7 +17,7 @@ end
 
 script.on_init(function()
     Indexer.run()
-    global.computation_stack = {}
+    storage.computation_stack = {}
     for _, player in pairs(game.players) do
         set_up_new_player(player)
     end
@@ -31,7 +31,7 @@ script.on_configuration_changed(function(configuration_changed_data)
         Updates.update_from(rrc_version_change.old_version)
     end
 
-    global.computation_stack = {}
+    storage.computation_stack = {}
     for _, player in pairs(game.players) do
         PlayerDataUpdater.reinitialize(player.index)
         Calculator.recompute_everything(player.index)
@@ -43,7 +43,7 @@ script.on_event(defines.events.on_player_created, function(event)
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)
-    global[event.player_index] = nil
+    storage[event.player_index] = nil
 end)
 
 script.on_event("hxrrc_toggle_calculator", function(event)
@@ -70,11 +70,11 @@ end
 
 --Do each sheet calculation in its own tick
 script.on_event(defines.events.on_tick, function()
-    if global.computation_stack[1] then
-        local call_and_parameters = table.remove(global.computation_stack)
+    if storage.computation_stack[1] then
+        local call_and_parameters = table.remove(storage.computation_stack)
         call_and_parameters.call(table.unpack(call_and_parameters.parameters))
         local player_index = call_and_parameters.player_index
-        game.get_player(player_index).gui.screen.hxrrc_calculator.enabled = global[player_index].backlogged_computation_count == 0
+        game.get_player(player_index).gui.screen.hxrrc_calculator.enabled = storage[player_index].backlogged_computation_count == 0
     end
 end)
 

@@ -1,19 +1,19 @@
 local PlayerDataUpdater = {}
 
 local function reinitialize_chosen_crafting_machines(player_index)
-    local machine_name_by_recipe_name = global[player_index].names_of_chosen_crafting_machines_by_recipe_name
+    local machine_name_by_recipe_name = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name
     for recipe_name, crafting_machine_name in pairs(machine_name_by_recipe_name) do
-        local recipe = game.recipe_prototypes[recipe_name]
+        local recipe = prototypes.recipe[recipe_name]
         if not recipe then
             machine_name_by_recipe_name[recipe_name] = nil
-        elseif not game.entity_prototypes[crafting_machine_name] then
-            machine_name_by_recipe_name[recipe_name] = global.crafting_machines_by_category[recipe.category][1].name
+        elseif not prototypes.entity[crafting_machine_name] then
+            machine_name_by_recipe_name[recipe_name] = storage.crafting_machines_by_category[recipe.category][1].name
         end
     end
 
-    for recipe_name, recipe in pairs(game.recipe_prototypes) do
+    for recipe_name, recipe in pairs(prototypes.recipe) do
         if not machine_name_by_recipe_name[recipe_name] then
-            machine_name_by_recipe_name[recipe_name] = global.crafting_machines_by_category[recipe.category][1].name
+            machine_name_by_recipe_name[recipe_name] = storage.crafting_machines_by_category[recipe.category][1].name
         end
     end
 end
@@ -30,15 +30,15 @@ end
 local function rebuild_inverse_recipe_bindings(player_index)
     local product_full_names_by_recipe_name = {}
 
-    for product_full_name, recipe in pairs(global[player_index].recipes_by_product_full_name) do
+    for product_full_name, recipe in pairs(storage[player_index].recipes_by_product_full_name) do
         product_full_names_by_recipe_name[recipe.name] = product_full_name
     end
 
-    global[player_index].product_full_names_by_recipe_name = product_full_names_by_recipe_name
+    storage[player_index].product_full_names_by_recipe_name = product_full_names_by_recipe_name
 end
 
 local function update_recipe_bindings(player_index)
-    local recipes_by_product_full_name = global[player_index].recipes_by_product_full_name
+    local recipes_by_product_full_name = storage[player_index].recipes_by_product_full_name
 
     --remove recipes that are no longer valid:
     for item_or_fluid_full_name, recipe_prototype in pairs(recipes_by_product_full_name) do
@@ -52,7 +52,7 @@ end
 
 local function check_for_deleted_modules()
     local modules_were_deleted = false
-    for _, module in pairs(global.modules_by_name) do
+    for _, module in pairs(storage.modules_by_name) do
         if not module.valid then
             modules_were_deleted = true
             return
@@ -63,15 +63,15 @@ end
 
 local function reinitialize_module_preferences(player_index)
     local modules_were_deleted = check_for_deleted_modules()
-    local module_preferences = global[player_index].module_preferences_by_recipe_name
-    local modules_by_name = global.modules_by_name
-    for recipe_name, _ in pairs(game.recipe_prototypes) do
+    local module_preferences = storage[player_index].module_preferences_by_recipe_name
+    local modules_by_name = storage.modules_by_name
+    for recipe_name, _ in pairs(prototypes.recipe) do
         if not module_preferences[recipe_name] then
             module_preferences[recipe_name] = {effects = {consumption = {bonus = 0}, speed = {bonus = 0}, productivity = {bonus = 0}, pollution = {bonus = 0}}}
         end
     end
     for recipe_name, preferences_table in pairs(module_preferences) do
-        if not game.recipe_prototypes[recipe_name] then
+        if not prototypes.recipe[recipe_name] then
             module_preferences[recipe_name] = nil
         elseif modules_were_deleted then
             local effects_table_recomputation_needed = false

@@ -11,14 +11,14 @@ local function determine_used_recipes(recipe, used_recipe_name_set, player_index
 
     for _, ingredient in ipairs(recipe.ingredients) do
         local ingridient_full_name = ingredient.type .. "/" .. ingredient.name
-        local ingridient_recipe = global[player_index].recipes_by_product_full_name[ingridient_full_name]
+        local ingridient_recipe = storage[player_index].recipes_by_product_full_name[ingridient_full_name]
         determine_used_recipes(ingridient_recipe, used_recipe_name_set, player_index)
     end
 end
 
 local function get_total_productivity_multiplier_for_recipe(recipe, player_index)
-    local crafting_machine_name = global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
-    local base_productivity = (crafting_machine_name and game.entity_prototypes[crafting_machine_name].base_productivity or 0) + 1
+    local crafting_machine_name = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
+    local base_productivity = (crafting_machine_name and prototypes.entity[crafting_machine_name].effect_receiver.base_effect.productivity or 0) + 1
     return base_productivity * Decomposer.module_effect_multiplier(player_index, recipe.name, "productivity")
 end
 
@@ -30,7 +30,7 @@ local function prepare_matrix(used_recipe_name_list, production_rates_by_product
     for i, recipe_name in ipairs(used_recipe_name_list) do
         A[i] = {}
 
-        local product_full_name = global[player_index].product_full_names_by_recipe_name[recipe_name]
+        local product_full_name = storage[player_index].product_full_names_by_recipe_name[recipe_name]
         line_numbers_by_product_full_name[product_full_name] = i
         column_numbers_by_recipe_name[recipe_name] = i
         A[i][N+1] = (production_rates_by_product_full_name[product_full_name] or 0)
@@ -38,7 +38,7 @@ local function prepare_matrix(used_recipe_name_list, production_rates_by_product
 
     for _, recipe_name in ipairs(used_recipe_name_list) do
         local column = column_numbers_by_recipe_name[recipe_name]
-        local recipe = game.recipe_prototypes[recipe_name]
+        local recipe = prototypes.recipe[recipe_name]
         --TODO catalysts into account.
         local productivity_multiplier = get_total_productivity_multiplier_for_recipe(recipe, player_index)
         for _, product in ipairs(recipe.products) do
@@ -111,7 +111,7 @@ local function compute_product_rates_by_product_full_name(recipe_rates_by_recipe
     end
 
     for recipe_name, recipe_rate in pairs(recipe_rates_by_recipe_name) do
-        local recipe = game.recipe_prototypes[recipe_name]
+        local recipe = prototypes.recipe[recipe_name]
         for _, ingredient in pairs(recipe.ingredients) do
             local ingredient_full_name = ingredient.type .. "/" .. ingredient.name
             demanded_rates[ingredient_full_name] = (demanded_rates[ingredient_full_name] or 0) + recipe_rate * Decomposer.product_amount(ingredient)
@@ -137,7 +137,7 @@ end
 function Solver.solve_for(production_rates_by_product_full_name, player_index)
     local used_recipe_name_set = {}
     for product_full_name, _ in pairs(production_rates_by_product_full_name) do
-        determine_used_recipes(global[player_index].recipes_by_product_full_name[product_full_name], used_recipe_name_set, player_index)
+        determine_used_recipes(storage[player_index].recipes_by_product_full_name[product_full_name], used_recipe_name_set, player_index)
     end
 
     local used_recipe_name_list = {}

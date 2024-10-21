@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2024.10.21
+  Info:
+    - Updated to Factorio 2.0.
+    - Temporarily disabled module filtering.
+    - Quality modules not yet supported.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2024.10.21
   Major Features:

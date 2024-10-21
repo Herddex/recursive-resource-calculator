@@ -11,14 +11,14 @@ function Calculator.build(player)
         caption = {"hxrrc.calculator_title"},
         visible = false,
     }
-    global[player.index].calculator = calculator
+    storage[player.index].calculator = calculator
     calculator.auto_center = true
     local main_scroll_area = calculator.add{type = "scroll-pane", direction = "horizontal", name = "main_scroll_area"}
     local main_scroll_area_flow = main_scroll_area.add{type = "flow", direction = "horizontal", name = "main_scroll_area_flow"}
 
     --Sheet section:
     local sheet_section = main_scroll_area_flow.add{type = "flow", direction = "vertical", name = "sheet_section"}
-    global[player.index].sheet_section = sheet_section
+    storage[player.index].sheet_section = sheet_section
     sheet_section.style.horizontally_stretchable = true
     --Sheet addition and removal buttons:
     local sheet_buttons_flow = sheet_section.add{type = "flow", direction = "horizontal"}
@@ -44,12 +44,12 @@ end
 
 event_handlers.on_gui_click["hxrrc_new_sheet_button"] = function(event)
     Sheet.new(event.element.parent.parent.sheet_pane)
-    global[event.player_index].calculator.force_auto_center()
+    storage[event.player_index].calculator.force_auto_center()
 end
 
 event_handlers.on_gui_click["hxrrc_delete_sheet_button"] = function(event)
     Sheet.delete_selected_sheet(event.element.parent.parent.sheet_pane)
-    global[event.player_index].calculator.force_auto_center()
+    storage[event.player_index].calculator.force_auto_center()
 end
 
 function Calculator.toggle(player)
@@ -59,15 +59,15 @@ function Calculator.toggle(player)
 end
 
 function Calculator.recompute_everything(player_index)
-    local sheet_pane = global[player_index].sheet_section.sheet_pane
+    local sheet_pane = storage[player_index].sheet_section.sheet_pane
 
     for sheet_index, _ in ipairs(sheet_pane.tabs) do
-        global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
-        global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
+        storage.computation_stack[#storage.computation_stack+1] = {player_index = player_index, call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
+        storage[player_index].backlogged_computation_count = storage[player_index].backlogged_computation_count + 1
     end
 
-    global.computation_stack[#global.computation_stack+1] = {player_index = player_index, call = global[player_index].calculator.force_auto_center, parameters = {}}
-    global[player_index].backlogged_computation_count = global[player_index].backlogged_computation_count + 1
+    storage.computation_stack[#storage.computation_stack+1] = {player_index = player_index, call = storage[player_index].calculator.force_auto_center, parameters = {}}
+    storage[player_index].backlogged_computation_count = storage[player_index].backlogged_computation_count + 1
 end
 
 event_handlers.on_gui_elem_changed["hxrrc_choose_module_button"] = function(event)

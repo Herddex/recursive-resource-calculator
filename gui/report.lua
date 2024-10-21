@@ -46,7 +46,7 @@ local function add_item_cell(report, product_full_name, production_rate)
 
     local type, short_name = split_product_name(product_full_name)
 
-    local prototype = type == "item" and game.item_prototypes[short_name] or game.fluid_prototypes[short_name]
+    local prototype = type == "item" and prototypes.item[short_name] or prototypes.fluid[short_name]
     item_cell.add{type = "sprite", sprite = product_full_name, tooltip = prototype.localised_name}
 
     item_cell.add{type = "label", caption = format_by_precision(production_rate, report.player_index) .. " /s"}
@@ -89,7 +89,7 @@ local function add_machine_cell(report, crafting_machine, recipe, recipe_rate)
         elem_type = "entity",
         entity = crafting_machine.name,
         elem_filters = {{filter = "crafting-category", crafting_category = recipe.category}},
-        enabled = #global.crafting_machines_by_category[recipe.category] > 1,
+        enabled = #storage.crafting_machines_by_category[recipe.category] > 1,
     }
 
     --the machine amount:
@@ -100,17 +100,17 @@ end
 
 local function add_row_for_solved_product(report, product_full_name, product_rate, recipe_rate)
     local pi = report.player_index
-    local recipe = global[pi].recipes_by_product_full_name[product_full_name]
+    local recipe = storage[pi].recipes_by_product_full_name[product_full_name]
 
     add_item_cell(report, product_full_name, product_rate)
 
     --Crafting machine and module cells:
-    local crafting_machine_name = global[pi].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
+    local crafting_machine_name = storage[pi].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
     if not crafting_machine_name then --the recipe only supports manual crafting:
         report.add{type = "label", caption = {"hxrrc.not_automatically_craftable"}}
         report.add{type = "empty-widget"}
     else
-        local crafting_machine = game.entity_prototypes[crafting_machine_name]
+        local crafting_machine = prototypes.entity[crafting_machine_name]
         add_machine_cell(report, crafting_machine, recipe, recipe_rate)
         ModuleGUI.new(report, recipe.name, crafting_machine.allowed_effects)
     end
@@ -137,13 +137,13 @@ function Report.new(parent, recipe_rates_by_recipe_name, product_rates_by_produc
     setup_headers(report, energy_consumption, pollution)
 
     for recipe_name, recipe_rate in pairs(recipe_rates_by_recipe_name) do
-        local product_full_name = global[pi].product_full_names_by_recipe_name[recipe_name]
+        local product_full_name = storage[pi].product_full_names_by_recipe_name[recipe_name]
         local product_rate = product_rates_by_product_full_name[product_full_name]
         add_row_for_solved_product(report, product_full_name, product_rate, recipe_rate)
     end
 
     for product_full_name, product_rate in pairs(product_rates_by_product_full_name) do
-        if not global[pi].recipes_by_product_full_name[product_full_name] then
+        if not storage[pi].recipes_by_product_full_name[product_full_name] then
             add_row_for_unsolved_product(report, product_full_name, product_rate)
         end
     end
@@ -160,7 +160,7 @@ function Report.handle_crafting_machine_change(event)
     local player_index = event.player_index
     local choose_crafting_machine_button = event.element
     local recipe_name = get_recipe_name_associated_to(choose_crafting_machine_button)
-    local name_of_old_machine = global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name]
+    local name_of_old_machine = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name]
     local name_of_new_machine = choose_crafting_machine_button.elem_value
 
     if not name_of_new_machine then
@@ -171,7 +171,7 @@ function Report.handle_crafting_machine_change(event)
         return false
     end
 
-    global[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name] = name_of_new_machine
+    storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name] = name_of_new_machine
 
     return true
 end
@@ -180,24 +180,24 @@ function Report.handle_recipe_binding_change(event)
     local pi = event.player_index
     local button = event.element
     local product_full_name = button.tags.product_full_name
-    local old_recipe = global[pi].recipes_by_product_full_name[product_full_name]
+    local old_recipe = storage[pi].recipes_by_product_full_name[product_full_name]
     local name_of_old_recipe = old_recipe and old_recipe.name
     local name_of_new_recipe = button.elem_value
 
     if name_of_old_recipe == name_of_new_recipe then
         return false
-    elseif name_of_new_recipe and global[pi].product_full_names_by_recipe_name[name_of_new_recipe] then
+    elseif name_of_new_recipe and storage[pi].product_full_names_by_recipe_name[name_of_new_recipe] then
         game.get_player(pi).create_local_flying_text{text = {"hxrrc.recipe_already_used_by_another_product_error"}, create_at_cursor = true}
         button.elem_value = name_of_old_recipe
         return false
     end
 
-    global[pi].recipes_by_product_full_name[product_full_name] = name_of_new_recipe and game.recipe_prototypes[name_of_new_recipe]
+    storage[pi].recipes_by_product_full_name[product_full_name] = name_of_new_recipe and prototypes.recipe[name_of_new_recipe]
     if name_of_new_recipe then
-        global[pi].product_full_names_by_recipe_name[name_of_new_recipe] = product_full_name
+        storage[pi].product_full_names_by_recipe_name[name_of_new_recipe] = product_full_name
     end
     if name_of_old_recipe then
-        global[pi].product_full_names_by_recipe_name[name_of_old_recipe] = nil
+        storage[pi].product_full_names_by_recipe_name[name_of_old_recipe] = nil
     end
 
     return true

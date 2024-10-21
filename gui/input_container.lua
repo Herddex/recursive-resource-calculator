@@ -13,7 +13,6 @@ local function add_row(input_container, index)
         allow_decimal = true,
         allow_negative = false,
         lose_focus_on_confirm = true,
-        clear_and_focus_on_right_click = true,
     }
 
     row.add{

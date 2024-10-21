@@ -8,7 +8,7 @@ local Sheet = {}
 local function update_sheet_title(sheet_pane, sheet_index)
     local sheet_and_flow = sheet_pane.tabs[sheet_index]
     local item_name = sheet_and_flow.content.input_container.children[1].hxrrc_desired_item_button.elem_value
-    sheet_and_flow.tab.caption = item_name and game.item_prototypes[item_name].localised_name or {"hxrrc.empty_sheet"}
+    sheet_and_flow.tab.caption = item_name and prototypes.item[item_name].localised_name or {"hxrrc.empty_sheet"}
 end
 
 local function add_compute_button(sheet_flow)
@@ -90,7 +90,7 @@ end
 --Note: Before 1.0.6 time_unit_dropdown elements did not exist
 function Sheet._repair_old_sheets()
     for player_index, _ in pairs(game.players) do
-        for _, tab_and_contents in ipairs(global[player_index].sheet_section.sheet_pane.tabs) do
+        for _, tab_and_contents in ipairs(storage[player_index].sheet_section.sheet_pane.tabs) do
             local sheet_flow = tab_and_contents.content
             local old_input_flow = sheet_flow.input_flow
 
@@ -114,7 +114,7 @@ end
 
 event_handlers.on_gui_click["hxrrc_compute_button"] = function(event)
     Sheet.calculate(event.element)
-    global[event.player_index].calculator.force_auto_center()
+    storage[event.player_index].calculator.force_auto_center()
 end
 
 return Sheet

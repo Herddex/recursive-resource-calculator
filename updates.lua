@@ -22,13 +22,13 @@ end
 local function remove_totals_section()
     for _, player in pairs(game.players) do
         local player_index = player.index
-        global[player_index].totals_section.destroy()
-        global[player_index].totals_section = nil
-        global[player_index].totals_table_flow = nil
-        global[player_index].total_production_rates = nil
-        global[player_index].sheet_section.visible = true
-        global[player_index].sheet_section.children[1].children[1].destroy()
-        for _, tab_and_content in ipairs(global[player_index].sheet_section.sheet_pane.tabs) do
+        storage[player_index].totals_section.destroy()
+        storage[player_index].totals_section = nil
+        storage[player_index].totals_table_flow = nil
+        storage[player_index].total_production_rates = nil
+        storage[player_index].sheet_section.visible = true
+        storage[player_index].sheet_section.children[1].children[1].destroy()
+        for _, tab_and_content in ipairs(storage[player_index].sheet_section.sheet_pane.tabs) do
             tab_and_content.content.tags = {}
         end
     end
@@ -36,9 +36,9 @@ end
 
 local function update_old_preferences()
     for player_index, _ in pairs(game.players) do
-        global[player_index].crafting_machine_preferences = nil
-        global[player_index].names_of_chosen_crafting_machines_by_recipe_name = {}
-        global[player_index].recipe_preferences = nil
+        storage[player_index].crafting_machine_preferences = nil
+        storage[player_index].names_of_chosen_crafting_machines_by_recipe_name = {}
+        storage[player_index].recipe_preferences = nil
         PlayerData.initialize_recipe_bindings(player_index)
     end
 end
@@ -47,6 +47,12 @@ Updates["1.1.0"] = function()
     remove_totals_section()
     Sheet._repair_old_sheets()
     update_old_preferences()
+end
+
+Updates["1.1.1"] = function()
+    storage.universally_allowed_modules = nil
+    storage.allowed_modules_by_recipe = nil
+    storage.modules_by_name = nil
 end
 
 return Updates
