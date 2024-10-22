@@ -1,4 +1,4 @@
-local Decomposer = require "logic/decomposer"
+local Utils = require "logic.utils"
 
 local function compute_for_recipe(recipe, recipe_rate, player_index)
     local crafting_machine_name = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
@@ -6,13 +6,13 @@ local function compute_for_recipe(recipe, recipe_rate, player_index)
         return 0, 0
     end
 
-    local energy_consumption_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "consumption")
+    local energy_consumption_multiplier = Utils.module_effect_multiplier(player_index, recipe.name, "consumption")
     local crafting_machine = prototypes.entity[crafting_machine_name]
 
-    local machine_amount = Decomposer.machine_amount(recipe, recipe_rate, crafting_machine, player_index)
+    local machine_amount = Utils.machine_amount(recipe, recipe_rate, crafting_machine, player_index)
     local energy_consumption = crafting_machine.energy_usage * 60 * machine_amount * energy_consumption_multiplier
 
-    local pollution_multiplier = Decomposer.module_effect_multiplier(player_index, recipe.name, "pollution")
+    local pollution_multiplier = Utils.module_effect_multiplier(player_index, recipe.name, "pollution")
     local pollution = storage.pollution_by_crafting_machine[crafting_machine.name] * machine_amount * pollution_multiplier * energy_consumption_multiplier
 
     return energy_consumption, pollution

@@ -1,4 +1,4 @@
-local Decomposer = require "logic/decomposer"
+local Utils = require "logic.utils"
 
 local Solver = {}
 
@@ -19,7 +19,7 @@ end
 local function get_total_productivity_multiplier_for_recipe(recipe, player_index)
     local crafting_machine_name = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
     local base_productivity = (crafting_machine_name and prototypes.entity[crafting_machine_name].effect_receiver.base_effect.productivity or 0) + 1
-    return base_productivity * Decomposer.module_effect_multiplier(player_index, recipe.name, "productivity")
+    return base_productivity * Utils.module_effect_multiplier(player_index, recipe.name, "productivity")
 end
 
 local function prepare_matrix(used_recipe_name_list, production_rates_by_product_full_name, player_index)
@@ -45,7 +45,7 @@ local function prepare_matrix(used_recipe_name_list, production_rates_by_product
             local product_full_name = product.type .. "/" .. product.name
             local line = line_numbers_by_product_full_name[product_full_name]
             if line then
-                A[line][column] = productivity_multiplier * Decomposer.product_amount(product)
+                A[line][column] = productivity_multiplier * Utils.product_amount(product)
             end
         end
         for _, ingredient in ipairs(recipe.ingredients) do
@@ -114,13 +114,13 @@ local function compute_product_rates_by_product_full_name(recipe_rates_by_recipe
         local recipe = prototypes.recipe[recipe_name]
         for _, ingredient in pairs(recipe.ingredients) do
             local ingredient_full_name = ingredient.type .. "/" .. ingredient.name
-            demanded_rates[ingredient_full_name] = (demanded_rates[ingredient_full_name] or 0) + recipe_rate * Decomposer.product_amount(ingredient)
+            demanded_rates[ingredient_full_name] = (demanded_rates[ingredient_full_name] or 0) + recipe_rate * Utils.product_amount(ingredient)
         end
         for _, product in pairs(recipe.products) do
             --TODO Handle catalysts
             local product_full_name = product.type .. "/" .. product.name
             local productivity_multiplier = get_total_productivity_multiplier_for_recipe(recipe, player_index)
-            supplied_rates[product_full_name] = (supplied_rates[product_full_name] or 0) + recipe_rate * productivity_multiplier * Decomposer.product_amount(product)
+            supplied_rates[product_full_name] = (supplied_rates[product_full_name] or 0) + recipe_rate * productivity_multiplier * Utils.product_amount(product)
         end
     end
 

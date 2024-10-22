@@ -1,9 +1,11 @@
+local Utils = require "logic.utils"
+
 local PlayerData = {}
 
 local function initialize_chosen_crafting_machines(player_index)
     local machine_names_by_recipe_name = {}
     for recipe_name, recipe in pairs(prototypes.recipe) do
-        machine_names_by_recipe_name[recipe_name] = storage.crafting_machines_by_category[recipe.category][1].name
+        machine_names_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_for(recipe.category)
     end
     storage[player_index].names_of_chosen_crafting_machines_by_recipe_name = machine_names_by_recipe_name
 end

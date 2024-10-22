@@ -1,3 +1,5 @@
+local Utils = require "logic.utils"
+
 local PlayerDataUpdater = {}
 
 local function reinitialize_chosen_crafting_machines(player_index)
@@ -6,14 +8,14 @@ local function reinitialize_chosen_crafting_machines(player_index)
         local recipe = prototypes.recipe[recipe_name]
         if not recipe then
             machine_name_by_recipe_name[recipe_name] = nil
-        elseif not prototypes.entity[crafting_machine_name] then
-            machine_name_by_recipe_name[recipe_name] = storage.crafting_machines_by_category[recipe.category][1].name
+        elseif not prototypes.entity[crafting_machine_name] or not prototypes.entity[crafting_machine_name].crafting_categories[recipe.category] then
+            machine_name_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_for(recipe.category)
         end
     end
 
     for recipe_name, recipe in pairs(prototypes.recipe) do
         if not machine_name_by_recipe_name[recipe_name] then
-            machine_name_by_recipe_name[recipe_name] = storage.crafting_machines_by_category[recipe.category][1].name
+            machine_name_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_for(recipe.category)
         end
     end
 end

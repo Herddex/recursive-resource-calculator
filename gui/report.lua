@@ -1,5 +1,5 @@
 local ModuleGUI = require "gui.modulegui"
-local Decomposer = require "logic/decomposer"
+local Utils = require "logic.utils"
 
 local Report = {}
 
@@ -93,7 +93,7 @@ local function add_machine_cell(report, crafting_machine, recipe, recipe_rate)
     }
 
     --the machine amount:
-    local machine_amount = Decomposer.machine_amount(recipe, recipe_rate, crafting_machine, pi)
+    local machine_amount = Utils.machine_amount(recipe, recipe_rate, crafting_machine, pi)
     local label = machine_cell.add{type = "label", name = "label"}
     label.caption = " x " .. format_by_precision( machine_amount, pi)
 end

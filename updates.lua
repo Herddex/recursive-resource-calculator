@@ -1,7 +1,6 @@
 --Handles control-side migrations from older versions of the mod
 --When updating the mod, all the update functions in this file that correspond to versions greater than the old version will be executed in order from the oldest version to the newest version
 local Sheet = require "gui.sheet"
-local Calculator = require "gui.calculator"
 local PlayerData = require "logic.player_data"
 
 local Updates = {}
