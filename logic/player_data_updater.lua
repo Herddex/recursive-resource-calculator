@@ -50,21 +50,8 @@ local function update_recipe_bindings(player_index)
     rebuild_inverse_recipe_bindings(player_index)
 end
 
-local function check_for_deleted_modules()
-    local modules_were_deleted = false
-    for _, module in pairs(storage.modules_by_name) do
-        if not module.valid then
-            modules_were_deleted = true
-            return
-        end
-    end
-    return modules_were_deleted
-end
-
 local function reinitialize_module_preferences(player_index)
-    local modules_were_deleted = check_for_deleted_modules()
     local module_preferences = storage[player_index].module_preferences_by_recipe_name
-    local modules_by_name = storage.modules_by_name
     for recipe_name, _ in pairs(prototypes.recipe) do
         if not module_preferences[recipe_name] then
             module_preferences[recipe_name] = {effects = {consumption = {bonus = 0}, speed = {bonus = 0}, productivity = {bonus = 0}, pollution = {bonus = 0}}}
@@ -73,10 +60,10 @@ local function reinitialize_module_preferences(player_index)
     for recipe_name, preferences_table in pairs(module_preferences) do
         if not prototypes.recipe[recipe_name] then
             module_preferences[recipe_name] = nil
-        elseif modules_were_deleted then
+        else
             local effects_table_recomputation_needed = false
             for index, module_name in ipairs(preferences_table) do
-                if not modules_by_name[module_name] then
+                if not prototypes.item[module_name] then
                     preferences_table[-index] = preferences_table[-#preferences_table]
                     preferences_table[-#preferences_table] = nil
                     preferences_table[index] = preferences_table[#preferences_table]
@@ -89,10 +76,10 @@ local function reinitialize_module_preferences(player_index)
                     module_preferences.effects[effect].bonus = 0
                 end
                 for index, module_name in ipairs(preferences_table) do
-                    local module_prototype = modules_by_name[module_name]
+                    local module = prototypes.item[module_name]
                     for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
-                        if module_prototype.module_effects[effect] then
-                            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect].bonus
+                        if module.module_effects[effect] then
+                            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module.module_effects[effect].bonus
                         end
                     end
                 end
