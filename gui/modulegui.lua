@@ -1,6 +1,8 @@
+local Utils = require "logic.utils"
+
 local ModuleGUI = {}
 
-local function add_module_slot(module_gui, module_name, module_count)
+local function add_module_slot(module_gui, recipe_name, module_name, module_count)
     local module_slot = module_gui.add{type = "flow", direction = "vertical"}
     module_slot.style.horizontal_align = "center"
     module_slot.add{
@@ -9,7 +11,7 @@ local function add_module_slot(module_gui, module_name, module_count)
         tooltip = {"hxrrc.choose_module_button_tooltip"},
         elem_type = "item",
         item = module_name,
-        elem_filters = {{filter = "type", type = "module"}},
+        elem_filters = {{filter = "name", name = storage.names_of_allowed_modules_by_recipe_name[recipe_name]}},
     }
     local textfield = module_slot.add{
         type = "textfield",
@@ -27,10 +29,10 @@ end
 local function add_module_data(main_module_flow)
     local label_flow = main_module_flow.add{type = "flow", direction = "vertical"}
     local module_preferences = storage[main_module_flow.player_index].module_preferences_by_recipe_name[main_module_flow.tags.recipe_name]
-    for _, effect in ipairs{"consumption", "speed", "productivity", "pollution"} do
-        local bonus = module_preferences.effects[effect].bonus
-        if math.abs(bonus) >= 0.01 then
-            label_flow.add{type = "label", caption = {"", {"hxrrc." .. effect}, ": ", string.format("%+.0f", (bonus > -0.8 and bonus or -0.8) * 100) .. "%"}}
+    for _, effect in ipairs(Utils.module_effect_names) do
+        local effect_value = module_preferences.effects[effect]
+        if math.abs(effect_value) >= 0.01 then
+            label_flow.add{type = "label", caption = {"", {"hxrrc." .. effect}, ": ", string.format("%+.0f", (effect_value > -0.8 and effect_value or -0.8) * 100) .. "%"}}
         end
     end
 end
@@ -51,9 +53,9 @@ function ModuleGUI.new(parent, recipe_name, allowed_effects)
 
             local modules = storage[module_gui.player_index].module_preferences_by_recipe_name[recipe_name]
             for index, module_name in ipairs(modules) do
-                add_module_slot(module_gui, module_name, modules[-index])
+                add_module_slot(module_gui, recipe_name, module_name, modules[-index])
             end
-            add_module_slot(module_gui)
+            add_module_slot(module_gui, recipe_name)
 
             add_module_data(main_module_flow)
         else
@@ -74,9 +76,9 @@ function ModuleGUI.on_gui_elem_changed(event)
 
     if not choose_module_button.elem_value and index < #module_gui.children then
         local module_prototype = prototypes.item[module_preferences[index]]
-        for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
+        for _, effect in ipairs(Utils.module_effect_names) do
             if module_prototype.module_effects[effect] then
-                module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect]
+                module_preferences.effects[effect] = module_preferences.effects[effect] - module_preferences[-index] * module_prototype.module_effects[effect]
             end
         end
         --a button that was not the last one was emptied, so the module data must be shifted to fill the gap, and the button must be deleted along with its textfield buddy
@@ -93,21 +95,21 @@ function ModuleGUI.on_gui_elem_changed(event)
             --the last module slot was set, so its textfiled must be enabled, the module's count set to 1 by default, and a new one must be added
             module_slot.hxrrc_module_count_textfield.enabled = true
             module_preferences[-index] = 1
-            add_module_slot(module_gui)
+            add_module_slot(module_gui, recipe_name)
         else
             --a previous module was replaced
             local module_prototype = prototypes.item[module_preferences[index]]
-            for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
+            for _, effect in ipairs(Utils.module_effect_names) do
                 if module_prototype.module_effects[effect] then
-                    module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module_prototype.module_effects[effect]
+                    module_preferences.effects[effect] = module_preferences.effects[effect] - module_preferences[-index] * module_prototype.module_effects[effect]
                 end
             end
         end
         module_preferences[index] = choose_module_button.elem_value
         local module_prototype = prototypes.item[module_preferences[index]]
-        for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
+        for _, effect in ipairs(Utils.module_effect_names) do
             if module_prototype.module_effects[effect] then
-                module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus + module_preferences[-index] * module_prototype.module_effects[effect]
+                module_preferences.effects[effect] = module_preferences.effects[effect] + module_preferences[-index] * module_prototype.module_effects[effect]
             end
         end
     end
@@ -123,9 +125,9 @@ function ModuleGUI.on_gui_confirmed(event)
 
     local new_value = tonumber(textfield.text) or 0
     local delta = new_value - module_preferences[-index]
-    for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
+    for _, effect in ipairs(Utils.module_effect_names) do
         if module_prototype.module_effects[effect] then
-            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus + delta * module_prototype.module_effects[effect]
+            module_preferences.effects[effect] = module_preferences.effects[effect] + delta * module_prototype.module_effects[effect]
         end
     end
 

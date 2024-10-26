@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.4
+Date: 2024.10.26
+  Minor Features:
+    - Hovering over a recipe choosing button now displays the selected recipe's tooltip.
+    - Added quality to the tracked module effects.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.3
 Date: 2024.10.22
   Bugfixes:

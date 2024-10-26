@@ -66,6 +66,7 @@ local function add_recipe_cell(report, product_full_name, recipe)
         type = "choose-elem-button",
         name = "hxrrc_choose_recipe_button",
         tooltip = {"hxrrc.empty_the_recipe_button"},
+        elem_tooltip = recipe and {type = "recipe", name = recipe.name},
         elem_type = "recipe",
         recipe = recipe and recipe.name,
         tags = {product_full_name = product_full_name}, --used in Calculator.on_gui_elem_changed
@@ -86,8 +87,8 @@ local function add_machine_cell(report, crafting_machine, recipe, recipe_rate)
     machine_cell.add{
         type = "choose-elem-button",
         name = "hxrrc_choose_crafting_machine_button",
-        elem_type = "entity",
-        entity = crafting_machine.name,
+        elem_type = "entity-with-quality",
+        ["entity-with-quality"] = {name = crafting_machine.name},
         elem_filters = {{filter = "crafting-category", crafting_category = recipe.category}},
         enabled = #storage.crafting_machines_by_category[recipe.category] > 1,
     }
@@ -105,12 +106,12 @@ local function add_row_for_solved_product(report, product_full_name, product_rat
     add_item_cell(report, product_full_name, product_rate)
 
     --Crafting machine and module cells:
-    local crafting_machine_name = storage[pi].names_of_chosen_crafting_machines_by_recipe_name[recipe.name]
-    if not crafting_machine_name then --the recipe only supports manual crafting:
+    local crafting_machine_identifier = storage[pi].identifiers_of_chosen_crafting_machines_by_recipe_name[recipe.name]
+    if not crafting_machine_identifier then --the recipe only supports manual crafting:
         report.add{type = "label", caption = {"hxrrc.not_automatically_craftable"}}
         report.add{type = "empty-widget"}
     else
-        local crafting_machine = prototypes.entity[crafting_machine_name]
+        local crafting_machine = prototypes.entity[crafting_machine_identifier.name]
         add_machine_cell(report, crafting_machine, recipe, recipe_rate)
         ModuleGUI.new(report, recipe.name, crafting_machine.allowed_effects)
     end
@@ -160,18 +161,18 @@ function Report.handle_crafting_machine_change(event)
     local player_index = event.player_index
     local choose_crafting_machine_button = event.element
     local recipe_name = get_recipe_name_associated_to(choose_crafting_machine_button)
-    local name_of_old_machine = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name]
-    local name_of_new_machine = choose_crafting_machine_button.elem_value
+    local old_machine_identifier = storage[player_index].identifiers_of_chosen_crafting_machines_by_recipe_name[recipe_name]
+    local new_machine_identifier = choose_crafting_machine_button.elem_value
 
-    if not name_of_new_machine then
+    if not new_machine_identifier then
         game.get_player(player_index).create_local_flying_text{text = {"hxrrc.cannot_empty_a_choose_crafting_machine_button_error"}, create_at_cursor = true}
-        choose_crafting_machine_button.elem_value = name_of_old_machine
+        choose_crafting_machine_button.elem_value = old_machine_identifier
         return false
-    elseif name_of_new_machine == name_of_old_machine then
+    elseif new_machine_identifier.name == old_machine_identifier.name and new_machine_identifier.quality == old_machine_identifier.quality then
         return false
     end
 
-    storage[player_index].names_of_chosen_crafting_machines_by_recipe_name[recipe_name] = name_of_new_machine
+    storage[player_index].identifiers_of_chosen_crafting_machines_by_recipe_name[recipe_name] = new_machine_identifier
 
     return true
 end

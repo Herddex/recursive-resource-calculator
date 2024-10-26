@@ -3,19 +3,19 @@ local Utils = require "logic.utils"
 local PlayerDataUpdater = {}
 
 local function reinitialize_chosen_crafting_machines(player_index)
-    local machine_name_by_recipe_name = storage[player_index].names_of_chosen_crafting_machines_by_recipe_name
-    for recipe_name, crafting_machine_name in pairs(machine_name_by_recipe_name) do
+    local machine_identifier_by_recipe_name = storage[player_index].identifiers_of_chosen_crafting_machines_by_recipe_name
+    for recipe_name, crafting_machine_identifier in pairs(machine_identifier_by_recipe_name) do
         local recipe = prototypes.recipe[recipe_name]
         if not recipe then
-            machine_name_by_recipe_name[recipe_name] = nil
-        elseif not prototypes.entity[crafting_machine_name] or not prototypes.entity[crafting_machine_name].crafting_categories[recipe.category] then
-            machine_name_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_for(recipe.category)
+            machine_identifier_by_recipe_name[recipe_name] = nil
+        elseif not prototypes.entity[crafting_machine_identifier.name] or not prototypes.entity[crafting_machine_identifier.name].crafting_categories[recipe.category] then
+            machine_identifier_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_identifier_for(recipe.category)
         end
     end
 
     for recipe_name, recipe in pairs(prototypes.recipe) do
-        if not machine_name_by_recipe_name[recipe_name] then
-            machine_name_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_for(recipe.category)
+        if not machine_identifier_by_recipe_name[recipe_name] then
+            machine_identifier_by_recipe_name[recipe_name] = Utils.get_any_crafting_machine_identifier_for(recipe.category)
         end
     end
 end
@@ -56,7 +56,7 @@ local function reinitialize_module_preferences(player_index)
     local module_preferences = storage[player_index].module_preferences_by_recipe_name
     for recipe_name, _ in pairs(prototypes.recipe) do
         if not module_preferences[recipe_name] then
-            module_preferences[recipe_name] = {effects = {consumption = {bonus = 0}, speed = {bonus = 0}, productivity = {bonus = 0}, pollution = {bonus = 0}}}
+            module_preferences[recipe_name] = {effects = {consumption = 0, speed = 0, productivity = 0, pollution = 0, quality = 0}}
         end
     end
     for recipe_name, preferences_table in pairs(module_preferences) do
@@ -74,14 +74,14 @@ local function reinitialize_module_preferences(player_index)
                 end
             end
             if effects_table_recomputation_needed then
-                for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
-                    module_preferences.effects[effect].bonus = 0
+                for _, effect in ipairs(Utils.module_effect_names) do
+                    module_preferences.effects[effect] = 0
                 end
                 for index, module_name in ipairs(preferences_table) do
                     local module = prototypes.item[module_name]
-                    for _, effect in ipairs({"consumption", "speed", "productivity", "pollution"}) do
+                    for _, effect in ipairs(Utils.module_effect_names) do
                         if module.module_effects[effect] then
-                            module_preferences.effects[effect].bonus = module_preferences.effects[effect].bonus - module_preferences[-index] * module.module_effects[effect].bonus
+                            module_preferences.effects[effect] = module_preferences.effects[effect] - module_preferences[-index] * module.module_effects[effect]
                         end
                     end
                 end
