@@ -4,10 +4,13 @@ event_handlers.on_gui_confirmed = {}
 event_handlers.on_gui_elem_changed = {}
 
 local Calculator = require "gui.calculator"
+local Sheet = require "gui.sheet"
 local Indexer = require "logic.indexer"
 local PlayerData = require "logic.player_data"
 local PlayerDataUpdater = require "logic.player_data_updater"
 local Updates = require "updates"
+
+async_calls = {Sheet.calculate, Calculator.auto_center}
 
 local function set_up_new_player(player)
     local pi = player.index
@@ -71,9 +74,10 @@ end
 --Do each sheet calculation in its own tick
 script.on_event(defines.events.on_tick, function()
     if storage.computation_stack[1] then
-        local call_and_parameters = table.remove(storage.computation_stack)
-        call_and_parameters.call(table.unpack(call_and_parameters.parameters))
-        local player_index = call_and_parameters.player_index
+        local async_call_data = table.remove(storage.computation_stack)
+        local call = async_calls[async_call_data.call_id]
+        call(table.unpack(async_call_data.parameters))
+        local player_index = async_call_data.player_index
         game.get_player(player_index).gui.screen.hxrrc_calculator.enabled = storage[player_index].backlogged_computation_count == 0
     end
 end)

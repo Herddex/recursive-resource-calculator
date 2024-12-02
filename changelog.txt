@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.5
+Date: 2024.12.02
+  Bugfixes:
+    - Fixed a rare timing crash triggered when the game saves while the calculator still has backlogged computations to do.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.4
 Date: 2024.10.26
   Minor Features:

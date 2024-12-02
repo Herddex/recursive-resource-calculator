@@ -42,6 +42,10 @@ function Calculator.build(player)
     sheet_pane.selected_tab_index = 1
 end
 
+function Calculator.auto_center(player_index)
+    storage[player_index].calculator.force_auto_center()
+end
+
 event_handlers.on_gui_click["hxrrc_new_sheet_button"] = function(event)
     Sheet.new(event.element.parent.parent.sheet_pane)
     storage[event.player_index].calculator.force_auto_center()
@@ -62,11 +66,11 @@ function Calculator.recompute_everything(player_index)
     local sheet_pane = storage[player_index].sheet_section.sheet_pane
 
     for sheet_index, _ in ipairs(sheet_pane.tabs) do
-        storage.computation_stack[#storage.computation_stack+1] = {player_index = player_index, call = Sheet.calculate, parameters = {false, sheet_pane, sheet_index}}
+        storage.computation_stack[#storage.computation_stack+1] = {player_index = player_index, call_id = 1, parameters = {false, sheet_pane, sheet_index}}
         storage[player_index].backlogged_computation_count = storage[player_index].backlogged_computation_count + 1
     end
 
-    storage.computation_stack[#storage.computation_stack+1] = {player_index = player_index, call = storage[player_index].calculator.force_auto_center, parameters = {}}
+    storage.computation_stack[#storage.computation_stack+1] = {player_index = player_index, call_id = 2, parameters = {player_index}}
     storage[player_index].backlogged_computation_count = storage[player_index].backlogged_computation_count + 1
 end
 
