@@ -12,7 +12,9 @@ local function index_recipes()
     local recipes = {}
     for _, recipe_prototype in pairs(prototypes.recipe) do
         for _, product in ipairs(recipe_prototype.products) do
-            insert_multimap(recipes, product.type .. "/" .. product.name, recipe_prototype)
+            if product.type ~= "research-progress" then
+                insert_multimap(recipes, product.type .. "/" .. product.name, recipe_prototype)
+            end
         end
     end
     storage.recipe_lists_by_product_full_name = recipes
