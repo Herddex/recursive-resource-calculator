@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.7
+Date: 2025.08.03
+  Bugfixes:
+    - Changed the default key binding for opening the calculator to ALT + X so that it won't
+      conflict with the default keybinding for copper wire anymore.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.6
 Date: 2025.02.15
   Bugfixes:
@@ -7,7 +13,8 @@ Date: 2025.02.15
 Version: 1.1.5
 Date: 2024.12.02
   Bugfixes:
-    - Fixed a rare timing crash triggered when the game saves while the calculator still has backlogged computations to do.
+    - Fixed a rare timing crash triggered when the game saves while the calculator still has
+      backlogged computations to do.
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.4
 Date: 2024.10.26
