@@ -13,8 +13,7 @@ local Updates = require "updates"
 async_calls = {Sheet.calculate, Calculator.auto_center}
 
 local function set_up_new_player(player)
-    local pi = player.index
-    PlayerData.initialize_player_data(pi)
+    PlayerData.initialize_player_data(player.index)
     Calculator.build(player)
 end
 
@@ -56,6 +55,17 @@ end)
 script.on_event(defines.events.on_gui_closed, function(event)
     if event.element and event.element.name == "hxrrc_calculator" and event.element.visible then
         Calculator.toggle(game.get_player(event.player_index))
+    end
+end)
+
+script.on_event(defines.events.on_research_finished, function(event)
+    for _, effect in ipairs(event.research.prototype.effects) do
+        if effect.type == "change-recipe-productivity" then
+            for player_index, _ in ipairs(event.research.force.players) do
+                Calculator.recompute_everything(player_index)
+            end
+            return
+        end
     end
 end)
 

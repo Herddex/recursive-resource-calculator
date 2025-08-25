@@ -17,9 +17,11 @@ local function determine_used_recipes(recipe, used_recipe_name_set, player_index
 end
 
 local function get_total_productivity_multiplier_for_recipe(recipe, player_index)
+    local player_recipe = game.players[player_index].force.recipes[recipe.name]
+    local recipe_productivity = player_recipe and player_recipe.productivity_bonus or 0
     local crafting_machine_identifier = storage[player_index].identifiers_of_chosen_crafting_machines_by_recipe_name[recipe.name]
-    local base_productivity = (crafting_machine_identifier and prototypes.entity[crafting_machine_identifier.name].effect_receiver.base_effect.productivity or 0) + 1
-    return base_productivity * Utils.module_effect_multiplier(player_index, recipe.name, "productivity")
+    local base_productivity = crafting_machine_identifier and prototypes.entity[crafting_machine_identifier.name].effect_receiver.base_effect.productivity or 0
+    return (1 + base_productivity) * (1 + recipe_productivity) * Utils.module_effect_multiplier(player_index, recipe.name, "productivity")
 end
 
 local function prepare_matrix(used_recipe_name_list, production_rates_by_product_full_name, player_index)
