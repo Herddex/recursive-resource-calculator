@@ -1,0 +1,1694 @@
+--Poles that cover everything electric, and the wires that actually join them.
+--
+--Owned by lane W3-power.  The input and output are deliberately plain data: the
+--power stage does not know what a consumer is, and it never retains a prototype
+--or an engine object.
+--
+--  Power.begin{grid_w, grid_h, occupied = {{rect, owner}}, consumers = {{id, rect}}, pole = <catalog pole>,
+--              limits = {max_poles}} -> state
+--  state.result = {entities = {PlacedEntity}, wires = {{a_id, a_connector, b_id, b_connector}},
+--                  pole_count, components, uncovered = {id}, connection_point = {pole_id, x, y}}
+--
+--A wire edge is a physical claim, so it carries its connectors: power runs on
+--copper (defines.wire_connector_id.pole_copper), and a graph joined through a
+--circuit connector is not an electric network.  Reach is the smaller of the
+--two poles' own reach at their own quality.  Roboports are not consumers here.
+local Power = {}
+
+local EPSILON = 1e-9
+
+local function finite(value, fallback)
+    if type(value) == "number" and value - value == 0 then return value end
+    return fallback
+end
+
+local function integer(value, fallback)
+    if type(value) == "number" and value - value == 0 then return math.floor(value) end
+    value = finite(value, fallback)
+    if value == nil then return nil end
+    return math.floor(value)
+end
+
+--Only plain scalar values cross the stage boundary.  In particular, a
+--prototype method or userdata must never become reachable from a resumable
+--state.
+local function plain_scalar(value, fallback)
+    local kind = type(value)
+    if kind == "string" or kind == "number" or kind == "boolean" then return value end
+    if value == nil then return fallback end
+    return tostring(value)
+end
+
+local function copy_rect(rect)
+    if type(rect) ~= "table" then return nil end
+    local result = {
+        x = finite(rect.x, nil), y = finite(rect.y, nil),
+        w = finite(rect.w, nil), h = finite(rect.h, nil),
+    }
+    if result.x == nil or result.y == nil or result.w == nil or result.h == nil then return nil end
+    return result
+end
+
+local function rect_valid(rect)
+    return rect ~= nil and rect.w > 0 and rect.h > 0
+end
+
+local function rect_intersects(a, b)
+    if a == nil or b == nil then return false end
+    local aw, ah, bw, bh = a.w, a.h, b.w, b.h
+    if not (aw > 0 and ah > 0 and bw > 0 and bh > 0) then return false end
+    local ax, ay, bx, by = a.x, a.y, b.x, b.y
+    return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
+end
+
+local function sorted_keys(map)
+    local keys = {}
+    for key, _ in pairs(map or {}) do keys[#keys + 1] = key end
+    table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+    return keys
+end
+
+local function value_for_quality(spec, key, quality)
+    local by_quality = spec[key .. "_by_quality"] or spec[key .. "s_by_quality"]
+    if type(by_quality) == "table" and by_quality[quality] ~= nil then return by_quality[quality] end
+
+    local qualities = spec.quality_poles or spec.quality_variants
+    if type(qualities) == "table" and type(qualities[quality]) == "table" then
+        local value = qualities[quality][key]
+        if value ~= nil then return value end
+    end
+    local direct = spec[key]
+    if type(direct) == "table" and direct[quality] ~= nil then return direct[quality] end
+    return direct
+end
+
+local function quality_name(value)
+    if type(value) == "table" then return plain_scalar(value.name or value.id, "normal") end
+    if type(value) == "string" and value ~= "" then return value end
+    return "normal"
+end
+
+local function merge_spec(base, variant, quality)
+    local result = {}
+    for key, value in pairs(base or {}) do result[key] = value end
+    for key, value in pairs(variant or {}) do result[key] = value end
+    if quality ~= nil then result.quality = quality end
+    return result
+end
+
+local function looks_like_spec(value)
+    if type(value) ~= "table" then return false end
+    return value.name ~= nil or value.tile_w ~= nil or value.tile_h ~= nil
+        or value.supply_w ~= nil or value.supply_h ~= nil or value.wire_reach ~= nil
+        or value.quality ~= nil or value.x ~= nil or value.y ~= nil
+end
+
+local function append_spec(specs, raw, quality)
+    if type(raw) ~= "table" then return end
+    if not looks_like_spec(raw) and type(raw.pole) == "table" then
+        raw = merge_spec(raw.pole, raw, quality)
+    else
+        raw = merge_spec(raw, nil, quality)
+    end
+
+    local selected_quality = quality_name(raw.quality)
+    local supply_w = value_for_quality(raw, "supply_w", selected_quality)
+    local supply_h = value_for_quality(raw, "supply_h", selected_quality)
+    if supply_w == nil then supply_w = value_for_quality(raw, "supply_area_distance", selected_quality) end
+    if supply_h == nil then supply_h = value_for_quality(raw, "supply_area_distance_h", selected_quality) end
+    local result = {
+        name = plain_scalar(raw.name or raw.prototype, "electric-pole"),
+        quality = selected_quality,
+        tile_w = math.max(1, integer(raw.tile_w or raw.width, 1)),
+        tile_h = math.max(1, integer(raw.tile_h or raw.height, 1)),
+        supply_w = finite(supply_w, nil),
+        supply_h = finite(supply_h, nil),
+        wire_reach = finite(value_for_quality(raw, "wire_reach", selected_quality), nil),
+        max_count = integer(raw.max_count or raw.count_limit, nil),
+        fixed_x = finite(raw.x, nil),
+        fixed_y = finite(raw.y, nil),
+    }
+
+    if result.supply_w == nil then
+        local supply = value_for_quality(raw, "supply_area", selected_quality)
+        if type(supply) == "table" then
+            result.supply_w = finite(supply.w or supply.x or supply[1], 0)
+            result.supply_h = finite(supply.h or supply.y or supply[2], result.supply_w)
+        else
+            result.supply_w = finite(supply, 0)
+            result.supply_h = finite(value_for_quality(raw, "supply_h", selected_quality), result.supply_w)
+        end
+    elseif result.supply_h == nil then
+        result.supply_h = result.supply_w
+    end
+    if result.wire_reach == nil then result.wire_reach = finite(raw.wire_distance, 0) end
+    result.supply_w = math.max(0, result.supply_w)
+    result.supply_h = math.max(0, result.supply_h)
+    result.wire_reach = math.max(0, result.wire_reach)
+    result.max_count = result.max_count and math.max(0, result.max_count) or nil
+    specs[#specs + 1] = result
+end
+
+local function normalize_specs(input)
+    local specs = {}
+    local pole = input.pole
+    local alternatives = input.poles or input.pole_choices
+
+    if type(alternatives) == "table" and #alternatives > 0 then
+        for _, raw in ipairs(alternatives) do append_spec(specs, raw) end
+    elseif type(pole) == "table" and #pole > 0 then
+        for _, raw in ipairs(pole) do append_spec(specs, raw) end
+    elseif type(pole) == "table" and not looks_like_spec(pole) then
+        local variants = pole.quality_poles or pole.quality_variants or pole.qualities
+        if type(variants) == "table" then
+            local base = {}
+            for key, value in pairs(pole) do
+                if key ~= "quality_poles" and key ~= "quality_variants" and key ~= "qualities" then base[key] = value end
+            end
+            for _, quality in ipairs(sorted_keys(variants)) do
+                if type(variants[quality]) == "table" then
+                    append_spec(specs, merge_spec(base, variants[quality], quality))
+                end
+            end
+        else
+            for _, quality in ipairs(sorted_keys(pole)) do
+                if type(pole[quality]) == "table" then append_spec(specs, pole[quality], quality) end
+            end
+        end
+    elseif type(pole) == "table" then
+        --A catalog normally gives us one already-selected quality.  Pure-data
+        --callers may instead give one pole family with quality variants; make
+        --each variant a real spec so every placed pole carries the reach that
+        --belongs to its own quality.
+        local variants = pole.quality_poles or pole.quality_variants or pole.qualities
+        if type(variants) == "table" and pole.quality == nil then
+            local base = {}
+            for key, value in pairs(pole) do
+                if key ~= "quality_poles" and key ~= "quality_variants" and key ~= "qualities" then base[key] = value end
+            end
+            for _, quality in ipairs(sorted_keys(variants)) do
+                if type(variants[quality]) == "table" then
+                    append_spec(specs, merge_spec(base, variants[quality], quality))
+                end
+            end
+        else
+            append_spec(specs, pole)
+        end
+    end
+
+    table.sort(specs, function(a, b)
+        if a.quality ~= b.quality then return a.quality < b.quality end
+        if tostring(a.name) ~= tostring(b.name) then return tostring(a.name) < tostring(b.name) end
+        if a.tile_w ~= b.tile_w then return a.tile_w < b.tile_w end
+        if a.tile_h ~= b.tile_h then return a.tile_h < b.tile_h end
+        if a.supply_w ~= b.supply_w then return a.supply_w > b.supply_w end
+        if a.supply_h ~= b.supply_h then return a.supply_h > b.supply_h end
+        return a.wire_reach > b.wire_reach
+    end)
+    return specs
+end
+
+local function normalize_consumers(input)
+    local result = {}
+    for index, entry in ipairs(input.consumers or {}) do
+        local id, rect
+        if type(entry) == "table" then
+            id = entry.id or entry.consumer_id or entry.name
+            rect = entry.rect or entry[2]
+            if rect == nil and entry[1] and type(entry[1]) == "table" then rect = entry[1] end
+            if rect == nil and entry.x ~= nil then rect = entry end
+            if id == nil and entry[1] and type(entry[1]) ~= "table" then id = entry[1] end
+        end
+        result[#result + 1] = {id = plain_scalar(id, tostring(index)), rect = copy_rect(rect)}
+    end
+    --Same comparisons; each id's text built once (round 56 gate Tick cost).
+    local id_text = {}
+    for _, entry in ipairs(result) do id_text[entry] = tostring(entry.id) end
+    table.sort(result, function(a, b)
+        local aa, bb = id_text[a], id_text[b]
+        if aa ~= bb then return aa < bb end
+        local ar, br = a.rect or {}, b.rect or {}
+        if (ar.y or 0) ~= (br.y or 0) then return (ar.y or 0) < (br.y or 0) end
+        return (ar.x or 0) < (br.x or 0)
+    end)
+    return result
+end
+
+local function normalize_occupied(input)
+    local result = {}
+    for index, entry in ipairs(input.occupied or {}) do
+        local rect, owner, kind
+        if type(entry) == "table" then
+            rect = entry.rect or entry[1]
+            owner = entry.owner or entry[2]
+            kind = entry.kind
+            if rect == nil and entry.x ~= nil then rect = entry end
+        end
+        rect = copy_rect(rect)
+        if rect then result[#result + 1] = {rect = rect, owner = plain_scalar(owner, tostring(index)), kind = kind} end
+    end
+    local owner_text = {}
+    for _, entry in ipairs(result) do owner_text[entry] = tostring(entry.owner) end
+    table.sort(result, function(a, b)
+        if a.rect.y ~= b.rect.y then return a.rect.y < b.rect.y end
+        if a.rect.x ~= b.rect.x then return a.rect.x < b.rect.x end
+        if a.rect.w ~= b.rect.w then return a.rect.w < b.rect.w end
+        if a.rect.h ~= b.rect.h then return a.rect.h < b.rect.h end
+        return owner_text[a] < owner_text[b]
+    end)
+    return result
+end
+
+local function begin_make_room(state)
+    local work = state._work
+    if type(work.make_room) ~= "function" or work.room_started or #work.selected >= work.max_poles then return false end
+    work.room_started = true
+    work.blocked_candidates = work.blocked_candidates or {}
+    work.room = {consumer_index = 1, candidate_index = 1, tried = 0, candidates = {}, scan_index = 1,
+        scanning = true, attempt_index = 1}
+    state.cursor.phase = "make_room"
+    return true
+end
+
+--Same strings as tostring(x) .. ":" .. tostring(y) for integer cells, built once (round 56 gate: 6k tostring calls in
+--one blue tick). Pure memo, cleared when large; zero takes the old path (-0 prints "-0").
+local cell_key_memo, cell_key_count = {}, 0
+local function cell_key(x, y)
+    if x == 0 or y == 0 then return tostring(x) .. ":" .. tostring(y) end
+    local row = cell_key_memo[x]
+    if row then
+        local key = row[y]
+        if key then return key end
+    else
+        if cell_key_count >= 262144 then cell_key_memo, cell_key_count = {}, 0 end
+        row = {}; cell_key_memo[x] = row
+    end
+    local key = tostring(x) .. ":" .. tostring(y)
+    row[y] = key; cell_key_count = cell_key_count + 1
+    return key
+end
+
+local function occupied_cell_index(occupied)
+    local cells = {}
+    for index, entry in ipairs(occupied) do
+        local rect = entry.rect
+        local min_x, min_y = math.floor(rect.x), math.floor(rect.y)
+        local max_x, max_y = math.ceil(rect.x + rect.w) - 1, math.ceil(rect.y + rect.h) - 1
+        for y = min_y, max_y do
+            for x = min_x, max_x do
+                local key = cell_key(x, y)
+                local cell = cells[key]
+                if not cell then cell = {}; cells[key] = cell end
+                cell[#cell + 1] = index
+            end
+        end
+    end
+    return cells
+end
+
+local function candidate_is_occupied(candidate, work)
+    local rect = candidate.rect
+    local cells = work.occupied_cells
+    local seen = {}
+    for y = math.floor(rect.y), math.ceil(rect.y + rect.h) - 1 do
+        for x = math.floor(rect.x), math.ceil(rect.x + rect.w) - 1 do
+            local indices = cells[cell_key(x, y)] or {}
+            for _, index in ipairs(indices) do
+                if not seen[index] then
+                    seen[index] = true
+                    if rect_intersects(rect, work.occupied[index].rect) then return true end
+                end
+            end
+        end
+    end
+    return false
+end
+
+local function connector_id(name)
+    if type(defines) == "table" and type(defines.wire_connector_id) == "table"
+        and defines.wire_connector_id[name] ~= nil then
+        return defines.wire_connector_id[name]
+    end
+    --The fallback exists so the pure module works without the Factorio globals.  It is 5 because the player's
+    --own 2.0.77 blueprint writes 5 on both ends of all twelve of its pole-to-pole copper wires, measured from
+    --its bytes on 2026-09-21.  It was 0 on the belief that pole_copper takes the FIRST connector id, which is a
+    --guess about field order rather than an observation, and factorio-draftsman is no oracle here: it accepted
+    --an invented connector id of 99 and round-tripped `wires` as None.
+    return 5
+end
+
+local function supplied_connector_id(input, name)
+    local supplied = type(input) == "table" and (input.wire_connector_ids or input.connector_ids) or nil
+    if type(supplied) == "table" and supplied[name] ~= nil then return supplied[name] end
+    return connector_id(name)
+end
+
+local function consume(budget, cost)
+    if type(budget) ~= "table" then return false end
+    local ops = integer(budget.ops, 0)
+    cost = math.max(1, integer(cost, 1))
+    if ops <= 0 then return false end
+    --Legacy callers may deliberately provide one-op slices. They still make
+    --one unit of progress; larger slices pay the full mode-specific charge.
+    budget.ops = ops - math.min(ops, cost)
+    return true
+end
+
+--One scheduler op is not the same amount of work in every mode.  These
+--charges approximate the inner loops that a mode performs; in particular,
+--candidate scans and selection score many records while a connect step tests
+--one pole pair.  This keeps a 2000-op game tick bounded without changing the
+--order or outcome of any decision.
+local function operation_cost(state)
+    local phase, work = state.cursor.phase, state._work
+    if phase == "candidate_position" then return 4 end
+    if phase == "candidate_coverage" then return 1 end
+    if phase == "candidate_commit" then return 2 end
+    if phase == "candidate_index" then
+        local builder = work.index_builder
+        if builder and (builder.mode == "consumer_position" or builder.mode == "finalize"
+            or builder.mode == "lattice_position") then return 2 end
+    end
+    if phase == "greedy" then return 4 end
+    if phase == "make_room" then return 4 end
+    if phase == "repair_check" then return 1 end
+    if phase == "prune" or phase == "publish_sort" then return 2 end
+    --Relay chain (round 52): an enumerate step checks a spot against the occupancy index and every chosen pole; a
+    --BFS step tests wire reach. Charged at cost so one 2000-op slice stays inside a tick (integrator, 2026-09-30:
+    --at 1 op per step the stack1 chain ran 37 ms in one Power.step).
+    if phase == "chain" then
+        local chain = work.chain
+        if chain and chain.mode == "enumerate" then return 16 end
+        if chain and chain.mode == "commit" then return 2 end
+        return 4
+    end
+    return 1
+end
+
+local function candidate_rect(spec, x, y)
+    return {x = x, y = y, w = spec.tile_w, h = spec.tile_h}
+end
+
+local function consumer_covered(candidate, consumer)
+    local r = consumer.rect
+    if r == nil or not (r.w > 0 and r.h > 0) then return false end
+    local cr, sw, sh = candidate.rect, candidate.supply_w, candidate.supply_h
+    local sx, sy = cr.x + cr.w / 2 - sw, cr.y + cr.h / 2 - sh
+    local w, h = sw * 2, sh * 2
+    if not (w > 0 and h > 0) then return false end
+    return sx < r.x + r.w and r.x < sx + w and sy < r.y + r.h and r.y < sy + h
+end
+
+local function candidate_less(a, b, candidates)
+    local aa, bb = candidates[a], candidates[b]
+    if aa.rect.y ~= bb.rect.y then return aa.rect.y < bb.rect.y end
+    if aa.rect.x ~= bb.rect.x then return aa.rect.x < bb.rect.x end
+    if aa.quality ~= bb.quality then return aa.quality < bb.quality end
+    if tostring(aa.name) ~= tostring(bb.name) then return tostring(aa.name) < tostring(bb.name) end
+    if aa.rect.w ~= bb.rect.w then return aa.rect.w < bb.rect.w end
+    if aa.rect.h ~= bb.rect.h then return aa.rect.h < bb.rect.h end
+    return aa.spec_index < bb.spec_index
+end
+
+local function distance_squared(a, b)
+    local acx, acy = a.rect.x + a.rect.w / 2, a.rect.y + a.rect.h / 2
+    local bcx, bcy = b.rect.x + b.rect.w / 2, b.rect.y + b.rect.h / 2
+    local dx, dy = acx - bcx, acy - bcy
+    return dx * dx + dy * dy
+end
+
+local function wire_legal(a, b)
+    local reach = math.min(a.wire_reach, b.wire_reach)
+    return distance_squared(a, b) <= reach * reach + math.max(EPSILON, reach * EPSILON)
+end
+
+local function candidate_key(spec_index, x, y)
+    return tostring(spec_index) .. ":" .. tostring(x) .. ":" .. tostring(y)
+end
+
+local function append_candidate(work, candidate)
+    local key = candidate_key(candidate.spec_index, candidate.rect.x, candidate.rect.y)
+    local existing = work.candidate_index_by_key[key]
+    if existing ~= nil then return existing, false end
+    work.candidates[#work.candidates + 1] = candidate
+    work.candidate_keys[key] = true
+    work.candidate_index_by_key[key] = #work.candidates
+    return #work.candidates, true
+end
+
+local function make_candidate(work, spec_index, x, y, with_covers)
+    local spec = work.specs[spec_index]
+    local candidate = {
+        spec_index = spec_index, name = spec.name, quality = spec.quality,
+        rect = candidate_rect(spec, x, y), supply_w = spec.supply_w, supply_h = spec.supply_h,
+        wire_reach = spec.wire_reach, covers = {},
+    }
+    if with_covers then candidate.covers = {} end
+    return candidate
+end
+
+local function range_for_node(spec, node, reach, axis)
+    local centre = axis == "x" and node.rect.x + node.rect.w / 2 or node.rect.y + node.rect.h / 2
+    local size = axis == "x" and spec.tile_w or spec.tile_h
+    return math.ceil(centre - reach - size / 2 - EPSILON),
+        math.floor(centre + reach - size / 2 + EPSILON)
+end
+
+local function uf_root(connect, index)
+    local parent = connect.parent
+    while parent[index] ~= index do
+        parent[index] = parent[parent[index]]
+        index = parent[index]
+    end
+    return index
+end
+
+local function uf_join(connect, left, right)
+    local a, b = uf_root(connect, left), uf_root(connect, right)
+    if a == b then return false end
+    if connect.size[a] < connect.size[b] then a, b = b, a end
+    connect.parent[b] = a
+    connect.size[a] = connect.size[a] + connect.size[b]
+    connect.components = connect.components - 1
+    return true
+end
+
+local function next_candidate_position(state)
+    local work, cursor = state._work, state.cursor
+    if cursor.spec_index > #work.specs or #work.candidates >= work.candidate_limit then return nil end
+    local spec_index, spec = cursor.spec_index, work.specs[cursor.spec_index]
+    -- Candidate coordinates are indexed by the rectangles a pole can reach.
+    -- They were built in row-major order, so resuming this cursor preserves
+    -- the exact ordering of the old exhaustive grid walk.
+    local indexed = work.positions_by_spec[spec_index]
+    if indexed then
+        local item = indexed[cursor.position_index or 1]
+        if item then
+            cursor.position_index = (cursor.position_index or 1) + 1
+            return {spec_index = spec_index, x = item.x, y = item.y, covers = item.covers}
+        end
+        cursor.spec_index, cursor.position_index = spec_index + 1, 1
+        return false
+    end
+    local max_x, max_y = work.grid_w - spec.tile_w, work.grid_h - spec.tile_h
+    local x, y = cursor.x, cursor.y
+    if spec.fixed_x ~= nil or spec.fixed_y ~= nil then
+        x = spec.fixed_x ~= nil and integer(spec.fixed_x, 0) or 0
+        y = spec.fixed_y ~= nil and integer(spec.fixed_y, 0) or 0
+        cursor.spec_index, cursor.x, cursor.y = spec_index + 1, 0, 0
+    elseif max_x < 0 or max_y < 0 or y > max_y then
+        cursor.spec_index, cursor.x, cursor.y = spec_index + 1, 0, 0
+        return false
+    else
+        cursor.x = cursor.x + 1
+        if cursor.x > max_x then cursor.x, cursor.y = 0, cursor.y + 1 end
+    end
+    if x < 0 or y < 0 or x > max_x or y > max_y then return false end
+    if spec.fixed_x ~= nil and x ~= integer(spec.fixed_x, 0) then return false end
+    if spec.fixed_y ~= nil and y ~= integer(spec.fixed_y, 0) then return false end
+    return {spec_index = spec_index, x = x, y = y}
+end
+
+local INDEX_CANDIDATE = {rect = {}}
+local function advance_candidate_index(state)
+    local work, builder = state._work, state._work.index_builder
+    local spec = work.specs[builder.spec_index]
+    if not spec then
+        work.index_builder = nil
+        state.cursor = {phase = "candidate_position", spec_index = 1, x = 0, y = 0, position_index = 1}
+        return
+    end
+    local max_x, max_y = work.grid_w - spec.tile_w, work.grid_h - spec.tile_h
+    if builder.mode == "spec_start" then
+        builder.by_key, builder.positions = {}, {}
+        builder.consumer_index, builder.mode = 1, "consumer_start"
+    elseif builder.mode == "consumer_start" then
+        local consumer = work.consumers[builder.consumer_index]
+        if not consumer then
+            builder.mode = "lattice_start"
+        elseif not rect_valid(consumer.rect) then
+            builder.consumer_index = builder.consumer_index + 1
+        else
+            local rect = consumer.rect
+            builder.min_x = math.max(0, math.floor(rect.x - spec.tile_w / 2 - spec.supply_w))
+            builder.max_cx = math.min(max_x, math.ceil(rect.x + rect.w - spec.tile_w / 2 + spec.supply_w))
+            builder.min_y = math.max(0, math.floor(rect.y - spec.tile_h / 2 - spec.supply_h))
+            builder.max_cy = math.min(max_y, math.ceil(rect.y + rect.h - spec.tile_h / 2 + spec.supply_h))
+            if spec.fixed_x ~= nil then builder.min_x, builder.max_cx = integer(spec.fixed_x, 0), integer(spec.fixed_x, 0) end
+            if spec.fixed_y ~= nil then builder.min_y, builder.max_cy = integer(spec.fixed_y, 0), integer(spec.fixed_y, 0) end
+            builder.x, builder.y = builder.min_x, builder.min_y
+            builder.mode = "consumer_position"
+        end
+    elseif builder.mode == "consumer_position" then
+        if builder.y > builder.max_cy then
+            builder.consumer_index, builder.mode = builder.consumer_index + 1, "consumer_start"
+        else
+            local consumer_index = builder.consumer_index
+            local candidate = INDEX_CANDIDATE
+            candidate.rect.x, candidate.rect.y = builder.x, builder.y
+            candidate.rect.w, candidate.rect.h = spec.tile_w, spec.tile_h
+            candidate.supply_w, candidate.supply_h = spec.supply_w, spec.supply_h
+            if consumer_covered(candidate, work.consumers[consumer_index]) then
+                local key = builder.y * (work.grid_w + 1) + builder.x
+                local item = builder.by_key[key]
+                if not item then item = {x = builder.x, y = builder.y, covers = {}, lattice = false}; builder.by_key[key] = item end
+                item.covers[consumer_index] = true
+            end
+            builder.x = builder.x + 1
+            if builder.x > builder.max_cx then builder.x, builder.y = builder.min_x, builder.y + 1 end
+        end
+    elseif builder.mode == "lattice_start" then
+        builder.lattice_step = math.max(1, math.floor(finite(spec.wire_reach, 2) / 2))
+        builder.x, builder.y, builder.mode = 0, 0, "lattice_position"
+    elseif builder.mode == "lattice_position" then
+        if max_x < 0 or max_y < 0 or builder.y > max_y then
+            builder.finalize_key, builder.mode = nil, "finalize"
+        else
+            local key = builder.y * (work.grid_w + 1) + builder.x
+            local item = builder.by_key[key]
+            if not item then item = {x = builder.x, y = builder.y, covers = {}, lattice = true}; builder.by_key[key] = item
+            else item.lattice = true end
+            builder.x = builder.x + builder.lattice_step
+            if builder.x > max_x then builder.x, builder.y = 0, builder.y + builder.lattice_step end
+        end
+    elseif builder.mode == "finalize" then
+        local key, item = next(builder.by_key, builder.finalize_key)
+        if key == nil then
+            builder.mode = "sort_start"
+        else
+            builder.finalize_key = key
+            local covers = {}
+            for consumer_index in pairs(item.covers) do covers[#covers + 1] = consumer_index end
+            table.sort(covers)
+            item.covers = covers
+            if #covers > 0 or item.lattice then builder.positions[#builder.positions + 1] = item end
+        end
+    elseif builder.mode == "sort_start" then
+        local count = #builder.positions
+        if count < 2 then
+            builder.mode = "collect"
+        else
+            builder.sort_source, builder.sort_target = builder.positions, {}
+            builder.sort_width, builder.sort_left, builder.mode = 1, 1, "sort_pass"
+        end
+    elseif builder.mode == "sort_pass" then
+        local count, left = #builder.sort_source, builder.sort_left
+        if left > count then
+            if builder.sort_width >= count then
+                builder.positions = builder.sort_source
+                builder.sort_source, builder.sort_target = nil, nil
+                builder.mode = "collect"
+            else
+                builder.sort_source, builder.sort_target = builder.sort_target, {}
+                builder.sort_width, builder.sort_left = builder.sort_width * 2, 1
+            end
+        else
+            local middle, right = math.min(left + builder.sort_width, count + 1),
+                math.min(left + builder.sort_width * 2, count + 1)
+            builder.sort_i, builder.sort_j, builder.sort_k = left, middle, left
+            builder.sort_middle, builder.sort_right, builder.mode = middle, right, "sort_merge"
+        end
+    elseif builder.mode == "sort_merge" then
+        if builder.sort_k >= builder.sort_right then
+            builder.sort_left, builder.mode = builder.sort_right, "sort_pass"
+        else
+            local source, target = builder.sort_source, builder.sort_target
+            local i, j, middle, right = builder.sort_i, builder.sort_j, builder.sort_middle, builder.sort_right
+            local take_left
+            if i >= middle then take_left = false
+            elseif j >= right then take_left = true
+            else
+                local a, b = source[i], source[j]
+                take_left = a.y < b.y or (a.y == b.y and a.x <= b.x)
+            end
+            if take_left then target[builder.sort_k], builder.sort_i = source[i], i + 1
+            else target[builder.sort_k], builder.sort_j = source[j], j + 1 end
+            builder.sort_k = builder.sort_k + 1
+        end
+    elseif builder.mode == "collect" then
+        if builder.positions then
+            work.positions_by_spec[builder.spec_index] = builder.positions
+            builder.spec_index, builder.mode = builder.spec_index + 1, "spec_start"
+        end
+    end
+end
+
+local function advance_pair(repair, count)
+    if repair.pair_right < count then
+        repair.pair_right = repair.pair_right + 1
+    else
+        repair.pair_left = repair.pair_left + 1
+        repair.pair_right = repair.pair_left + 1
+    end
+end
+
+local function advance_prune_pair(eval, count)
+    --The graph trial uses the old selected positions so that removing a pole
+    --does not change the meaning of a pair halfway through the scan.
+    while eval.graph_left <= count do
+        if eval.graph_left == eval.removed then
+            eval.graph_left = eval.graph_left + 1
+            eval.graph_right = eval.graph_left + 1
+        elseif eval.graph_right > count then
+            eval.graph_left = eval.graph_left + 1
+            eval.graph_right = eval.graph_left + 1
+        elseif eval.graph_right == eval.removed then
+            eval.graph_right = eval.graph_right + 1
+        else
+            return
+        end
+    end
+end
+
+local function begin_prune_eval(work)
+    local removed = work.prune_index
+    local eval = {
+        removed = removed, coverage_index = 1, coverage_selected_index = 1,
+        covered = false, graph_left = 1, graph_right = 2,
+        parent = {}, size = {}, components = 0, edges = {},
+    }
+    for position = 1, #work.selected do
+        if position ~= removed then
+            eval.parent[position], eval.size[position] = position, 1
+            eval.components = eval.components + 1
+        end
+    end
+    advance_prune_pair(eval, #work.selected)
+    work.prune_eval = eval
+    return eval
+end
+
+local function accept_prune(work, eval)
+    local old_to_new, selected = {}, {}
+    local new_position = 0
+    for old_position, candidate_index in ipairs(work.selected) do
+        if old_position ~= eval.removed then
+            new_position = new_position + 1
+            old_to_new[old_position] = new_position
+            selected[new_position] = candidate_index
+        end
+    end
+
+    local connect = {add_position = new_position + 1, compare_position = 1,
+        parent = {}, size = {}, components = 0, edges = {}}
+    for position = 1, new_position do
+        connect.parent[position], connect.size[position] = position, 1
+        connect.components = connect.components + 1
+    end
+    for _, edge in ipairs(eval.edges) do
+        local left, right = old_to_new[edge.a], old_to_new[edge.b]
+        if left and right and uf_join(connect, left, right) then
+            connect.edges[#connect.edges + 1] = {a = left, b = right}
+        end
+    end
+
+    work.selected = selected
+    work.selected_set = {}
+    for _, candidate_index in ipairs(selected) do work.selected_set[candidate_index] = true end
+    work.connect = connect
+    work.prune_index = math.min(eval.removed - 1, #selected)
+    work.prune_eval = nil
+end
+
+local function start_prune(state)
+    local work = state._work
+    work.prune_index = #work.selected
+    work.prune_eval = nil
+    state.cursor.phase = "prune"
+end
+
+local function start_publish(state)
+    local work = state._work
+    work.publish = {
+        ordered = {}, picked = {}, pick_position = 1, scan_index = 1, best = nil,
+        entities = {}, ids_by_position = {}, position_by_candidate = {}, wires = {}, edge_index = 1,
+        uncovered = {}, uncovered_index = 1, errors = {}, entity_index = 1,
+    }
+    state.cursor.phase = "publish_sort"
+end
+
+local function finish_repair(state)
+    start_prune(state)
+end
+
+local function start_chain(state)
+    local work = state._work
+    local smallest, source_root
+    for position = 1, #work.selected do
+        local root = uf_root(work.connect, position)
+        local count = work.connect.size[root]
+        if smallest == nil or count < smallest then smallest, source_root = count, root end
+    end
+    local sources, targets = {}, {}
+    for position = 1, #work.selected do
+        local root = uf_root(work.connect, position)
+        if root == source_root then sources[#sources + 1] = position
+        else targets[#targets + 1] = position end
+    end
+    work.chain = {mode = "enumerate", x = 0, y = 0, spec_index = 1, spots = {}, by_cell = {},
+        sources = sources, targets = targets, scan = 1, seed_source = 1,
+        queue = {}, head = 1, visited = 0, edge_y = nil, edge_x = nil, edge_spec = 1,
+        pending = nil}
+    state.cursor.phase = "chain"
+end
+
+local function chain_candidate_free(work, candidate)
+    if candidate_is_occupied(candidate, work) then return false end
+    for _, position in ipairs(work.selected) do
+        if rect_intersects(candidate.rect, work.candidates[position].rect) then return false end
+    end
+    return true
+end
+
+local function chain_enqueue(chain, spot, predecessor)
+    if spot.seen then return false end
+    spot.seen, spot.predecessor = true, predecessor
+    chain.queue[#chain.queue + 1] = spot.id
+    chain.visited = chain.visited + 1
+    return true
+end
+
+local function chain_found(state, spot)
+    local work, chain = state._work, state._work.chain
+    local ids, cursor = {}, spot.id
+    while cursor do
+        ids[#ids + 1] = cursor
+        cursor = chain.spots[cursor].predecessor
+    end
+    local additions = {}
+    for i = #ids, 1, -1 do additions[#additions + 1] = chain.spots[ids[i]].candidate end
+    local new_candidates = 0
+    for _, candidate in ipairs(additions) do
+        local key = candidate_key(candidate.spec_index, candidate.rect.x, candidate.rect.y)
+        if work.candidate_index_by_key[key] == nil then new_candidates = new_candidates + 1 end
+    end
+    if #work.selected + #additions > work.max_poles
+        or new_candidates > work.relay_candidate_limit - work.relay_candidates_used then
+        work.relay_bound_hit, work.chain = true, nil
+        finish_repair(state)
+        return
+    end
+    chain.mode, chain.additions, chain.add_index = "commit", additions, 1
+end
+
+local function select_repair_candidate(state, candidate)
+    local work, repair = state._work, state._work.repair
+    local key = candidate_key(candidate.spec_index, candidate.rect.x, candidate.rect.y)
+    local index = work.candidate_index_by_key[key]
+    if index == nil then
+        if work.relay_candidates_used >= work.relay_candidate_limit then
+            work.relay_bound_hit = true
+            finish_repair(state)
+            return
+        end
+        index = append_candidate(work, candidate)
+        work.relay_candidates_used = work.relay_candidates_used + 1
+    end
+    if work.selected_set[index] then
+        repair.mode = repair.resume
+        state.cursor.phase = "repair"
+        return
+    end
+    work.selected[#work.selected + 1] = index
+    work.selected_set[index] = true
+    work.connect.add_position = #work.selected
+    work.connect.compare_position = 1
+    state.cursor.phase = "connect"
+end
+
+local function begin_repair_eval(state, candidate, resume, frontier)
+    local work = state._work
+    work.repair_eval = {
+        candidate = candidate, occupied_index = 1, selected_index = 1,
+        resume = resume, frontier = frontier, blocked = false,
+    }
+    state.cursor.phase = "repair_check"
+end
+
+local function repair_position_usable(state, spec_index, x, y, left, right, source)
+    local work, spec = state._work, state._work.specs[spec_index]
+    local max_x, max_y = work.grid_w - spec.tile_w, work.grid_h - spec.tile_h
+    if x < 0 or y < 0 or x > max_x or y > max_y then return nil end
+    if spec.fixed_x ~= nil and x ~= integer(spec.fixed_x, 0) then return nil end
+    if spec.fixed_y ~= nil and y ~= integer(spec.fixed_y, 0) then return nil end
+    local candidate = make_candidate(work, spec_index, x, y, false)
+    if left and not wire_legal(candidate, left) then return nil end
+    if right and not wire_legal(candidate, right) then return nil end
+    if source and not wire_legal(candidate, source) then return nil end
+    return candidate
+end
+
+local function direct_spec(state)
+    local work, repair = state._work, state._work.repair
+    local spec = work.specs[repair.spec_index]
+    if not spec then
+        repair.mode = "pair_direct"
+        advance_pair(repair, #work.selected)
+        return
+    end
+    local left = work.candidates[work.selected[repair.pair_left]]
+    local right = work.candidates[work.selected[repair.pair_right]]
+    local reach_left = math.min(spec.wire_reach, left.wire_reach)
+    local reach_right = math.min(spec.wire_reach, right.wire_reach)
+    local left_x, left_x2 = range_for_node(spec, left, reach_left, "x")
+    local right_x, right_x2 = range_for_node(spec, right, reach_right, "x")
+    local left_y, left_y2 = range_for_node(spec, left, reach_left, "y")
+    local right_y, right_y2 = range_for_node(spec, right, reach_right, "y")
+    repair.min_x, repair.max_x = math.max(left_x, right_x), math.min(left_x2, right_x2)
+    repair.min_y, repair.max_y = math.max(left_y, right_y), math.min(left_y2, right_y2)
+    if spec.fixed_x ~= nil then repair.min_x, repair.max_x = integer(spec.fixed_x, 0), integer(spec.fixed_x, 0) end
+    if spec.fixed_y ~= nil then repair.min_y, repair.max_y = integer(spec.fixed_y, 0), integer(spec.fixed_y, 0) end
+    repair.x, repair.y = repair.min_x, repair.min_y
+    if repair.min_x > repair.max_x or repair.min_y > repair.max_y then
+        repair.spec_index = repair.spec_index + 1
+    else
+        repair.mode = "direct_position"
+    end
+end
+
+local function frontier_spec(state)
+    local work, repair = state._work, state._work.repair
+    local spec = work.specs[repair.spec_index]
+    if not spec then
+        repair.mode = "frontier_pair"
+        advance_pair(repair, #work.selected)
+        return
+    end
+    local source = work.candidates[work.selected[repair.pair_left]]
+    local reach = math.min(spec.wire_reach, source.wire_reach)
+    repair.min_x, repair.max_x = range_for_node(spec, source, reach, "x")
+    repair.min_y, repair.max_y = range_for_node(spec, source, reach, "y")
+    if spec.fixed_x ~= nil then repair.min_x, repair.max_x = integer(spec.fixed_x, 0), integer(spec.fixed_x, 0) end
+    if spec.fixed_y ~= nil then repair.min_y, repair.max_y = integer(spec.fixed_y, 0), integer(spec.fixed_y, 0) end
+    repair.x, repair.y = repair.min_x, repair.min_y
+    repair.best, repair.best_distance = nil, math.huge
+    if repair.min_x > repair.max_x or repair.min_y > repair.max_y then
+        repair.spec_index = repair.spec_index + 1
+    else
+        repair.mode = "frontier_position"
+    end
+end
+
+local function start_repair(state)
+    local work = state._work
+    if #work.selected < 2 or #work.selected >= work.max_poles
+        or work.relay_candidate_limit <= 0 or work.relay_check_limit <= 0 then
+        if #work.selected >= 2 and work.connect.components > 1 then work.relay_bound_hit = true end
+        finish_repair(state)
+        return
+    end
+    work.repair = {mode = "pair_direct", pair_left = 1, pair_right = 2, spec_index = 1,
+        checks = work.relay_checks}
+    state.cursor.phase = "repair"
+end
+
+function Power.begin(input)
+    input = type(input) == "table" and input or {}
+    local limits = type(input.limits) == "table" and input.limits or {}
+    local specs = normalize_specs(input)
+    local consumers = normalize_consumers(input)
+    local occupied = normalize_occupied(input)
+    local grid = type(input.grid) == "table" and input.grid or input
+    local grid_w = integer(input.grid_w or grid.w, nil)
+    local grid_h = integer(input.grid_h or grid.h, nil)
+    if grid_w == nil then
+        grid_w = 0
+        for _, consumer in ipairs(consumers) do
+            if rect_valid(consumer.rect) then grid_w = math.max(grid_w, math.ceil(consumer.rect.x + consumer.rect.w)) end
+        end
+    end
+    if grid_h == nil then
+        grid_h = 0
+        for _, consumer in ipairs(consumers) do
+            if rect_valid(consumer.rect) then grid_h = math.max(grid_h, math.ceil(consumer.rect.y + consumer.rect.h)) end
+        end
+    end
+    grid_w, grid_h = math.max(0, grid_w), math.max(0, grid_h)
+
+    --The old defaults were one pole per tile per spec and 256 search seeds. On the smallest grid the search
+    --offers, one roboport block of 54 by 54 tiles, that is 2916 poles chosen out of 2916 candidates, 256 times
+    --over, inside a single op that never yields. A player sees a frozen Generate, and a watchdog caught this
+    --run still inside the first seed after 25 seconds of it.
+    --A pole is worth placing only to cover a consumer or to relay between poles, so the counts come from the
+    --problem: one pole per consumer, plus enough relays to cross the grid twice.
+    local max_poles = integer(limits.max_poles, nil)
+    if max_poles == nil then
+        --Relays are counted in wire reaches, never in tiles: crossing the grid twice needs
+        --2 * (w + h) / reach poles, not 2 * (w + h) of them.
+        local reach = 1
+        for _, spec in ipairs(specs) do reach = math.max(reach, finite(spec.wire_reach, 1)) end
+        local relays = math.ceil((grid_w + grid_h) / reach) * 2
+        max_poles = math.max(1, math.min(grid_w * grid_h * math.max(1, #specs), #consumers + relays))
+    end
+    local candidate_limit = integer(limits.max_candidates, nil)
+    if candidate_limit == nil then
+        candidate_limit = math.max(1, math.min(1000000, grid_w * grid_h * math.max(1, #specs)))
+    end
+    --There is one deterministic greedy pass.  A seed search made each charged
+    --unit repeat the whole selection, so it is intentionally no longer part
+    --of the power stage's work shape.
+    local search_limit = 1
+    local relay_candidate_limit = input.max_off_lattice_candidates or input.max_relay_candidates
+        or limits.max_off_lattice_candidates or limits.max_relay_candidates or limits.max_local_candidates
+    relay_candidate_limit = math.max(0, integer(relay_candidate_limit, 256) or 0)
+    local relay_check_limit = input.max_off_lattice_checks or input.max_relay_checks
+        or limits.max_off_lattice_checks or limits.max_relay_checks or limits.max_local_checks
+    relay_check_limit = math.max(0, integer(relay_check_limit, 4096) or 0)
+
+    local candidate_positions = 0
+    for _, spec in ipairs(specs) do
+        if spec.fixed_x ~= nil or spec.fixed_y ~= nil then
+            candidate_positions = candidate_positions + 1
+        else
+            candidate_positions = candidate_positions
+                + math.max(0, grid_w - spec.tile_w + 1) * math.max(0, grid_h - spec.tile_h + 1)
+        end
+    end
+    local total_units = math.max(1, candidate_positions * (1 + #occupied + #consumers)
+        + candidate_limit * math.max(1, #consumers + 2) + relay_check_limit
+        + math.max(1, max_poles) * 8 + #consumers + 16)
+    local state = {
+        done = false, ok = nil,
+        cursor = {phase = "candidate_index"},
+        progress = {phase = "power", done_units = 0, total_units = total_units},
+        result = nil, errors = nil, ops_used = 0,
+        _work = {
+            grid_w = grid_w, grid_h = grid_h, specs = specs, consumers = consumers, occupied = occupied,
+            occupied_cells = occupied_cell_index(occupied), make_room = input.make_room,
+            blocked_candidates = {},
+            positions_by_spec = {}, index_builder = {spec_index = 1, mode = "spec_start"},
+            max_poles = math.max(0, max_poles), candidate_limit = candidate_limit,
+            search_limit = search_limit, candidates = {}, candidate_keys = {}, candidate_index_by_key = {},
+            candidate_eval = nil, selected = {}, selected_set = {}, covered = {}, covered_count = 0,
+            greedy = {candidate_index = 1, selected_position = 1, cover_index = 1,
+                candidate = nil, rejected = false, variant_count = 0, gain = 0, total = 0,
+                best = nil, best_gain = -1, best_total = -1, mode = "candidate"},
+            relay_candidate_limit = relay_candidate_limit, relay_check_limit = relay_check_limit,
+            relay_candidates_used = 0, relay_checks = 0, relay_bound_hit = false,
+            pruning_enabled = limits.prune == true,
+            copper_connector = supplied_connector_id(input, "pole_copper"),
+        },
+    }
+    return state
+end
+
+function Power.cancel(state)
+    if type(state) ~= "table" or state.done then return state end
+    state.cancelled, state.done, state.ok, state.result = true, true, false, nil
+    state.errors = {{code = "BP_FAIL_CANCELLED"}}
+    state.cursor = {phase = "cancelled"}
+    state.progress.phase = "cancelled"
+    return state
+end
+
+function Power.step(state, budget)
+    if type(state) ~= "table" or state.done then return state end
+    if type(budget) ~= "table" then return state end
+    local work = state._work
+
+    while not state.done do
+        local cost, available = operation_cost(state), integer(budget.ops, 0)
+        if not consume(budget, cost) then break end
+        -- ops_used records charged work, not state-machine transitions.
+        state.ops_used = state.ops_used + math.min(cost, available)
+        local phase, cursor = state.cursor.phase, state.cursor
+
+        if phase == "candidate_index" then
+            advance_candidate_index(state)
+
+        elseif phase == "candidate_position" then
+            if #work.candidates >= work.candidate_limit or cursor.spec_index > #work.specs then
+                work.greedy.mode = "candidate"
+                cursor.phase = "greedy"
+            else
+                local position = next_candidate_position(state)
+                if position == nil then
+                    cursor.phase = "greedy"
+                    work.greedy.mode = "candidate"
+                elseif position ~= false then
+                    local candidate = make_candidate(work, position.spec_index, position.x, position.y, true)
+                    candidate.covers = position.covers or {}
+                    local blocked = candidate_is_occupied(candidate, work)
+                    work.candidate_eval = {candidate = candidate, occupied_index = #work.occupied + 1,
+                        consumer_index = #work.consumers + 1, blocked = blocked}
+                    -- The cell index above already performed exact intersection tests.  Rewalking
+                    -- every occupied rectangle here charged one op per unrelated building.
+                    if blocked then
+                        local covers = {}
+                        for ci, consumer in ipairs(work.consumers) do
+                            if consumer_covered(candidate, consumer) then covers[#covers + 1] = ci end
+                        end
+                        --This scan walks every consumer inside one unit: charge 1 op per 16 consumers, as far as the
+                        --budget goes (round 56 gate: red-green ticks 313-316 ran 848 instructions per op, 75 ms).
+                        local extra = math.min(integer(budget.ops, 0), math.floor(#work.consumers / 16))
+                        if extra > 0 then budget.ops = integer(budget.ops, 0) - extra; state.ops_used = state.ops_used + extra end
+                        candidate.covers = covers
+                        if #covers > 0 then work.blocked_candidates[#work.blocked_candidates + 1] = candidate end
+                        work.candidate_eval = nil; cursor.phase = "candidate_position"
+                    else cursor.phase = "candidate_coverage" end
+                end
+            end
+
+        elseif phase == "candidate_occupied" then
+            local eval = work.candidate_eval
+            if eval.occupied_index <= #work.occupied then
+                if rect_intersects(eval.candidate.rect, work.occupied[eval.occupied_index].rect) then eval.blocked = true end
+                eval.occupied_index = eval.occupied_index + 1
+            elseif eval.blocked then
+                work.candidate_eval = nil
+                cursor.phase = "candidate_position"
+            else
+                cursor.phase = "candidate_coverage"
+            end
+
+        elseif phase == "candidate_coverage" then
+            local eval = work.candidate_eval
+            if eval.consumer_index <= #work.consumers then
+                if consumer_covered(eval.candidate, work.consumers[eval.consumer_index]) then
+                    eval.candidate.covers[#eval.candidate.covers + 1] = eval.consumer_index
+                end
+                eval.consumer_index = eval.consumer_index + 1
+            else
+                cursor.phase = "candidate_commit"
+            end
+
+        elseif phase == "candidate_commit" then
+            local eval, candidate = work.candidate_eval, work.candidate_eval.candidate
+            local spec = work.specs[candidate.spec_index]
+            local lattice_step = math.max(1, math.floor(finite(spec.wire_reach, 2) / 2))
+            if #candidate.covers > 0 or (candidate.rect.x % lattice_step == 0 and candidate.rect.y % lattice_step == 0) then
+                append_candidate(work, candidate)
+            end
+            work.candidate_eval = nil
+            cursor.phase = "candidate_position"
+
+        elseif phase == "greedy" then
+            local greedy = work.greedy
+            if greedy.mode ~= "add" and greedy.mode ~= "add_coverage"
+                and (#work.selected >= work.max_poles or work.covered_count >= #work.consumers) then
+                if begin_make_room(state) then
+                    -- optional post-greedy attempt to clear transport and hand tiles
+                else work.connect = {add_position = 1, compare_position = 1, parent = {}, size = {},
+                    components = 0, edges = {}}
+                cursor.phase = "connect" end
+            elseif greedy.mode == "candidate" then
+                if greedy.candidate_index > #work.candidates then
+                    if greedy.best == nil then
+                        if begin_make_room(state) then
+                        else work.connect = {add_position = 1, compare_position = 1, parent = {}, size = {},
+                            components = 0, edges = {}}
+                        cursor.phase = "connect" end
+                    else
+                        greedy.mode = "add"
+                    end
+                else
+                    local index = greedy.candidate_index
+                    local candidate = work.candidates[index]
+                    if work.selected_set[index] or #candidate.covers == 0 then
+                        greedy.candidate_index = index + 1
+                    else
+                        greedy.candidate = index
+                        greedy.selected_position, greedy.variant_count = 1, 0
+                        greedy.rejected, greedy.mode = false, "selected_check"
+                    end
+                end
+            elseif greedy.mode == "selected_check" then
+                local rejected, variant_count = false, 0
+                for _, selected_index in ipairs(work.selected) do
+                    local selected = work.candidates[selected_index]
+                    local candidate = work.candidates[greedy.candidate]
+                    if rect_intersects(candidate.rect, selected.rect) then rejected = true end
+                    if candidate.spec_index == selected.spec_index then variant_count = variant_count + 1 end
+                end
+                local candidate = work.candidates[greedy.candidate]
+                local limit = work.specs[candidate.spec_index].max_count
+                if limit ~= nil and variant_count >= limit then rejected = true end
+                if rejected then
+                    greedy.candidate_index = greedy.candidate_index + 1
+                    greedy.mode = "candidate"
+                else
+                    local gain, total = 0, #candidate.covers
+                    for _, consumer_index in ipairs(candidate.covers) do
+                        if not work.covered[consumer_index] then gain = gain + 1 end
+                    end
+                    if gain > 0 and (greedy.best == nil or gain > greedy.best_gain
+                        or (gain == greedy.best_gain and (total > greedy.best_total
+                            or (total == greedy.best_total and greedy.candidate < greedy.best)))) then
+                        greedy.best, greedy.best_gain, greedy.best_total = greedy.candidate, gain, total
+                    end
+                    greedy.candidate_index = greedy.candidate_index + 1
+                    greedy.mode = "candidate"
+                end
+            elseif greedy.mode == "coverage" then
+                --Kept for state compatibility with older resumable states; new scans
+                --score a candidate's short cover list in one op above.
+                greedy.mode = "candidate"
+            elseif greedy.mode == "add" then
+                local index = greedy.best
+                work.selected[#work.selected + 1] = index
+                work.selected_set[index] = true
+                greedy.cover_index, greedy.mode = 1, "add_coverage"
+            elseif greedy.mode == "add_coverage" then
+                local candidate = work.candidates[greedy.best]
+                for _, consumer_index in ipairs(candidate.covers) do
+                    if not work.covered[consumer_index] then
+                        work.covered[consumer_index] = true
+                        work.covered_count = work.covered_count + 1
+                    end
+                end
+                greedy.best, greedy.best_gain, greedy.best_total = nil, -1, -1
+                greedy.candidate_index, greedy.mode = 1, "candidate"
+            end
+
+        elseif phase == "make_room" then
+            local room = work.room
+            while room.consumer_index <= #work.consumers and (work.covered[room.consumer_index]
+                or #work.selected >= work.max_poles) do
+                room.consumer_index = room.consumer_index + 1
+                room.candidate_index, room.tried, room.candidates, room.scan_index = 1, 0, {}, 1
+                room.scanning, room.attempt_index = true, 1
+            end
+            if room.consumer_index > #work.consumers then
+                work.connect = {add_position = 1, compare_position = 1, parent = {}, size = {}, components = 0, edges = {}}
+                cursor.phase = "connect"
+            else
+                if room.scanning and room.scan_index <= #work.blocked_candidates then
+                    local candidate = work.blocked_candidates[room.scan_index]
+                    room.scan_index = room.scan_index + 1
+                    local gain, covers_target = 0, false
+                    for _, ci in ipairs(candidate.covers) do
+                        if not work.covered[ci] then gain = gain + 1 end
+                        if ci == room.consumer_index then covers_target = true end
+                    end
+                    if gain > 0 and covers_target then
+                        local entry = {candidate = candidate, gain = gain}
+                        local at = #room.candidates + 1
+                        for i, old in ipairs(room.candidates) do
+                            if gain > old.gain or (gain == old.gain and (candidate.rect.y < old.candidate.rect.y
+                                or (candidate.rect.y == old.candidate.rect.y and candidate.rect.x < old.candidate.rect.x))) then
+                                at = i; break
+                            end
+                        end
+                        table.insert(room.candidates, at, entry)
+                        if #room.candidates > 8 then room.candidates[9] = nil end
+                    end
+                elseif room.scanning then
+                    room.scanning = false
+                else
+                local entry = room.candidates[room.attempt_index]
+                if not entry or room.tried >= 8 then
+                    room.consumer_index = room.consumer_index + 1
+                    room.candidate_index, room.tried, room.candidates, room.scan_index = 1, 0, {}, 1
+                    room.scanning, room.attempt_index = true, 1
+                else
+                    room.candidate_index, room.tried, room.attempt_index = room.candidate_index + 1, room.tried + 1, room.attempt_index + 1
+                    local candidate, blockers = entry.candidate, {}
+                    for _, selected_index in ipairs(work.selected) do
+                        if rect_intersects(candidate.rect, work.candidates[selected_index].rect) then blockers = nil; break end
+                    end
+                    for oi, occupied in ipairs(work.occupied) do
+                        if blockers == nil then break end
+                        if rect_intersects(candidate.rect, occupied.rect) then
+                            if occupied.kind ~= "belt" and occupied.kind ~= "underground" and occupied.kind ~= "pipe" and occupied.kind ~= "inserter" then
+                                blockers = nil; break
+                            end
+                            blockers[#blockers + 1] = occupied
+                        end
+                    end
+                    local freed = blockers ~= nil and #blockers > 0
+                    if freed then
+                        for _, blocked in ipairs(blockers) do
+                            if not freed then break end
+                            local ok = true
+                            local r = blocked.rect
+                            for y = math.floor(r.y), math.ceil(r.y+r.h)-1 do for x = math.floor(r.x), math.ceil(r.x+r.w)-1 do
+                                if x >= math.floor(candidate.rect.x) and x < math.ceil(candidate.rect.x+candidate.rect.w)
+                                    and y >= math.floor(candidate.rect.y) and y < math.ceil(candidate.rect.y+candidate.rect.h) then
+                                    if ok and not work.make_room(x,y) then ok=false end
+                                end
+                            end end
+                            if not ok then freed = false; break end
+                        end
+                    end
+                    if freed then
+                        local keep = {}
+                        for _, occupied in ipairs(work.occupied) do
+                            local hit = false
+                            for _, blocked in ipairs(blockers) do if occupied == blocked then hit = true end end
+                            if not hit then keep[#keep+1] = occupied end
+                        end
+                        work.occupied, work.occupied_cells = keep, occupied_cell_index(keep)
+                        local index = append_candidate(work, candidate)
+                        work.selected[#work.selected+1], work.selected_set[index] = index, true
+                        for _, ci in ipairs(candidate.covers) do if not work.covered[ci] then work.covered[ci]=true; work.covered_count=work.covered_count+1 end end
+                    end
+                end
+                end
+            end
+
+        elseif phase == "connect" then
+            local connect = work.connect
+            if connect.add_position > #work.selected then
+                if connect.components <= 1 then
+                    start_prune(state)
+                elseif #work.selected >= work.max_poles then
+                    --Reaching the pole bound with multiple components is an
+                    --incomplete bounded search.  It must not be presented as
+                    --a proof that no legal layout exists.
+                    work.relay_bound_hit = true
+                    start_prune(state)
+                else
+                    start_repair(state)
+                end
+            elseif connect.parent[connect.add_position] == nil then
+                local position = connect.add_position
+                connect.parent[position], connect.size[position] = position, 1
+                connect.components = connect.components + 1
+                connect.compare_position = 1
+            elseif connect.compare_position < connect.add_position then
+                local left = work.candidates[work.selected[connect.add_position]]
+                local right = work.candidates[work.selected[connect.compare_position]]
+                if wire_legal(left, right) and uf_join(connect, connect.add_position, connect.compare_position) then
+                    connect.edges[#connect.edges + 1] = {a = connect.compare_position, b = connect.add_position}
+                end
+                connect.compare_position = connect.compare_position + 1
+            else
+                connect.add_position = connect.add_position + 1
+                connect.compare_position = 1
+            end
+
+        elseif phase == "repair" then
+            local repair = work.repair
+            if repair.mode == "pair_direct" then
+                if #work.selected < 2 or #work.selected >= work.max_poles or repair.pair_left >= #work.selected then
+                    repair.mode, repair.pair_left, repair.pair_right = "frontier_pair", 1, 2
+                elseif repair.pair_right > #work.selected then
+                    advance_pair(repair, #work.selected)
+                elseif uf_root(work.connect, repair.pair_left) == uf_root(work.connect, repair.pair_right) then
+                    advance_pair(repair, #work.selected)
+                else
+                    repair.spec_index, repair.mode = 1, "direct_spec"
+                end
+            elseif repair.mode == "direct_spec" then
+                direct_spec(state)
+            elseif repair.mode == "direct_position" then
+                if repair.y > repair.max_y then
+                    repair.spec_index, repair.mode = repair.spec_index + 1, "direct_spec"
+                else
+                    local x, y = repair.x, repair.y
+                    repair.x = repair.x + 1
+                    if repair.x > repair.max_x then repair.x, repair.y = repair.min_x, repair.y + 1 end
+                    if work.relay_checks >= work.relay_check_limit then
+                        work.relay_bound_hit = true
+                        finish_repair(state)
+                    else
+                        work.relay_checks = work.relay_checks + 1
+                        local left = work.candidates[work.selected[repair.pair_left]]
+                        local right = work.candidates[work.selected[repair.pair_right]]
+                        local candidate = repair_position_usable(state, repair.spec_index, x, y, left, right, nil)
+                        if candidate then begin_repair_eval(state, candidate, "direct_position", false) end
+                    end
+                end
+            elseif repair.mode == "frontier_pair" then
+                if #work.selected < 2 or #work.selected >= work.max_poles or repair.pair_left >= #work.selected then
+                    if work.connect.components > 1 and #work.selected < work.max_poles then start_chain(state)
+                    else finish_repair(state) end
+                elseif repair.pair_right > #work.selected then
+                    advance_pair(repair, #work.selected)
+                elseif uf_root(work.connect, repair.pair_left) == uf_root(work.connect, repair.pair_right) then
+                    advance_pair(repair, #work.selected)
+                else
+                    repair.spec_index, repair.mode = 1, "frontier_spec"
+                end
+            elseif repair.mode == "frontier_spec" then
+                frontier_spec(state)
+            elseif repair.mode == "frontier_position" then
+                if repair.y > repair.max_y then
+                    if repair.best then repair.mode = "frontier_commit"
+                    else repair.spec_index, repair.mode = repair.spec_index + 1, "frontier_spec" end
+                else
+                    local x, y = repair.x, repair.y
+                    repair.x = repair.x + 1
+                    if repair.x > repair.max_x then repair.x, repair.y = repair.min_x, repair.y + 1 end
+                    if work.relay_checks >= work.relay_check_limit then
+                        work.relay_bound_hit = true
+                        finish_repair(state)
+                    else
+                        work.relay_checks = work.relay_checks + 1
+                        local source = work.candidates[work.selected[repair.pair_left]]
+                        local candidate = repair_position_usable(state, repair.spec_index, x, y, nil, nil, source)
+                        if candidate then begin_repair_eval(state, candidate, "frontier_compare", true) end
+                    end
+                end
+            elseif repair.mode == "frontier_commit" then
+                local candidate = repair.best
+                repair.best = nil
+                select_repair_candidate(state, candidate)
+            elseif repair.mode == "direct_commit" then
+                local candidate = work.repair_eval.candidate
+                work.repair_eval = nil
+                select_repair_candidate(state, candidate)
+            else
+                if repair.mode == "frontier_compare" and work.connect.components > 1
+                    and #work.selected < work.max_poles and work.relay_checks < work.relay_check_limit then start_chain(state)
+                else finish_repair(state) end
+            end
+
+        elseif phase == "chain" then
+            local chain = work.chain
+            if chain.mode == "commit" then
+                local candidate = chain.additions[chain.add_index]
+                if candidate then
+                    local key = candidate_key(candidate.spec_index, candidate.rect.x, candidate.rect.y)
+                    local index = work.candidate_index_by_key[key]
+                    if index == nil then
+                        index = append_candidate(work, candidate)
+                        work.relay_candidates_used = work.relay_candidates_used + 1
+                    end
+                    if not work.selected_set[index] then
+                        work.selected[#work.selected + 1] = index
+                        work.selected_set[index] = true
+                    end
+                    chain.add_index = chain.add_index + 1
+                else
+                    work.connect = {add_position = 1, compare_position = 1, parent = {}, size = {},
+                        components = 0, edges = {}}
+                    work.chain = nil
+                    cursor.phase = "connect"
+                end
+            elseif chain.mode == "enumerate" then
+                if chain.y > work.grid_h - 1 then
+                    chain.mode = "seed"
+                    chain.scan, chain.seed_source = 1, 1
+                else
+                    local spec_index = chain.spec_index
+                    local spec = work.specs[spec_index]
+                    if not spec then
+                        chain.spec_index, chain.x = 1, chain.x + 1
+                        if chain.x > work.grid_w - 1 then chain.x, chain.y = 0, chain.y + 1 end
+                    else
+                        chain.spec_index = spec_index + 1
+                        local candidate = repair_position_usable(state, spec_index, chain.x, chain.y, nil, nil, nil)
+                        if candidate and chain_candidate_free(work, candidate) then
+                            local id = #chain.spots + 1
+                            local spot = {id = id, candidate = candidate, x = chain.x, y = chain.y,
+                                spec_index = spec_index}
+                            chain.spots[id] = spot
+                            local row = chain.by_cell[chain.y]
+                            if not row then row = {}; chain.by_cell[chain.y] = row end
+                            local cell = row[chain.x]
+                            if not cell then cell = {}; row[chain.x] = cell end
+                            cell[#cell + 1] = id
+                        end
+                    end
+                end
+            elseif chain.mode == "seed" then
+                local spot = chain.spots[chain.scan]
+                if not spot then
+                    if #chain.queue == 0 then
+                        work.chain = nil
+                        finish_repair(state)
+                    else
+                        chain.mode, chain.head = "target", 1
+                        chain.target_index = 1
+                    end
+                elseif chain.seed_source > #chain.sources then
+                    chain.scan, chain.seed_source = chain.scan + 1, 1
+                else
+                    local source = work.candidates[work.selected[chain.sources[chain.seed_source]]]
+                    chain.seed_source = chain.seed_source + 1
+                    if wire_legal(spot.candidate, source) then
+                        if not spot.seen and chain.visited >= work.relay_check_limit then
+                            work.relay_bound_hit, work.chain = true, nil
+                            finish_repair(state)
+                        else
+                            chain_enqueue(chain, spot, false)
+                        end
+                    end
+                end
+            elseif chain.mode == "target" then
+                local spot = chain.spots[chain.queue[chain.head]]
+                if not spot then
+                    work.chain = nil
+                    finish_repair(state)
+                elseif chain.target_index > #chain.targets then
+                    local reach = 0
+                    for _, spec in ipairs(work.specs) do reach = math.max(reach, spec.wire_reach) end
+                    chain.mode = "neighbors"
+                    chain.radius = math.ceil(math.max(reach, spot.candidate.wire_reach))
+                    chain.edge_y, chain.edge_x, chain.edge_spec = math.max(0, spot.y - chain.radius),
+                        math.max(0, spot.x - chain.radius), 1
+                    chain.max_edge_y, chain.max_edge_x = math.min(work.grid_h - 1, spot.y + chain.radius),
+                        math.min(work.grid_w - 1, spot.x + chain.radius)
+                else
+                    local target_position = chain.targets[chain.target_index]
+                    chain.target_index = chain.target_index + 1
+                    local target = work.candidates[work.selected[target_position]]
+                    if wire_legal(spot.candidate, target) then chain_found(state, spot) end
+                end
+            elseif chain.mode == "neighbors" then
+                local spot = chain.spots[chain.queue[chain.head]]
+                if chain.edge_y > chain.max_edge_y then
+                    chain.head = chain.head + 1
+                    chain.mode, chain.target_index = "target", 1
+                else
+                    local spec = work.specs[chain.edge_spec]
+                    if not spec then
+                        chain.edge_spec, chain.edge_x = 1, chain.edge_x + 1
+                        if chain.edge_x > chain.max_edge_x then
+                            chain.edge_x, chain.edge_y = math.max(0, spot.x - chain.radius), chain.edge_y + 1
+                        end
+                    else
+                        chain.edge_spec = chain.edge_spec + 1
+                        local row = chain.by_cell[chain.edge_y]
+                        local cell = row and row[chain.edge_x]
+                        if cell then
+                            for _, id in ipairs(cell) do
+                                local next_spot = chain.spots[id]
+                                if next_spot.spec_index == chain.edge_spec - 1
+                                    and wire_legal(spot.candidate, next_spot.candidate) and not next_spot.seen then
+                                    if chain.visited >= work.relay_check_limit then
+                                        work.relay_bound_hit, work.chain = true, nil
+                                        finish_repair(state)
+                                        break
+                                    else
+                                        chain_enqueue(chain, next_spot, spot.id)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+        elseif phase == "repair_check" then
+            local eval = work.repair_eval
+            if eval.occupied_index <= #work.occupied then
+                if rect_intersects(eval.candidate.rect, work.occupied[eval.occupied_index].rect) then eval.blocked = true end
+                eval.occupied_index = eval.occupied_index + 1
+            elseif eval.blocked then
+                work.repair_eval = nil
+                cursor.phase, work.repair.mode = "repair", eval.resume
+            elseif eval.selected_index <= #work.selected then
+                if rect_intersects(eval.candidate.rect,
+                    work.candidates[work.selected[eval.selected_index]].rect) then eval.blocked = true end
+                eval.selected_index = eval.selected_index + 1
+            else
+                cursor.phase = eval.frontier and "frontier_compare" or "repair"
+                if not eval.frontier then work.repair.mode = "direct_commit" end
+            end
+
+        elseif phase == "frontier_compare" then
+            local eval, repair = work.repair_eval, work.repair
+            local target = work.candidates[work.selected[repair.pair_right]]
+            local distance = distance_squared(eval.candidate, target)
+            if repair.best == nil or distance < repair.best_distance
+                or (distance == repair.best_distance
+                    and (eval.candidate.rect.y < repair.best.rect.y
+                        or (eval.candidate.rect.y == repair.best.rect.y and eval.candidate.rect.x < repair.best.rect.x))) then
+                repair.best, repair.best_distance = eval.candidate, distance
+            end
+            work.repair_eval = nil
+            cursor.phase = "repair"
+            repair.mode = "frontier_position"
+
+        elseif phase == "prune" then
+            if not work.pruning_enabled or work.prune_index <= 0 then
+                start_publish(state)
+            else
+                begin_prune_eval(work)
+                cursor.phase = "prune_coverage"
+            end
+
+        elseif phase == "prune_coverage" then
+            local eval = work.prune_eval
+            if eval.coverage_index > #work.consumers then
+                cursor.phase = "prune_graph"
+            elseif eval.covered then
+                eval.coverage_index = eval.coverage_index + 1
+                eval.coverage_selected_index = 1
+                eval.covered = false
+            elseif eval.coverage_selected_index > #work.selected then
+                --The trial would leave a consumer uncovered; keep this pole.
+                work.prune_eval = nil
+                work.prune_index = work.prune_index - 1
+                cursor.phase = "prune"
+            else
+                local selected_position = eval.coverage_selected_index
+                eval.coverage_selected_index = selected_position + 1
+                if selected_position ~= eval.removed
+                    and consumer_covered(work.candidates[work.selected[selected_position]],
+                        work.consumers[eval.coverage_index]) then
+                    eval.covered = true
+                end
+            end
+
+        elseif phase == "prune_graph" then
+            local eval = work.prune_eval
+            if eval.graph_left > #work.selected then
+                if eval.components <= 1 then
+                    accept_prune(work, eval)
+                    cursor.phase = "prune"
+                else
+                    work.prune_eval = nil
+                    work.prune_index = work.prune_index - 1
+                    cursor.phase = "prune"
+                end
+            else
+                local left = work.candidates[work.selected[eval.graph_left]]
+                local right = work.candidates[work.selected[eval.graph_right]]
+                if wire_legal(left, right) and uf_join(eval, eval.graph_left, eval.graph_right) then
+                    eval.edges[#eval.edges + 1] = {a = eval.graph_left, b = eval.graph_right}
+                end
+                eval.graph_right = eval.graph_right + 1
+                advance_prune_pair(eval, #work.selected)
+            end
+
+        elseif phase == "publish_sort" then
+            local publish = work.publish
+            if publish.pick_position > #work.selected then
+                publish.entity_index = 1
+                cursor.phase = "publish_entities"
+            elseif publish.scan_index <= #work.selected then
+                local index = work.selected[publish.scan_index]
+                if not publish.picked[index]
+                    and (publish.best == nil or candidate_less(index, publish.best, work.candidates)) then
+                    publish.best = index
+                end
+                publish.scan_index = publish.scan_index + 1
+            else
+                publish.ordered[publish.pick_position] = publish.best
+                publish.picked[publish.best] = true
+                publish.pick_position = publish.pick_position + 1
+                publish.scan_index, publish.best = 1, nil
+            end
+
+        elseif phase == "publish_entities" then
+            local publish = work.publish
+            if publish.entity_index > #publish.ordered then
+                publish.edge_index = 1
+                cursor.phase = "publish_wires"
+            else
+                local position, candidate_index = publish.entity_index, publish.ordered[publish.entity_index]
+                local candidate, rect = work.candidates[candidate_index], work.candidates[candidate_index].rect
+                local id = "p:" .. tostring(position)
+                publish.ids_by_position[position] = id
+                publish.position_by_candidate[candidate_index] = position
+                publish.entities[position] = {
+                    id = id, kind = "pole", name = candidate.name, quality = candidate.quality,
+                    x = rect.x, y = rect.y, w = rect.w, h = rect.h,
+                    position = {x = rect.x + rect.w / 2, y = rect.y + rect.h / 2},
+                    rect = {x = rect.x, y = rect.y, w = rect.w, h = rect.h},
+                    supply_w = candidate.supply_w, supply_h = candidate.supply_h,
+                    wire_reach = candidate.wire_reach,
+                }
+                publish.entity_index = position + 1
+            end
+
+        elseif phase == "publish_wires" then
+            local publish, edges = work.publish, work.connect.edges
+            if publish.edge_index > #edges then
+                publish.uncovered_index = 1
+                cursor.phase = "publish_uncovered"
+            else
+                local edge = edges[publish.edge_index]
+                local a_position = publish.position_by_candidate[work.selected[edge.a]]
+                local b_position = publish.position_by_candidate[work.selected[edge.b]]
+                publish.wires[#publish.wires + 1] = {
+                    a_id = publish.ids_by_position[a_position], a_connector = work.copper_connector,
+                    b_id = publish.ids_by_position[b_position], b_connector = work.copper_connector,
+                }
+                publish.edge_index = publish.edge_index + 1
+            end
+
+        elseif phase == "publish_uncovered" then
+            local publish = work.publish
+            if publish.uncovered_index > #work.consumers then
+                cursor.phase = "publish_errors"
+            else
+                local index = publish.uncovered_index
+                if not work.covered[index] then publish.uncovered[#publish.uncovered + 1] = work.consumers[index].id end
+                publish.uncovered_index = index + 1
+            end
+
+        elseif phase == "publish_errors" then
+            local publish = work.publish
+            if #publish.uncovered > 0 then
+                publish.errors[#publish.errors + 1] = {code = "BP_PW_UNCOVERED", ids = publish.uncovered}
+            end
+            if work.connect.components > 1 then
+                publish.errors[#publish.errors + 1] = {code = "BP_PW_DISCONNECTED", components = work.connect.components}
+            end
+            if work.relay_bound_hit and work.connect.components > 1 then
+                publish.errors[#publish.errors + 1] = {code = "BP_PW_SEARCH_BOUND", candidates = work.relay_candidates_used,
+                    limit = work.relay_candidate_limit, checks = work.relay_checks, check_limit = work.relay_check_limit}
+            end
+            cursor.phase = "publish_connection"
+
+        elseif phase == "publish_connection" then
+            local publish = work.publish
+            if publish.entities[1] then
+                local entity = publish.entities[1]
+                publish.connection_point = {pole_id = entity.id, x = entity.x + entity.w, y = entity.y + entity.h / 2}
+            end
+            cursor.phase = "publish_finish"
+
+        elseif phase == "publish_finish" then
+            local publish = work.publish
+            local finish = publish.finish
+            if not finish then
+                finish = {result = {entities = {}, wires = {}, uncovered = {}, errors = {}},
+                    array = "entities", index = 1}
+                publish.finish = finish
+            end
+            local source = publish[finish.array]
+            if source and finish.index <= #source then
+                finish.result[finish.array][finish.index] = source[finish.index]
+                finish.index = finish.index + 1
+            elseif finish.array == "entities" then
+                finish.array, finish.index = "wires", 1
+            elseif finish.array == "wires" then
+                finish.array, finish.index = "uncovered", 1
+            elseif finish.array == "uncovered" then
+                finish.array, finish.index = "errors", 1
+            elseif finish.array == "errors" then
+                finish.result.pole_count = #publish.entities
+                finish.result.components = work.connect.components
+                finish.result.connection_point = publish.connection_point
+                finish.array = "complete"
+            else
+                state.result = finish.result
+                state.errors, state.ok, state.done = publish.errors, #publish.errors == 0, true
+                cursor.phase = "done"
+                state.progress.phase = "power"
+                state.progress.done_units = state.progress.total_units
+            end
+        else
+            if phase == "done" then state.done = true end
+        end
+        state.progress.done_units = math.min(state.progress.total_units, state.progress.done_units + 1)
+    end
+    return state
+end
+
+return Power

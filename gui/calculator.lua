@@ -1,6 +1,9 @@
 local Report = require "gui.report"
 local Sheet = require "gui.sheet"
 local ModuleGUI = require "gui.modulegui"
+local ModulePicker = require "gui.module_picker"
+local Reset = require "logic.reset"
+local Registry = require "logic.registry"
 local Calculator = {}
 
 function Calculator.build(player)
@@ -24,6 +27,13 @@ function Calculator.build(player)
     local sheet_buttons_flow = sheet_section.add{type = "flow", direction = "horizontal"}
     sheet_buttons_flow.style.horizontal_align = "right"
     sheet_buttons_flow.style.horizontally_stretchable = true
+    --Round 8: a mod-level action, beside the sheet buttons because it is not about one sheet
+    sheet_buttons_flow.add{
+        type = "button",
+        name = "hxrrc_reset_setups_button",
+        caption = {"hxrrc.reset_setups_button"},
+        tooltip = {"hxrrc.reset_setups_tooltip"},
+    }
     sheet_buttons_flow.add{
         type = "button",
         name = "hxrrc_new_sheet_button",
@@ -56,13 +66,46 @@ event_handlers.on_gui_click["hxrrc_delete_sheet_button"] = function(event)
     storage[event.player_index].calculator.force_auto_center()
 end
 
-function Calculator.toggle(player)
+local function select_running_job_sheet(player_index)
+    local data = storage[player_index]
+    local pane = data and data.sheet_section and data.sheet_section.sheet_pane
+    if not pane then return end
+    local blueprint = data.blueprint_job
+    local wanted = blueprint and blueprint.sheet_id
+    if not wanted then
+        for sheet_id in pairs(data.calc_jobs or {}) do wanted = sheet_id; break end
+    end
+    if not wanted then return end
+    for index, tab_and_sheet in ipairs(pane.tabs) do
+        if Sheet.id_of(tab_and_sheet.content) == wanted then
+            pane.selected_tab_index = index
+            return
+        end
+    end
+end
+
+function Calculator.show(player)
+    ModulePicker.close(player.index, false)
     local calculator = player.gui.screen.hxrrc_calculator
-    calculator.visible = not calculator.visible
-    player.opened = calculator.visible and calculator or nil
+    calculator.visible = true
+    select_running_job_sheet(player.index)
+    player.opened = calculator
+end
+
+function Calculator.toggle(player)
+    ModulePicker.close(player.index, false)
+    local calculator = player.gui.screen.hxrrc_calculator
+    if calculator.visible then
+        calculator.visible = false
+        player.opened = nil
+    else
+        Calculator.show(player)
+    end
 end
 
 function Calculator.recompute_everything(player_index)
+    --every report is rebuilt, so a picker for one of their slots goes now
+    ModulePicker.close(player_index, true)
     local sheet_pane = storage[player_index].sheet_section.sheet_pane
 
     for sheet_index, _ in ipairs(sheet_pane.tabs) do
@@ -74,14 +117,55 @@ function Calculator.recompute_everything(player_index)
     storage[player_index].backlogged_computation_count = storage[player_index].backlogged_computation_count + 1
 end
 
+Registry.calculator = Calculator
+
 event_handlers.on_gui_elem_changed["hxrrc_choose_module_button"] = function(event)
-    ModuleGUI.on_gui_elem_changed(event)
-    Calculator.recompute_everything(event.player_index)
+    if ModuleGUI.on_module_button_changed(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
 end
 
-event_handlers.on_gui_confirmed["hxrrc_module_count_textfield"] = function(event)
-    ModuleGUI.on_gui_confirmed(event)
-    Calculator.recompute_everything(event.player_index)
+--Module slots and the picker window's buttons
+for name, handler in pairs({
+    hxrrc_choose_module_button = ModulePicker.on_slot_click,
+    hxrrc_choose_beacon_module_button = ModulePicker.on_slot_click,
+    hxrrc_choose_crafting_machine_button = ModulePicker.on_machine_click,
+    hxrrc_choose_loop_machine_button = ModulePicker.on_machine_click,
+    hxrrc_choose_beacon_button = ModulePicker.on_beacon_click,
+    hxrrc_picker_choice_button = ModulePicker.on_choice_click,
+    hxrrc_picker_quality_button = ModulePicker.on_quality_click,
+    hxrrc_picker_confirm_button = function(event) return ModulePicker.confirm(event.player_index) end,
+    hxrrc_picker_clear_button = function(event) return ModulePicker.clear(event.player_index) end,
+}) do
+    event_handlers.on_gui_click[name] = function(event)
+        if handler(event) then
+            Calculator.recompute_everything(event.player_index)
+        end
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_beacon_button"] = function(event)
+    if ModuleGUI.on_beacon_button_changed(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_beacon_module_button"] = function(event)
+    if ModuleGUI.on_beacon_module_button_changed(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_confirmed["hxrrc_beacon_count_textfield"] = function(event)
+    if ModuleGUI.on_beacon_count_confirmed(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_confirmed["hxrrc_beacon_sharing_textfield"] = function(event)
+    if ModuleGUI.on_beacon_sharing_confirmed(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
 end
 
 event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = function(event)
@@ -90,10 +174,56 @@ event_handlers.on_gui_elem_changed["hxrrc_choose_recipe_button"] = function(even
     end
 end
 
+event_handlers.on_gui_elem_changed["hxrrc_choose_burner_button"] = function(event)
+    if Report.handle_burner_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_burner_entity_button"] = function(event)
+    if Report.handle_burner_entity_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_loop_machine_button"] = function(event)
+    if Report.handle_loop_machine_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_assist_recipe_button"] = function(event)
+    if Report.handle_assist_recipe_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_tier_recipe_button"] = function(event)
+    if Report.handle_tier_recipe_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_loop_recipe_button"] = function(event)
+    if Report.handle_loop_recipe_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
+event_handlers.on_gui_elem_changed["hxrrc_choose_recycle_recipe_button"] = function(event)
+    if Report.handle_recycle_recipe_change(event) then
+        Calculator.recompute_everything(event.player_index)
+    end
+end
+
 event_handlers.on_gui_elem_changed["hxrrc_choose_crafting_machine_button"] = function(event)
     if Report.handle_crafting_machine_change(event) then
         Calculator.recompute_everything(event.player_index)
     end
+end
+
+event_handlers.on_gui_click["hxrrc_reset_setups_button"] = function(event)
+    Reset.on_reset_clicked(event)
 end
 
 return Calculator

@@ -1,0 +1,251 @@
+# Claimed lane numbers
+
+| Number | Session | Work | Claimed |
+|---|---|---|---|
+| `001` | `rrc/agent` | W1 snapshot: a sheet as plain data | 2026-09-18 |
+| `002` | `rrc/agent` | W1 jobs: save-safe incremental work | 2026-09-18 |
+| `003` | `rrc/agent` | W1 catalog: prototypes as plain data | 2026-09-18 |
+| `004` | `rrc/agent` | W1 grid: tile algebra and rotation | 2026-09-18 |
+| `005` | `rrc/agent` | W1 export dialog: the debug string window | 2026-09-18 |
+| `006` | `rrc/agent` | W1 progress panel: bar and cancel | 2026-09-18 |
+| `007` | `rrc/agent` | W2 payload: the debug envelope | 2026-09-18 |
+| `008` | `rrc/agent` | W2 solver: the solver in slices | 2026-09-18 |
+| `009` | `rrc/agent` | W2 reset: recipe setups back to defaults | 2026-09-18 |
+| `010` | `rrc/agent` | W2 report: power and rows in batches | 2026-09-18 |
+| `011` | `rrc/agent` | W2 plan: sheet numbers to whole machines | 2026-09-18 |
+| `012` | `rrc/agent` | W2 preflight: what this release refuses | 2026-09-18 |
+| `013` | `rrc/agent` | W1R grid: kill the out-of-bounds placement mutant | 2026-09-18 |
+| `014` | `rrc/agent` | W1R progress: kill the negative-progress mutant | 2026-09-18 |
+| `015` | `rrc/agent` | W1R catalog: kill the wire-reach quality mutant | 2026-09-18 |
+| `016` | `rrc/agent` | W3 calc: sheet calculation across ticks | 2026-09-18 |
+| `017` | `rrc/agent` | W3 infra: blueprint settings and dialog | 2026-09-18 |
+| `018` | `rrc/agent` | W3 pack: MaxRects with obstacles | 2026-09-18 |
+| `019` | `rrc/agent` | W3 groups: machines and their beacons | 2026-09-18 |
+| `020` | `rrc/agent` | W3 route: belts, pipes, capacity | 2026-09-18 |
+| `021` | `rrc/agent` | W3 power: poles and legal wires | 2026-09-18 |
+| `022` | `rrc/agent` | W3 validate: the second opinion | 2026-09-18 |
+| `023` | `rrc/agent` | W3 serial: blueprint entities and canonical form | 2026-09-18 |
+| `024` | `rrc/agent` | W2R plan: port lane count | 2026-09-18 |
+| `025` | `rrc/agent` | W2R payload: sorted reference lists | 2026-09-18 |
+| `026` | `rrc/agent` | W4 search: bounded layout search | 2026-09-18 |
+| `027` | `rrc/agent` | W4 deliver: blueprint to the player | 2026-09-18 |
+| `028` | `rrc/agent` | W4 golden: fixtures, canonical compare, engine evidence | 2026-09-18 |
+| `029` | `rrc/agent` | W3R pack: BSSF tightness and both-axis fit | 2026-09-19 |
+| `030` | `rrc/agent` | W3R settings: half a belt family | 2026-09-19 |
+| `031` | `rrc/agent` | W3R calc: the job carries the sheet's revisions | 2026-09-19 |
+| `032` | `rrc/agent` | W3R validate: reach of the shorter pole | 2026-09-19 |
+| `033` | `rrc/agent` | W4R delivery: retry clears, cursor refusal stays clean | 2026-09-19 |
+| `034` | `rrc/agent` | W4R export dialog: a readable box | 2026-09-19 |
+| `035` | `rrc/agent` | W4R blueprint dialog: aligned rows and filtered pickers | 2026-09-19 |
+| `036` | `rrc/agent` | W4R search: the better layout wins | 2026-09-19 |
+| `037` | `rrc/agent` | W5 activate sliced calculation behind Compute | 2026-09-19 |
+| `038` | `rrc/agent` | W5 export dialog: vanilla blueprint-string shape | 2026-09-19 |
+| `039` | `rrc/agent` | Recovery A blueprint generation service | 2026-09-19 |
+| `040` | `rrc/agent` | Recovery B engine scenario runner | 2026-09-19 |
+| `041` | `rrc/agent` | Recovery C release gate | 2026-09-19 |
+| `042` | `rrc/agent` | Recovery D golden generates from this candidate | 2026-09-19 |
+| `043` | `rrc/agent` | Repair: search hands pack bare rects | 2026-09-19 |
+| `044` | `rrc/agent` | Repair: perimeter ports sit inside the grid | 2026-09-19 |
+| `045` | `rrc/agent` | Recovery E golden coverage matrix | 2026-09-19 |
+| `046` | `rrc/agent` | Repair: draft cases say what they are | 2026-09-19 |
+| `047` | `rrc/agent` | Repair: block ports name their step | 2026-09-19 |
+| `048` | `rrc/agent` | unblock S | 2026-09-19 |
+| `049` | `rrc/agent` | unblock C | 2026-09-19 |
+| `050` | `rrc/agent` | unblock E | 2026-09-19 |
+| `051` | `rrc/agent` | unblock R | 2026-09-19 |
+| `052` | `rrc/agent` | unblock G | 2026-09-19 |
+| `053` | `rrc/agent` | Repair perimeter port collision | 2026-09-19 |
+| `053` | `rrc/agent` | Repair: perimeter ports never share a cell | 2026-09-19 |
+| `054` | `rrc/agent` | queue D | 2026-09-19 |
+| `055` | `rrc/agent` | queue A | 2026-09-19 |
+| `056` | `rrc/agent` | queue L | 2026-09-19 |
+| `057` | `rrc/agent` | queue F | 2026-09-19 |
+| `054` | `rrc/agent` | Queue D dispatch preflight | 2026-09-19 |
+| `055` | `rrc/agent` | Queue A API coverage | 2026-09-19 |
+| `056` | `rrc/agent` | Queue L generation reload | 2026-09-19 |
+| `057` | `rrc/agent` | Queue F capture case setup | 2026-09-19 |
+| `058` | `rrc/agent` | Repair block port placement | 2026-09-19 |
+| `058` | `rrc/agent` | Repair: block ports attach to free in-grid cells | 2026-09-19 |
+| `059` | `rrc/agent` | Repair block port cells | 2026-09-19 |
+| `059` | `rrc/agent` | Repair: block ports stand on free cells | 2026-09-19 |
+| `060` | `rrc/agent` | R route budget | 2026-09-19 |
+| `061` | `rrc/agent` | S search policy | 2026-09-19 |
+| `062` | `rrc/agent` | A companion api | 2026-09-19 |
+| `063` | `rrc/agent` | F corpus setups | 2026-09-19 |
+| `064` | `rrc/agent` | R2 route cost | 2026-09-19 |
+| `065` | `rrc/agent` | V validator independence | 2026-09-19 |
+| `066` | `rrc/agent` | R3 route cost cached | 2026-09-19 |
+| `067` | `rrc/agent` | power semantics | 2026-09-19 |
+| `068` | `rrc/agent` | fluid smoke case | 2026-09-19 |
+| `069` | `rrc/agent` | resumable power | 2026-09-19 |
+| `070` | `rrc/agent` | port edge and collision | 2026-09-19 |
+| `071` | `rrc/agent` | pole wires legal | 2026-09-19 |
+| `072` | `rrc/agent` | collision beacon port residual | 2026-09-19 |
+| `073` | `rrc/agent` | underground pairing | 2026-09-19 |
+| `074` | `rrc/agent` | placed boxes never overlap | 2026-09-20 |
+| `075` | `rrc/agent` | collision without reservation | 2026-09-20 |
+| `076` | `rrc/agent` | splitter occupies two tiles | 2026-09-20 |
+| `077` | `rrc/agent` | port tile foreign flow | 2026-09-20 |
+| `078` | `rrc/agent` | placed beacon covers machine | 2026-09-20 |
+| `079` | `rrc/agent` | port never blocks itself | 2026-09-20 |
+| `080` | `rrc/agent` | first layout corridor | 2026-09-20 |
+| `081` | `rrc/agent` | corridor candidate validates | 2026-09-20 |
+| `082` | `rrc/agent` | route the clean base | 2026-09-20 |
+| `083` | `rrc/agent` | expansion budget for many ports | 2026-09-20 |
+| `084` | `rrc/agent` | search allowance covers pipeline | 2026-09-20 |
+| `085` | `rrc/agent` | recipe and receiver facts producer | 2026-09-20 |
+| `086` | `rrc/agent` | preflight asks the quality rule | 2026-09-20 |
+| `087` | `rrc/agent` | planner asks the quality rule | 2026-09-20 |
+| `088` | `rrc/agent` | player export becomes a golden case | 2026-09-20 |
+| `089` | `rrc/agent` | handoff command | 2026-09-20 |
+| `090` | `rrc/agent` | acceptance digest instrumentation | 2026-09-20 |
+| `091` | `rrc/agent` | export payload completeness | 2026-09-20 |
+| `092` | `rrc/agent` | durable generation attempt lookup | 2026-09-20 |
+| `093` | `rrc/agent` | diagnostic handoff transition | 2026-09-20 |
+| `094` | `rrc/agent` | beacon geometry: overlap rule and real beacon rows | 2026-09-20 |
+| `095` | `rrc/agent` | validator symmetry: beacons use the pole rule | 2026-09-20 |
+| `096` | `rrc/agent` | roboport facts and their export | 2026-09-20 |
+| `097` | `rrc/agent` | search truth, bounds and spacing provenance | 2026-09-20 |
+| `098` | `rrc/agent` | golden runner truth | 2026-09-20 |
+| `099` | `rrc/agent` | release lifecycle | 2026-09-20 |
+| `110` | `rrc/agent` | producer: recipes, chains both directions, split blocks | 2026-09-21 |
+| `111` | `rrc/agent` | validator: reject a factory that cannot produce | 2026-09-21 |
+| `112` | `rrc/agent` | capture: export completeness, empty geometry refuses | 2026-09-21 |
+| `113` | `rrc/agent` | layout: measured route cost, reserved finalization, 5s ceiling | 2026-09-21 |
+| `114` | `rrc/agent` | harness: qualify the engine boundary | 2026-09-21 |
+| `115` | `rrc/agent` | goldens: real plan, case selector, fail closed | 2026-09-21 |
+| `120` | `rrc/agent` | gate: delete the bypass, witness, zero waste, beacon redundancy | 2026-09-21 |
+| `121` | `rrc/agent` | hands: inserters from captured offsets, no redundant beacon | 2026-09-21 |
+| `122` | `rrc/agent` | router: facing underground pairs, direction-aware search, zero waste | 2026-09-21 |
+| `123` | `rrc/agent` | layout: terminals from demand, no first-feasible shortcut | 2026-09-21 |
+| `124` | `rrc/agent` | goldens: report physical validation, freeze the known-bad artifact | 2026-09-21 |
+| `130` | `rrc/agent` | anchor: one port per hand, on the perimeter, never moved | 2026-09-21 |
+| `132` | `rrc/agent` | witness: every machine judged by its own port | 2026-09-21 |
+| `133` | `rrc/agent` | goldens: an acceptance case shaped like the player's sheet | 2026-09-21 |
+| `131` | `rrc/agent` | bindings: every hand gets its own belt | 2026-09-21 |
+| `134` | `rrc/agent` | faces: one face per flow, so a belt can reach every hand | 2026-09-21 |
+| `140` | `rrc/agent` | route: every laid run reaches its own sink, refused splitter is refused route | 2026-09-22 |
+| `141` | `rrc/agent` | witness: locate the orphaned belt, name the short sink, witness a hand per flow | 2026-09-22 |
+| `142` | `rrc/agent` | economy: one hand, two ingredients, one belt, both lanes | 2026-09-22 |
+| `143` | `rrc/agent` | audit: every family reported, delivered bytes judged against the player's 127 | 2026-09-22 |
+| `144` | `rrc/agent` | flag: one switch in one place, so the three-halves flip cannot go half-way | 2026-09-22 |
+| `145` | `rrc/agent` | probe: name the colliding pair in 18 seconds, never 414 | 2026-09-22 |
+| `146` | `rrc/agent` | guard: a routed result never publishes two entities on one tile | 2026-09-22 |
+| `147` | `rrc/agent` | route: one belt carries two flows, and 28.8 still lays a continuation, never a fork | 2026-09-22 |
+| `148` | `rrc/agent` | deliver: one command from the player's sheet to judged bytes | 2026-09-22 |
+| `149` | `rrc/agent` | shortfall: the finished science pack must reach the factory edge | 2026-09-22 |
+| `150` | `rrc/agent` | guard: the validator has never been tested against a splitter | 2026-09-22 |
+| `151` | `rrc/agent` | position: every delivered entity carries its own position, and the encoder refuses one that does not | 2026-09-22 |
+| `152` | `rrc/agent` | physics: a published splitter never turns flow | 2026-09-22 |
+| `153` | `rrc/agent` | audit: the byte auditor has never seen a splitter, and it covers two tiles | 2026-09-22 |
+| `154` | `rrc/agent` | census: the gate counts discarded alternatives, and success discards fewer | 2026-09-22 |
+| `155` | `rrc/agent` | guard re-cut: a published splitter never turns flow, and the row must tell dir=12 from dir=0 | 2026-09-22 |
+| `156` | `rrc/agent` | audit: a blueprint inserter takes from the tile it faces | 2026-09-22 |
+| `157` | `rrc/agent` | guard: every generated inserter direction, judged against the player's own factory | 2026-09-22 |
+| `158` | `rrc/agent` | waste: no U-turn that buys nothing, no dive that was never needed | 2026-09-22 |
+| `159` | `rrc/agent` | doors: an input enters next to the machines that consume it | 2026-09-22 |
+| `160` | `rrc/agent` | doors re-cut: an input enters next to its machines, and the blueprint still ships | 2026-09-22 |
+| `161` | `rrc/agent` | route: a dive is fed straight, one pair where one reaches, and no belt ring | 2026-09-23 |
+| `162` | `rrc/agent` | doors: a door sits at the END of its consumers, never the middle | 2026-09-23 |
+| `163` | `rrc/agent` | guards: validator and byte auditor refuse side-load, back-to-back and ring | 2026-09-23 |
+| `164` | `rrc/agent` | route: bury a straight laid run instead of diving the new path, and unbury any pair that covers nothing | 2026-09-23 |
+| `165` | `rrc/agent` | slide: a hand moves along its machine face so its belt ends straight | 2026-09-23 |
+| `166` | `rrc/agent` | pack: a pack step yields within its ops and scans by index, not by list | 2026-09-23 |
+| `167` | `rrc/agent` | route: route.begin and the re-route pass split across ticks | 2026-09-23 |
+| `168` | `rrc/agent` | search: stop when the incumbent stops improving; groups.begin resumable | 2026-09-23 |
+| `169` | `rrc/agent` | power: pole placement in far fewer ops | 2026-09-23 |
+| `170` | `rrc/agent` | pack: one op costs microseconds and a layout packs in half a second | 2026-09-23 |
+| `171` | `rrc/agent` | route: a layout routes in one second | 2026-09-23 |
+| `172` | `rrc/agent` | search: stop by layouts, publish each better layout as state.interim, groups.step yields | 2026-09-23 |
+| `173` | `rrc/agent` | deliver: the first layout reaches the player fast, better ones are offered | 2026-09-23 |
+| `174` | `rrc/agent` | power: pole placement in far fewer ops, same poles | 2026-09-23 |
+| `175` | `rrc/agent` | groups: every block carries buffer zones; different recipes never share a block | 2026-09-23 |
+| `176` | `rrc/agent` | pack: no machine lands in another machine's buffer zone | 2026-09-23 |
+| `177` | `rrc/agent` | validate: BP_V_BUFFER_ZONE refuses a machine inside another's buffer zone | 2026-09-23 |
+| `178` | `rrc/agent` | tests: test_search BP-20 comparison rows validate their two candidates | 2026-09-23 |
+| `179` | `rrc/agent` | tests: test_corpus_setups fluid-byproduct-chain capture finishes | 2026-09-23 |
+| `180-225` | `rrc/agent` | claimed by the task files in this directory (rounds 24-38); rows were never written here | 2026-09-26 |
+| `226` | `rrc/agent` | run_dir: a row run flows toward its partner (reversal restored after lane 189 deleted it) | 2026-09-26 |
+| `227` | `rrc/agent` | seat: an item input hand sits on the machine face nearest where its flow enters | 2026-09-26 |
+| `228` | `rrc/agent` | groups output fluid box from the other end; beacon_prune slides a beacon to serve two blocks | 2026-09-26 |
+| `229` | `rrc/agent` | fluid_touch: no pipe laid or unburied beside another fluid's pipe | 2026-09-26 |
+| `230` | `rrc/agent` | side_feed: a belt run fed from its side is never buried under a crossing | 2026-09-26 |
+| `231` | `rrc/agent` | route: a pipe-to-ground on a fluid port tile opens into its machine; fluid may dive from its port | 2026-09-26 |
+| `232` | `rrc/agent` | validate: a pipe-to-ground joins only its open side and partner; fluid box refuses one opening away | 2026-09-26 |
+| `233` | `rrc/agent` | groups: k-th recipe fluid takes k-th box; even-width row head clears its first hand | 2026-09-26 |
+| `234` | `rrc/agent` | pipe_runs: a straight run of plain pipes is buried as one pipe-to-ground pair at publication | 2026-09-26 |
+| `235` | `rrc/agent` | route: fluids around a crowded machine get out, cross and join (fronts, dive-only, network join, order) | 2026-09-26 |
+| `236` | `rrc/agent` | search: two fluid doors of different fluids never touch | 2026-09-26 |
+| `237` | `rrc/agent` | groups/validate: inside port on free ground valid; row belt ends at last hand | 2026-09-26 |
+| `238` | `rrc/agent` | pipe_runs: a pipe tile that connects nothing new is dropped before burial | 2026-09-26 |
+| `239` | `rrc/agent` | game tests: calculator GUI on the real engine (offline-checked) | 2026-09-26 |
+| `240` | `rrc/agent` | game tests: sheet to cursor through real jobs, ghosts, cancel, busy cursor | 2026-09-26 |
+| `241` | `rrc/agent` | game tests: in-game blueprint equals offline for two golden sheets | 2026-09-26 |
+| `242` | `rrc/agent` | groups: a lone machine short of beacons retries with a beacon width on its left | 2026-09-27 |
+| `243` | `rrc/agent` | groups: a belt hand never takes a machine face that a beacon row covers | 2026-09-27 |
+| `244` | `rrc/agent` | groups: a step whose item flow needs more than one belt splits into belt-sized blocks | 2026-09-27 |
+| `245` | `rrc/agent` | route: a second pipe of one fluid joins the first from any side, over its own pipe-to-ground | 2026-09-27 |
+| `246` | `rrc/agent` | route: a belt never dives on the tile it surfaced on, nor turns off its source tile without a splitter | 2026-09-27 |
+| `248` | `rrc/agent` | tools: one failed route demand is saved and replayed alone in seconds | 2026-09-27 |
+| `249` | `rrc/agent` | route: a pipe joins a pipe-to-ground only on its exposed side | 2026-09-27 |
+| `250` | `rrc/agent` | route: a path never steps on its own tile twice, and dives only from a free tile | 2026-09-27 |
+| `251` | `rrc/agent` | route: a second flow of a shared input hand side-joins the belt at its hand tile | 2026-09-27 |
+| `252` | `rrc/agent` | route: no pipe leaves a pipe-to-ground sideways; blocked straight feeds curve or turn at once | 2026-09-27 |
+| `253` | `rrc/agent` | route: a self-crossing path refused for any reason retries without self-crossing | 2026-09-27 |
+| `254` | `rrc/agent` | groups: a lone machine with five item flows fits by face slots; route: dead-end pipe stubs pruned after bury | 2026-09-27 |
+| `255` | `rrc/agent` | groups: a lone machine short of face slots under a beacon row retries with its beacon beside it | 2026-09-27 |
+| `256` | `rrc/agent` | tools: save the whole generation state at any named step and resume from it | 2026-09-27 |
+| `257` | `rrc/agent` | tools: profile one golden generation into JSON and render all profiles as one HTML page | 2026-09-27 |
+| `258` | `rrc/agent` | groups: a machine hand never sits on the tile where its fluid pipe connects | 2026-09-27 |
+| `259` | `rrc/agent` | route: a belt never enters an underground exit from its buried rear | 2026-09-28 |
+| `260` | `rrc/agent` | groups: an item port heading into another item's port points away from its machine | 2026-09-28 |
+| `261` | `rrc/agent` | search: tidy re-route treats every beacon's current footprint as an obstacle | 2026-09-28 |
+| `262` | `rrc/agent` | route: commit refuses any path with two underground jumps in a row | 2026-09-28 |
+| `263` | `rrc/agent` | validate: port approach checks follow the real belt, not the declared heading | 2026-09-28 |
+| `271` | `rrc/agent` | route: row belt books own share; block-aware row endpoints; path never ends on a trunk crossing a row head | 2026-09-28 |
+| `272` | `rrc/agent` | layout: seat never lands on a hand; row flip exit off roboports; beacon prune keeps coverage | 2026-09-28 |
+| `273` | `rrc/agent` | validate + ends: row ports keyed per block; two false alarms; splitter footprint; tile index ticks | 2026-09-28 |
+| `274` | `rrc/agent` | capacity: map-edge item inputs carry max belt stack | 2026-09-28 |
+| `275` | `rrc/agent` | tools: slow-check guard refuses slow tools without a slot and reason | 2026-09-28 |
+| `279` | `rrc/agent` | twins: every belt, underground and fluid rule gets a clean and a breach twin (round 48) | 2026-09-29 |
+| `280` | `rrc/agent` | twins: placement, power, beacon, hand, rate, identity, artifact, preflight twins; code registry (round 48) | 2026-09-29 |
+| `281` | `rrc/agent` | facts: fixture catalog facts, engine constants, mock members as rows; export startup settings (round 48) | 2026-09-29 |
+| `276` | `rrc/agent` | route: strict mode sees row-belt ends, refuses wrong-way row head seeds, refuses tidy rings | 2026-09-29 |
+| `277` | `rrc/agent` | search: a layout refused for belt shape is routed once more in strict mode | 2026-09-29 |
+| `278` | `rrc/agent` | audit: two belts facing each other are not a belt cycle | 2026-09-29 |
+| `282` | `rrc/agent` | snapshot: sheet snapshot built and fingerprinted in slices, same bytes (round 50) | 2026-09-29 |
+| `283` | `rrc/agent` | pipeline: calculation takes its snapshot in slices, never in the Compute tick (round 50) | 2026-09-29 |
+| `284` | `rrc/agent` | modules: prototype facts cached, report rows weighted 200 ops (round 50) | 2026-09-29 |
+| `285` | `rrc/agent` | flow draw: Flow graph Layers + fewest Crossings (Sugiyama) before pack (round 51) | 2026-09-30 |
+| `286` | `rrc/agent` | drawn pack: RRC_PACK=sugiyama aims Blocks at drawn spots, draw phase in search (round 51) | 2026-09-30 |
+| `287` | `rrc/agent` | machine Turn + Flip in a Block so fluid boxes face partners; Lab recipe-at-create (round 51) | 2026-09-30 |
+| `288` | `rrc/agent` | turned Blocks: world port tiles, slides, hops, seat, free_cell, RunDir for dir 4/8/12 (round 52) | 2026-09-30 |
+| `289` | `rrc/agent` | Dead pair: router prunes unfed underground pair, validator BP_V_UNDERGROUND_DEAD, lane_sim dead= (round 52) | 2026-09-30 |
+| `290` | `rrc/agent` | Box binding: engine fluid -> box per machine x recipe, runtime probe + catalog + fixture (round 52) | 2026-09-30 |
+| `291` | `rrc/agent` | power: repair joins pole components by a shortest relay chain when greedy repair gives up (round 52) |  2026-09-30 |
+| `292` | `rrc/agent` | drawing sees real ports: Source edges, ops left, port-to-port Crossings, Turn+Flip by Material cost (round 53) | 2026-09-30 |
+| `293` | `rrc/agent` | drawn feed + apply: 8 orients per Block, apply drawn turn/mirror, pack drawn dir, export draw fields (round 53) | 2026-09-30 |
+| `294` | `rrc/agent` | Material cost: raw resources per entity from recipes, catalog.material, fixtures, material_score.py (round 53) | 2026-09-30 |
+| `298` | `rrc/agent` | switch settings.force_turn_flip: every Block one Turn + Flip, BP_FAIL_FLIP_FORBIDDEN, no Fallback when forced (round 54) | 2026-09-30 |
+| `299` | `rrc/agent` | game probe: 20 tiny turn-flip test sheets per version (10 machine types x 1/4 machines), fixture JSON (round 54) | 2026-09-30 |
+| `300` | `rrc/agent` | turn-flip census runner offline + game lab sample/full, CENSUS rows (round 54) | 2026-09-30 |
+| `301` | `rrc/agent` | Turn+Flip census wave 2: mirrored Block rebuild keeps ports on edge; turned Row ports off belt runs (groups.lua) (round 54) | 2026-10-01 |
+| `302` | `rrc/agent` | Turn+Flip census wave 2: fluid input reaches turned ports; fluids never mix (route.lua) (round 54) | 2026-10-01 |
+| `303` | `rrc/agent` | Turn+Flip census wave 2: fluid inputs reach turned machines (edge slots with room in search.lua, router goes around in route.lua) (round 54) | 2026-10-01 |
+| `304` | `rrc/agent` | Drawn pack pins Blocks in place + one trial Block at one Turn (pack.lua) (round 55) | 2026-10-03 |
+| `305` | `rrc/agent` | whole-blueprint Material in Lua, TRIAL row lines, trial stage on progress bar (round 55) | 2026-10-03 |
+| `306` | `rrc/agent` | Turn trial step: after drawn sheet valid, try other Turns per Block, keep cheaper (search.lua) (round 55) | 2026-10-03 |
+| `307` | `rrc/agent` | Turn trial screen: every try scored by Material before tidy, only cheapest gets tidy + validate (search.lua) (round 55) | 2026-10-03 |
+| `308` | `rrc/agent` | gate tool: tick cost model, gate rows, proof-checked baseline writer, offline box binding loader (round 56) | 2026-10-04 |
+| `309` | `rrc/agent` | route fix bundle D1-D3 + strict ends from start + copies shared or sliced (route.lua, search.lua) (round 56) | 2026-10-04 |
+| `310` | `rrc/agent` | Groups cache per search, hoists, slices (groups.lua) (round 56) | 2026-10-04 |
+| `311` | `rrc/agent` | pack reject charge, power pcov/pfast + consumer charge + publish split (round 56) | 2026-10-04 |
+| `312` | `rrc/agent` | validate slices: transfers, beacons, transport, fluid (round 56) | 2026-10-04 |
+| `313` | `rrc/agent` | publish: sha256 on demand, one persist copy (generation.lua) (round 56) | 2026-10-04 |
+| `314` | `rrc/agent` | suite trim: Turn/Flip slice, twins vanilla only (round 56) | 2026-10-04 |
+| `315` | `rrc/agent` | split units (RRC_CASE, JUnit) + Suite Runner recipe, image, lock (round 56) | 2026-10-04 |
+| `310b` | `rrc/agent` | Groups cache owned by caller, cheap key, real per-hand slices (redo of 310 after integrator review) (round 56) | 2026-10-04 |
+| `312b` | `rrc/agent` | validate real slices, every step within Tick cost (redo of 312 after integrator review) (round 56) | 2026-10-04 |
+| `316` | `rrc/agent` | player run: metered feed, bar 0.98-1.1, calc refs for Sheet sim | 2026-10-05 |
+| `317` | `rrc/agent` | player run: port finder in Lua from blueprint geometry | 2026-10-05 |
+| `318` | `rrc/agent` | player run: GUI driver replays a Case through handlers | 2026-10-05 |

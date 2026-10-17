@@ -1,0 +1,6 @@
+logic/export_payload.lua
+tests/test_export_payload.lua
+tests/golden/add_case
+tests/golden/lib/common.py
+!tests/tools/test_capture_workflow.py
+docs/golden-workflow.md

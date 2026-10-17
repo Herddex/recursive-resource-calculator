@@ -1,0 +1,625 @@
+"""Qualify tools/blueprint_audit.py against a hand-built control and one named mutation each.
+
+The auditor is the delivery gate of round 14, so it must be shown to REJECT before it is trusted to accept.
+Two of its rules were wrong when first written and both were caught here, not in review:
+
+  * component membership is not the contract.  Joining components across legal underground pairs -- which is
+    physically right -- made one inserter bless a whole network, and the round 13 artifact's unused belt count
+    fell from 89 to 0.  Directed reachability replaced it.
+  * the bounding box was taken from entity CENTRES, so every cell of a one-row layout counted as perimeter and
+    a stray belt extended the box and inferred ITSELF as both supply and drain terminal.  Both the reversed
+    inserter and the added waste belt survived.  Extents, plus a terminal only where the belt's own flow
+    crosses the boundary, killed both.
+"""
+
+import base64
+import copy
+import json
+import pathlib
+import subprocess
+import sys
+import tempfile
+import unittest
+import zlib
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+AUDIT = ROOT / "tools" / "blueprint_audit.py"
+
+
+def belt(x, y, direction=4):
+    return {"name": "transport-belt", "position": {"x": x, "y": y}, "direction": direction}
+
+
+def underground(x, y, half, direction=4):
+    return {"name": "underground-belt", "position": {"x": x, "y": y},
+            "direction": direction, "type": half}
+
+
+def inserter(x, y, direction=4):
+    return {"name": "inserter", "position": {"x": x, "y": y}, "direction": direction}
+
+
+def splitter(x, y, direction=4):
+    return {"name": "splitter", "position": {"x": x, "y": y}, "direction": direction}
+
+
+def control():
+    """Belt in, inserter, machine, inserter, belt, tunnel, belt out.  Every entity serves the one obligation."""
+    return [
+        belt(0.5, 0.5), belt(1.5, 0.5),
+        inserter(2.5, 0.5, 12),
+        {"name": "assembling-machine-3", "position": {"x": 4.5, "y": 0.5}, "recipe": "iron-gear-wheel"},
+        inserter(6.5, 0.5, 12),
+        belt(7.5, 0.5),
+        underground(8.5, 0.5, "input"), underground(12.5, 0.5, "output"),
+        belt(13.5, 0.5),
+    ]
+
+
+def encode(entities, label="control"):
+    entities = copy.deepcopy(entities)
+    for index, entity in enumerate(entities, start=1):
+        entity["entity_number"] = index
+    payload = {"blueprint": {"item": "blueprint", "version": (2 << 48) | (77 << 16),
+                             "label": label, "entities": entities}}
+    body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    return "0" + base64.b64encode(zlib.compress(body, 9)).decode("ascii")
+
+
+def audit(entities, *extra):
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as handle:
+        handle.write(encode(entities) + "\n")
+        path = handle.name
+    try:
+        done = subprocess.run([sys.executable, str(AUDIT), path, "--json", *extra],
+                              capture_output=True, text=True)
+        return done.returncode, json.loads(done.stdout) if done.stdout.strip() else {}
+    finally:
+        pathlib.Path(path).unlink()
+
+
+class BlueprintAuditTest(unittest.TestCase):
+
+    def test_AUC1_head_on_belt_ends_are_not_a_cycle(self):
+        # Red on base: the directed tile graph incorrectly treats facing belt ends as connected.
+        _, counts = audit([belt(1.5, 12.5, 8), belt(1.5, 13.5, 0)])
+        self.assertEqual(counts["cycles"], 0)
+
+    def test_AUC2_real_ring_still_counts(self):
+        _, counts = audit([belt(0.5, 0.5, 4), belt(1.5, 0.5, 8),
+                           belt(1.5, 1.5, 12), belt(0.5, 1.5, 0)])
+        self.assertEqual(counts["cycles"], 1)
+
+    def test_AUC3_belt_into_opposite_underground_output_unchanged(self):
+        # Base count is one: only plain-belt destinations are affected by the AUC1 correction.
+        entities = [belt(0.5, 0.5, 4), underground(1.5, 0.5, "output", 12),
+                    underground(5.5, 0.5, "input", 12)]
+        _, counts = audit(entities)
+        self.assertEqual(counts["cycles"], 1)
+
+    def test_round20_transport_shape_rows_and_manual_control(self):
+        fixture = ROOT / "tests/fixtures/blueprints/round20_delivered.txt"
+        done = subprocess.run([sys.executable, str(AUDIT), str(fixture), "--json"], capture_output=True, text=True)
+        self.assertEqual(done.returncode, 1)
+        counts = json.loads(done.stdout)
+        self.assertEqual(counts["sideload"], 5)
+        self.assertGreaterEqual(counts["sideload_blocked"], 1)
+        self.assertEqual(counts["back_to_back"], 1)
+        self.assertEqual(counts["cycles"], 1)
+        text = subprocess.run([sys.executable, str(AUDIT), str(fixture)], capture_output=True, text=True)
+        self.assertIn("(14,4)->(13,4)", text.stdout)
+        reference = pathlib.Path.home() / "share/RRC/red_science_1s_manual_bp.txt"
+        done = subprocess.run([sys.executable, str(AUDIT), str(reference), "--json"], capture_output=True, text=True)
+        counts = json.loads(done.stdout)
+        self.assertEqual([counts[k] for k in ("sideload", "sideload_blocked", "back_to_back", "cycles")], [0,0,0,0])
+        self.assertEqual(done.returncode, 0)
+
+    def test_ACC19_a_crossing_underground_never_blocks_a_pair(self):
+        """(5,3) E -> (10,3) E passes under a NORTH exit at (6,3): both pairs are whole."""
+        entities = [
+            {"entity_number": 1, "name": "underground-belt", "type": "input", "direction": 4, "position": {"x": 5.5, "y": 3.5}},
+            {"entity_number": 2, "name": "underground-belt", "type": "output", "direction": 4, "position": {"x": 10.5, "y": 3.5}},
+            {"entity_number": 3, "name": "underground-belt", "type": "input", "direction": 0, "position": {"x": 6.5, "y": 8.5}},
+            {"entity_number": 4, "name": "underground-belt", "type": "output", "direction": 0, "position": {"x": 6.5, "y": 3.5}},
+        ]
+        from importlib import util
+        spec = util.spec_from_file_location("blueprint_audit", str(AUDIT))
+        module = util.module_from_spec(spec); spec.loader.exec_module(module)
+        failures, by_family, pairs = module.audit_underground(entities)
+        self.assertEqual(failures, [])
+        self.assertEqual(len(pairs), 4)
+        #Control: the same pair with a SAME-axis endpoint in its span is still refused.
+        blocked = copy.deepcopy(entities)
+        blocked[3]["direction"] = 4
+        blocked[3]["type"] = "input"
+        failures, _, _ = module.audit_underground(blocked)
+        self.assertTrue(any("(5.5,3.5)" in f for f in failures))
+
+    def test_ACC18_direction_points_to_pickup_and_drop_is_behind(self):
+        entities = [
+            {"name": "assembling-machine-1", "position": {"x": -0.5, "y": 0.5}},
+            inserter(0.5, 0.5, 4),
+            belt(1.5, 0.5),
+        ]
+        _, counts = audit(entities)
+        self.assertEqual(counts["invalid_inserters"], 0, counts)
+        # Endpoint validity alone is symmetric; pin the directional convention in the byte oracle itself.
+        source = AUDIT.read_text()
+        self.assertIn("pickup = endpoint_kind(cells.get((px + vx, py + vy)))", source)
+        self.assertIn("drop = endpoint_kind(cells.get((px - vx, py - vy)))", source)
+        self.assertIn("drops.add((px - vx, py - vy))", source)
+        self.assertIn("pickups.add((px + vx, py + vy))", source)
+
+    def test_splitter_east_west_anchor_tile_output(self):
+        entities = [belt(2.5, 4.5), belt(3.5, 4.5), belt(2.5, 5.5), belt(3.5, 5.5),
+                    splitter(4.5, 5), belt(5.5, 4.5), belt(6.5, 4.5),
+                    belt(5.5, 5.5), belt(6.5, 5.5)]
+        status, counts = audit(entities)
+        self.assertEqual(counts["unused_belt_tiles"], 0, counts)
+        self.assertEqual(status, 0, counts)
+
+    def test_splitter_east_west_second_tile_output_and_inserter_pickup(self):
+        entities = [belt(2.5, 4.5), belt(3.5, 4.5), belt(2.5, 5.5), belt(3.5, 5.5),
+                    splitter(4.5, 5), belt(5.5, 4.5), belt(6.5, 4.5),
+                    belt(5.5, 5.5), inserter(6.5, 5.5, 12), {"name": "assembling-machine-1", "position": {"x": 7.5, "y": 5.5}}]
+        status, counts = audit(entities)
+        self.assertEqual(counts["invalid_inserters"], 0, counts)
+        self.assertEqual(counts["unused_belt_tiles"], 0, counts)
+        self.assertEqual(status, 0, counts)
+
+    def test_splitter_north_south_rotation(self):
+        entities = [belt(4.5, 2.5, 8), belt(4.5, 3.5, 8), belt(5.5, 2.5, 8), belt(5.5, 3.5, 8),
+                    splitter(5, 4.5, 8), belt(4.5, 5.5, 8), belt(4.5, 6.5, 8),
+                    belt(5.5, 5.5, 8), belt(5.5, 6.5, 8)]
+        status, counts = audit(entities)
+        self.assertEqual(counts["unused_belt_tiles"], 0, counts)
+        self.assertEqual(status, 0, counts)
+
+    def test_splitter_unreachable_still_fails(self):
+        status, counts = audit([splitter(4.5, 5)])
+        self.assertEqual(status, 1)
+        self.assertEqual(counts["unused_belt_tiles"], 2)
+
+    def test_ACC1_control_is_accepted(self):
+        """Without this the whole suite below is satisfied by an auditor that rejects everything."""
+        status, counts = audit(control())
+        self.assertEqual(status, 0, f"the control must pass before any rejection counts: {counts}")
+        self.assertEqual(counts["unused_belt_tiles"], 0)
+        self.assertEqual(counts["invalid_inserters"], 0)
+        self.assertEqual(counts["unpairable_underground"], 0)
+
+    def test_ACC2_inserter_dropping_on_empty_ground(self):
+        entities = control()
+        entities[2]["position"] = {"x": 2.5, "y": 20.5}
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["invalid_inserters"], 1)
+
+    def test_ACC3_inserter_dropping_onto_a_pole(self):
+        entities = control()
+        entities.append({"name": "medium-electric-pole", "position": {"x": 14.5, "y": 0.5}})
+        entities.append(inserter(15.5, 0.5, 12))
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["invalid_inserters"], 1)
+
+    def test_ACC4_a_reversed_output_inserter_is_BEYOND_byte_level_waste(self):
+        """Honest limit of this tool, kept as a case so nobody re-adds the claim.
+        LIMIT LIFTED 2026-09-28 (RRC-03) for this exact shape: the hand direction audit refuses it, see
+        test_RRC03_control_output_hand_turned_is_refused. Waste and endpoint counts below stay 0.
+
+        Reversing the output inserter makes the machine drain nowhere, which is a broken obligation. It is NOT
+        a waste violation: the belt it used to receive from becomes an externally fed run that passes an
+        inserter taking from it, and that is a legal arrangement. From bytes alone, with no obligations, the
+        two are indistinguishable. Only the validator, which holds the plan, can reject this.
+
+        An earlier version of this suite asserted the opposite and passed, because the terminal rule was wrong
+        and reported every belt of a working factory as unused.
+        """
+        entities = control()
+        entities[4]["direction"] = 4
+        _, counts = audit(entities)
+        self.assertEqual(counts["unused_belt_tiles"], 0)
+        self.assertEqual(counts["invalid_inserters"], 0)
+
+    def test_ACC5_added_waste_belt_is_rejected(self):
+        """Production is untouched; contract 26.2 still refuses the spare entity."""
+        entities = control()
+        entities.append(belt(20.5, 20.5))
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["unused_belt_tiles"], 1)
+
+    def test_ACC6_underground_exit_turned_aside(self):
+        entities = control()
+        entities[7]["direction"] = 8
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["unpairable_underground_belt"], 1)
+
+    def test_ACC7_underground_entrance_deleted(self):
+        entities = control()
+        del entities[6]
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["unpairable_underground_belt"], 1)
+
+    def test_ACC8_underground_beyond_reach(self):
+        entities = control()
+        entities[7]["position"] = {"x": 20.5, "y": 0.5}
+        entities[8]["position"] = {"x": 21.5, "y": 0.5}
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["unpairable_underground_belt"], 1)
+
+    def test_ACC9_pipe_to_ground_pair_facing_the_same_way(self):
+        """The exact round 13 defect: every delivered pipe-to-ground faced east or south, so none could pair."""
+        entities = control()
+        entities.append({"name": "pipe-to-ground", "position": {"x": 4.5, "y": 5.5}, "direction": 4})
+        entities.append({"name": "pipe-to-ground", "position": {"x": 8.5, "y": 5.5}, "direction": 4})
+        status, counts = audit(entities)
+        self.assertEqual(status, 1)
+        self.assertGreaterEqual(counts["unpairable_pipe_to_ground"], 1)
+
+    def test_ACC10_pipe_to_ground_pair_facing_each_other_is_accepted(self):
+        """A correct pair must NOT be reported, or the rule above is satisfied by rejecting all pipes.
+
+        Each pipe-to-ground faces its exposed connection; its partner is behind it (2.0.77 prototype, round 33)."""
+        entities = control()
+        entities.append({"name": "pipe-to-ground", "position": {"x": 4.5, "y": 5.5}, "direction": 12})
+        entities.append({"name": "pipe-to-ground", "position": {"x": 8.5, "y": 5.5}, "direction": 4})
+        _, counts = audit(entities)
+        self.assertEqual(counts["unpairable_pipe_to_ground"], 0)
+
+    def test_ACC14_long_handed_inserter_reaches_two_tiles(self):
+        """A long hand picks two tiles away (player-inserter-10s, 2026-09-25: read at one tile it picked from ground)."""
+        entities = [belt(0.5, 0.5),
+                    {"name": "long-handed-inserter", "position": {"x": 2.5, "y": 0.5}, "direction": 12},
+                    {"name": "assembling-machine-3", "position": {"x": 5.5, "y": 0.5}, "recipe": "iron-gear-wheel"}]
+        _, counts = audit(entities)
+        self.assertEqual(counts["invalid_inserters"], 0)
+
+    def test_ACC11_redundant_beacon_is_rejected(self):
+        entities = control()
+        entities.append({"name": "beacon", "position": {"x": 4.5, "y": 4.5}})
+        entities.append({"name": "beacon", "position": {"x": 4.5, "y": -3.5}})
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            handle.write(json.dumps({"iron-gear-wheel": 1}))
+            config = handle.name
+        try:
+            status, counts = audit(entities, "--beacon-config", config)
+            self.assertEqual(status, 1)
+            self.assertEqual(counts["redundant_beacons"], 1)
+        finally:
+            pathlib.Path(config).unlink()
+
+    def test_ACC12_extra_influence_from_a_load_bearing_beacon_is_legal(self):
+        """Your rule: more beacons per machine is fine.  Only a REMOVABLE beacon is waste."""
+        entities = control()
+        entities.append({"name": "beacon", "position": {"x": 4.5, "y": 4.5}})
+        entities.append({"name": "beacon", "position": {"x": 4.5, "y": -3.5}})
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            handle.write(json.dumps({"iron-gear-wheel": 2}))
+            config = handle.name
+        try:
+            _, counts = audit(entities, "--beacon-config", config)
+            self.assertEqual(counts["redundant_beacons"], 0)
+        finally:
+            pathlib.Path(config).unlink()
+
+    def test_ACC13_the_round_13_delivery_stays_rejected(self):
+        """Known-bad regression.  These counts are the frozen baseline of round 14."""
+        artifact = pathlib.Path.home() / "share" / "RRC" / "rrc-round13-mine.txt"
+        if not artifact.exists():
+            self.skipTest("the round 13 delivery is not present on this host")
+        done = subprocess.run([sys.executable, str(AUDIT), str(artifact), "--json"],
+                              capture_output=True, text=True)
+        self.assertEqual(done.returncode, 1)
+        counts = json.loads(done.stdout)
+        #11 until 2026-09-24: two hands beside an electromagnetic plant were judged against a 3x3 footprint; the
+        #plant is 4x4 (catalog tile_w 4), so they are valid. The delivery stays rejected on its other counts.
+        self.assertEqual(counts["invalid_inserters"], 9)
+        self.assertEqual(counts["unpairable_pipe_to_ground"], 12)
+        #4 to 0 on 2026-09-23, legalcopilot-dev.  All four were one shape: a same-axis pair with an
+        #underground of the OTHER axis sitting in its span -- (5.5,2.5) S to (5.5,5.5) S across (5.5,3.5) W, and
+        #(8.5,18.5) E to (12.5,18.5) E across (11.5,18.5) N.  The engine pairs only along an endpoint's own axis,
+        #so the crossing endpoint is no blocker.  Round 21's first delivery was refused on the same false shape.
+        self.assertEqual(counts["unpairable_underground_belt"], 0)
+        #51, not the 224 this suite first froze. The bounding-box terminal rule reported every belt of a
+        #working hand-built factory as unused, so its count here was inflated too. 51 belt entities of 224
+        #genuinely reach no sink or are reached by no source.
+        self.assertEqual(counts["unused_belt_tiles"], 51)
+        #35 until 2026-09-24: the electromagnetic plant's 4x4 footprint (was judged 3x3) reaches 11 more pipe tiles.
+        self.assertEqual(counts["unused_pipe_tiles"], 24)
+        self.assertEqual(counts["wires"], 0)
+        self.assertEqual({k: counts[k] for k in ("sideload", "sideload_blocked", "back_to_back", "cycles")},
+                         {"sideload": 14, "sideload_blocked": 14, "back_to_back": 0, "cycles": 1})
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class HandBuiltReferenceTest(unittest.TestCase):
+    """The strongest control available: a factory a person built and the game runs.
+
+    Supplied 2026-09-21 as ~/share/RRC/red_science_1s_manual_bp.txt, sha256
+    934a0034af3069ef40ee1878582d53b26834d287fa4106c2b4480404f6123c30, 131 entities for
+    automation-science-pack at 1/s. A tool that rejects this rejects working factories, and the first version
+    of this auditor did exactly that: it reported all 84 belts unused.
+    """
+
+    def test_ACC14_a_working_hand_built_factory_is_accepted(self):
+        reference = pathlib.Path.home() / "share" / "RRC" / "red_science_1s_manual_bp.txt"
+        if not reference.exists():
+            self.skipTest("the hand-built reference is not present on this host")
+        done = subprocess.run([sys.executable, str(AUDIT), str(reference), "--json"],
+                              capture_output=True, text=True)
+        counts = json.loads(done.stdout)
+        self.assertEqual(counts["unused_belt_tiles"], 0, "a working factory has no unused belt")
+        self.assertEqual(counts["invalid_inserters"], 0, "a working factory has no invalid inserter")
+        self.assertEqual(counts["unpairable_underground"], 0)
+        self.assertEqual(counts["wires"], 12)
+        self.assertEqual({key: counts[key] for key in (
+            "entities", "belts", "inserters", "poles", "machines", "roboports", "splitters",
+            "undergrounds", "pipes", "beacons", "entities_excluding_roboports")}, {
+            "entities": 131, "belts": 84, "inserters": 22, "poles": 10, "machines": 11, "roboports": 4,
+            "splitters": 0, "undergrounds": 0, "pipes": 0, "beacons": 0,
+            "entities_excluding_roboports": 127,
+        })
+        self.assertEqual(done.returncode, 0, "the reference must pass outright")
+
+    def test_ACC17_measured_west_facing_hands_use_the_tile_they_face(self):
+        reference = pathlib.Path.home() / "share" / "RRC" / "red_science_1s_manual_bp.txt"
+        if not reference.exists():
+            self.skipTest("the hand-built reference is not present on this host")
+        encoded = reference.read_text().strip()
+        payload = json.loads(zlib.decompress(base64.b64decode(encoded[1:])))
+        entities = payload["blueprint"]["entities"]
+        by_position = {(e["position"]["x"], e["position"]["y"]): e for e in entities}
+        belts = {(e["position"]["x"], e["position"]["y"])
+                 for e in entities if e["name"] == "transport-belt"}
+        for hand_x, pickup_x, drop_x in ((206.5, 205.5, 207.5), (210.5, 209.5, 211.5)):
+            hand = by_position[(hand_x, 1076.5)]
+            self.assertEqual(hand["direction"], 12)
+            if hand_x == 206.5:
+                self.assertIn((pickup_x, 1076.5), belts)
+                self.assertEqual(by_position[(208.5, 1076.5)]["name"], "assembling-machine-3")
+                self.assertEqual(drop_x, 207.5)  # left tile of the 3 by 3 machine footprint
+            else:
+                self.assertEqual(by_position[(208.5, 1076.5)]["name"], "assembling-machine-3")
+                self.assertEqual(pickup_x, 209.5)  # right tile of the 3 by 3 machine footprint
+                self.assertIn((drop_x, 1076.5), belts)
+        done = subprocess.run([sys.executable, str(AUDIT), str(reference), "--json"],
+                              capture_output=True, text=True)
+        self.assertEqual(json.loads(done.stdout)["invalid_inserters"], 0)
+
+    def test_ACC15_family_census_keeps_zero_families_and_unknowns(self):
+        entities = control()
+        entities.append({"name": "modded-widget", "position": {"x": 30.5, "y": 30.5}})
+        status, counts = audit(entities)
+        self.assertEqual(status, 0)
+        self.assertEqual(counts["belts"], 4)
+        self.assertEqual(counts["undergrounds"], 2)
+        self.assertEqual(counts["splitters"], 0)
+        self.assertEqual(counts["inserters"], 2)
+        self.assertEqual(counts["machines"], 1)
+        self.assertEqual(counts["poles"], 0)
+        self.assertEqual(counts["pipes"], 0)
+        self.assertEqual(counts["beacons"], 0)
+        self.assertEqual(counts["roboports"], 0)
+        self.assertEqual(counts["other"], 1)
+        self.assertEqual(counts["entities_excluding_roboports"], 10)
+
+    def test_ACC16_target_accepts_exact_values_and_windows(self):
+        target = {
+            "note": "roboports are excluded",
+            "belts": {"min": 4, "max": 4},
+            "inserters": 2,
+            "entities_excluding_roboports": 9,
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            json.dump(target, handle)
+            target_path = handle.name
+        try:
+            status, counts = audit(control(), "--expect-target", target_path)
+            self.assertEqual(status, 0, counts)
+        finally:
+            pathlib.Path(target_path).unlink()
+
+    def test_ACC17_target_reports_mismatch_after_counts(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            json.dump({"splitters": 99}, handle)
+            target_path = handle.name
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as handle:
+            handle.write(encode(control()) + "\n")
+            artifact_path = handle.name
+        try:
+            done = subprocess.run([sys.executable, str(AUDIT), artifact_path, "--expect-target", target_path, "-q"],
+                                  capture_output=True, text=True)
+            self.assertEqual(done.returncode, 1)
+            self.assertIn("splitters", done.stderr)
+            self.assertIn("delivered 0", done.stderr)
+            self.assertIn("entities", done.stdout)
+        finally:
+            pathlib.Path(target_path).unlink()
+            pathlib.Path(artifact_path).unlink()
+
+    def test_ACC18_human_report_names_roboport_exclusion(self):
+        entities = control() + [{"name": "roboport", "position": {"x": 30.5, "y": 30.5}}]
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as handle:
+            handle.write(encode(entities) + "\n")
+            artifact_path = handle.name
+        try:
+            done = subprocess.run([sys.executable, str(AUDIT), artifact_path], capture_output=True, text=True)
+            self.assertEqual(done.returncode, 0)
+            self.assertIn("roboport", done.stdout.lower())
+            self.assertIn("exclud", done.stdout.lower())
+            self.assertIn("1", done.stdout)
+        finally:
+            pathlib.Path(artifact_path).unlink()
+
+
+GOLDEN_REFERENCE = ROOT / "tests/golden/cases/player-red-science-1s/reference_manual_blueprint.txt"
+GOLDEN_ROUND22 = ROOT / "tests/fixtures/blueprints/round22_v5.txt"
+ROUND18_INVERTED = ROOT / "tests/fixtures/blueprints/round18_inverted_inserters.txt"
+
+
+def decode_file(path):
+    return json.loads(zlib.decompress(base64.b64decode(path.read_text().strip()[1:])))["blueprint"]
+
+
+def run_text(text, *extra):
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as handle:
+        handle.write(text + "\n")
+        path = handle.name
+    try:
+        done = subprocess.run([sys.executable, str(AUDIT), path, *extra], capture_output=True, text=True)
+        return done, path
+    finally:
+        pathlib.Path(path).unlink()
+
+
+def encode_blueprint(blueprint, tail=b""):
+    body = json.dumps({"blueprint": blueprint}, separators=(",", ":")).encode("utf-8")
+    return "0" + base64.b64encode(zlib.compress(body, 9) + tail).decode("ascii")
+
+
+def turned(blueprint, numbers=None):
+    blueprint = copy.deepcopy(blueprint)
+    for entity in blueprint["entities"]:
+        if "inserter" in entity["name"] and (numbers is None or entity["entity_number"] in numbers):
+            entity["direction"] = (entity.get("direction", 0) + 8) % 16
+    return blueprint
+
+
+class HandDirectionTest(unittest.TestCase):
+    """RRC-03: round 18 shipped every hand 180 degrees wrong and every count here read 0."""
+
+    def counts(self, text):
+        done, _ = run_text(text, "--json")
+        return done.returncode, json.loads(done.stdout)
+
+    def test_RRC03_golden_reference_has_no_backward_hand(self):
+        status, counts = self.counts(GOLDEN_REFERENCE.read_text().strip())
+        self.assertEqual((status, counts["backward_hands"]), (0, 0), counts)
+
+    def test_RRC03_golden_round22_has_no_backward_hand(self):
+        status, counts = self.counts(GOLDEN_ROUND22.read_text().strip())
+        self.assertEqual((status, counts["backward_hands"]), (0, 0), counts)
+
+    def test_RRC03_round18_delivered_inverted_bytes_are_refused(self):
+        status, counts = self.counts(ROUND18_INVERTED.read_text().strip())
+        self.assertEqual(status, 1)
+        self.assertEqual(counts["backward_hands"], 20, counts)
+        self.assertEqual(counts["invalid_inserters"], 0, "endpoint validity alone never saw it")
+        done, _ = run_text(ROUND18_INVERTED.read_text().strip())
+        self.assertIn("hand direction (RRC-03): 20", done.stdout)
+
+    def test_RRC03_every_hand_of_the_reference_turned_is_refused(self):
+        status, counts = self.counts(encode_blueprint(turned(decode_file(GOLDEN_REFERENCE))))
+        self.assertEqual(status, 1)
+        self.assertEqual(counts["backward_hands"], 8, counts)
+
+    def test_RRC03_one_output_hand_turned_is_refused_by_name(self):
+        done, _ = run_text(encode_blueprint(turned(decode_file(GOLDEN_REFERENCE), {107})))
+        self.assertEqual(done.returncode, 1)
+        self.assertIn("  inserter at (210.5,1085.5) facing east: picks up from (211.5, 1085.5), "
+                      "the first tile of a belt nothing feeds\n", done.stdout)
+
+    def test_RRC03_control_output_hand_turned_is_refused(self):
+        """ACC4's shape: the belt the hand fed now starts at a hand that takes from it."""
+        entities = control()
+        entities[4]["direction"] = 4
+        status, counts = audit(entities)
+        self.assertEqual((status, counts["backward_hands"]), (1, 1), counts)
+        _, counts = audit(control())
+        self.assertEqual(counts["backward_hands"], 0, counts)
+
+    def test_RRC03_hand_dropping_onto_a_dead_end_is_refused_by_name(self):
+        entities = [belt(0.5, 0.5), belt(1.5, 0.5), inserter(2.5, 0.5, 4),
+                    {"name": "assembling-machine-3", "position": {"x": 4.5, "y": 0.5}, "recipe": "iron-gear-wheel"}]
+        done, _ = run_text(encode(entities))
+        self.assertEqual(done.returncode, 1)
+        self.assertIn("  inserter at (2.5,0.5) facing east: drops onto (1.5, 0.5), "
+                      "the last tile of a belt that leads nowhere\n", done.stdout)
+
+
+class StringSchemaTest(unittest.TestCase):
+    """RRC-03: a string the game will not import is named before any geometry is judged."""
+
+    def refused(self, text):
+        done, path = run_text(text)
+        self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertNotIn("Traceback", done.stderr)
+        return done.stderr, path
+
+    def blueprint(self, entities=None, **extra):
+        entities = copy.deepcopy(entities if entities is not None else control())
+        for index, entity in enumerate(entities, start=1):
+            entity.setdefault("entity_number", index)
+        return {"item": "blueprint", "version": (2 << 48) | (77 << 16), "entities": entities, **extra}
+
+    def test_RRC03_bad_base64_is_named(self):
+        stderr, path = self.refused("0eNq!!not-base64")
+        self.assertTrue(stderr.startswith(f"blueprint_audit.py: {path} does not decode: base64: "), stderr)
+
+    def test_RRC03_truncated_zlib_is_named(self):
+        whole = encode_blueprint(self.blueprint())
+        raw = base64.b64decode(whole[1:])[:-8]
+        stderr, path = self.refused("0" + base64.b64encode(raw).decode("ascii"))
+        self.assertEqual(stderr, f"blueprint_audit.py: {path} does not decode: zlib stream is truncated\n")
+
+    def test_RRC03_bytes_after_zlib_are_named(self):
+        stderr, path = self.refused(encode_blueprint(self.blueprint(), tail=b"junk"))
+        self.assertEqual(stderr, f"blueprint_audit.py: {path} does not decode: bytes after the zlib stream\n")
+
+    def test_RRC03_schema_rows_are_named(self):
+        cases = {
+            "internal key": (lambda b: b["entities"][2].update(port_id=4),
+                             "blueprint_audit.py: schema: entity 3 (inserter): unknown key 'port_id'"),
+            "untyped underground": (lambda b: b["entities"][6].pop("type"),
+                                    "blueprint_audit.py: schema: entity 7 (underground-belt): has no 'type'; "
+                                    "it imports as an entrance"),
+            "typed pipe": (lambda b: b["entities"].append({"entity_number": 99, "name": "pipe-to-ground",
+                                                            "position": {"x": 30.5, "y": 30.5}, "type": "input"}),
+                           "blueprint_audit.py: schema: entity 10 (pipe-to-ground): carries 'type' but is not an "
+                           "underground belt or loader"),
+            "direction 16": (lambda b: b["entities"][2].update(direction=16),
+                             "blueprint_audit.py: schema: entity 3 (inserter): direction 16 is not an integer 0..15"),
+            "repeated number": (lambda b: b["entities"][1].update(entity_number=1),
+                                "blueprint_audit.py: schema: entity 2 (transport-belt): entity_number 1 repeats"),
+            "string position": (lambda b: b["entities"][0]["position"].update(x="0.5"),
+                                "blueprint_audit.py: schema: entity 1 (transport-belt): position is not numeric x and y"),
+            "wire to nothing": (lambda b: b.update(wires=[[1, 5, 77, 5]]),
+                                "blueprint_audit.py: schema: wire 1: names an entity_number the blueprint does not hold"),
+            "wire connector 0": (lambda b: b.update(wires=[[1, 0, 2, 5]]),
+                                 "blueprint_audit.py: schema: wire 1: connector id below 1"),
+            "not a blueprint item": (lambda b: b.update(item="blueprint-book"),
+                                     "blueprint_audit.py: schema: blueprint: item is 'blueprint-book', not 'blueprint'"),
+        }
+        for label, (plant, line) in cases.items():
+            with self.subTest(label):
+                blueprint = self.blueprint()
+                plant(blueprint)
+                stderr, _ = self.refused(encode_blueprint(blueprint))
+                self.assertIn(line + "\n", stderr)
+
+    def test_RRC03_goldens_pass_the_schema(self):
+        for path in (GOLDEN_REFERENCE, GOLDEN_ROUND22, ROUND18_INVERTED):
+            with self.subTest(path.name):
+                done = subprocess.run([sys.executable, str(AUDIT), str(path), "--json"], capture_output=True, text=True)
+                self.assertNotIn("schema:", done.stderr)
+                self.assertIn("backward_hands", json.loads(done.stdout))
+
+    def test_RRC03_generator_json_skips_the_string_schema(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            json.dump({"ok": True, "result": {"entities": [dict(e, port_id=1) for e in control()]}}, handle)
+            path = handle.name
+        try:
+            done = subprocess.run([sys.executable, str(AUDIT), path, "--json"], capture_output=True, text=True)
+        finally:
+            pathlib.Path(path).unlink()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(json.loads(done.stdout)["backward_hands"], 0)

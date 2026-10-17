@@ -1,0 +1,759 @@
+#path	class	profile	why  (round 48 D1; classes twin|catalog|sheet|algo|double|player-rule|facts; profile player|vanilla|-)
+tests/acceptance/beacon_chain_case.lua	sheet	vanilla	acceptance chain; built and run in D7
+tests/acceptance/fluid_chain_case.lua	sheet	vanilla	acceptance chain; built and run in D7
+tests/acceptance/gate_digest_case.lua	sheet	vanilla	acceptance chain; built and run in D7
+tests/acceptance/item_chain_case.lua	sheet	vanilla	acceptance chain; built and run in D7
+tests/acceptance/red_science_case.lua	sheet	vanilla	acceptance chain; built and run in D7
+tests/export_golden/expected.json	catalog	vanilla	authored export payload; shape compared with a headless export
+tests/export_golden/fixture.json	catalog	vanilla	authored export payload; shape compared with a headless export
+tests/export_golden/negative_controls.json	catalog	vanilla	authored export payload; shape compared with a headless export
+tests/fixtures/blueprints/round18_inverted_inserters.txt	sheet	player	delivered blueprint; built and run in D7
+tests/fixtures/blueprints/round20_delivered.txt	sheet	player	delivered blueprint; built and run in D7
+tests/fixtures/blueprints/round22_v5.txt	sheet	player	delivered blueprint; built and run in D7
+tests/fixtures/bytes_round30.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round31.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round32.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round33.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round34.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round35.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round36.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round37.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round38.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round39.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round40.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round41.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round43.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round45.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/bytes_round47.txt	sheet	player	bytes baseline (sha per gated sheet); I3 checks sha of stored bp strings
+tests/fixtures/engine/roboport-cell.json	catalog	vanilla	engine observation of roboport spacing; re-measured headless
+tests/fixtures/groups_am2.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/groups_gray_magenta.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/groups_ins10s_bulk.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/groups_ins_stack1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/groups_red1s_foundry.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/pack_base_green.txt	algo	-	pack output lines, no engine meaning
+tests/fixtures/pack_base_red.txt	algo	-	pack output lines, no engine meaning
+tests/fixtures/player_red10s_fix.txt	sheet	player	delivered blueprint; built and run in D7
+tests/fixtures/route_gray_magenta.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_gray_magenta_154.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_ins10s_bulk_call4.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_ins10s_call1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_attempt1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_call2.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_edge_split_call1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_final.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_stack1_call1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_stack1_call2.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_red10s_twin_call3.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/route_snaps/gray_magenta_154_fail2.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_154_fail3.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_154_fail4.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_154_molten_iron.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_154_piercing.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_154_plastic.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_154_stone.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/gray_magenta_54_furnace.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/green_tidy.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/ins10_tidy2.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/r46_digests.txt	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/stack1_restart27.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/route_snaps/stack1_validate_candidate.lua.gz	algo	-	route checkpoint state, no engine meaning; covered by sheet sims
+tests/fixtures/routing/player_chain_first_candidate.lua	algo	-	frozen Route.begin input from harness
+tests/fixtures/row_block.lua	sheet	vanilla	hand-built science row; built and run in D7
+tests/fixtures/search_doubles.lua	double	-	stage doubles, no engine meaning
+tests/fixtures/validate/item_chain_first.lua	catalog	vanilla	frozen Validate input from harness capture
+tests/fixtures/validate_ins10s_bulk_stub.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_ins10s_v3_chain.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_inserter10s_attempt1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_red10s_attempt1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_red10s_bulk_c1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_red10s_collector.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_red10s_v1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/fixtures/validate_red_green_r40_c1.json	catalog	player	stage input dumped from a player sheet; catalog facts compared, stage state is algo
+tests/game/expected/player-red-science-1s-bulk.txt	sheet	player	headless parity expectation (already engine-run)
+tests/game/expected/player-red-science-1s-foundry.txt	sheet	player	headless parity expectation (already engine-run)
+tests/game/expected/player-red-science-1s.txt	sheet	player	headless parity expectation (already engine-run)
+tests/golden/cases/assembler-chain-example/prepared_input.json	catalog	vanilla	harness-made catalog (mock facts)
+tests/golden/cases/base-only-crafting-smelting/prepared_input.json	catalog	vanilla	harness-made catalog (mock facts)
+tests/golden/cases/fluid-byproduct-chain/prepared_input.json	catalog	vanilla	harness-made catalog (mock facts)
+tests/golden/cases/player-am2-chain-repaired/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-blue-science-10s/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-green-science-1s/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-inserter-10s-bulk/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-inserter-10s-stack1/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-inserter-10s/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-green-science-10s/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-science-10s-bulk/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-science-10s-stack1/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-science-10s/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-science-1s-bulk/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-science-1s-foundry/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/player-red-science-1s/prepared_input.json	catalog	player	captured from player game
+tests/golden/cases/repeatability/prepared_input.json	catalog	vanilla	harness-made catalog (mock facts)
+tests/golden/cases/shared-intermediate-multi-target/prepared_input.json	catalog	vanilla	harness-made catalog (mock facts)
+tests/fixtures/engine_facts/catalog_conflicts.tsv	facts	-	derived engine-fact rows (tools/fixture_facts.lua, lane 281); compared with the live game headless (I4)
+tests/fixtures/engine_facts/catalog_facts.tsv	facts	-	derived engine-fact rows (tools/fixture_facts.lua, lane 281); compared with the live game headless (I4)
+tests/fixtures/engine_facts/constants.json	facts	-	derived engine-fact rows (tools/fixture_facts.lua, lane 281); compared with the live game headless (I4)
+tests/fixtures/engine_facts/mock_members.json	facts	-	derived engine-fact rows (tools/fixture_facts.lua, lane 281); compared with the live game headless (I4)
+tests/fixtures/sheets/player-red-science-1s-foundry.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-1s-foundry.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-am2-chain-repaired.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-am2-chain-repaired.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-blue-science-10s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-blue-science-10s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-green-science-1s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-green-science-1s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-inserter-10s-bulk.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-inserter-10s-bulk.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-inserter-10s-stack1.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-inserter-10s-stack1.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-inserter-10s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-inserter-10s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-green-science-10s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-green-science-10s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-10s-bulk.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-10s-bulk.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-10s-stack1.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-10s-stack1.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-10s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-10s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-1s-bulk.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-1s-bulk.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-1s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/player-red-science-1s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7)
+tests/fixtures/sheets/vanilla-2.1-green-science-1s.bp.txt	sheet	vanilla	sheet generated in-game on vanilla 2.1 (tests/game/test_capture.lua), simmed on 2.1 (G7)
+tests/fixtures/sheets/vanilla-2.1-green-science-1s.ports.json	sheet	vanilla	sheet generated in-game on vanilla 2.1 (tests/game/test_capture.lua), simmed on 2.1 (G7)
+tests/fixtures/sheets/vanilla-2.1-red-science-1s.bp.txt	sheet	vanilla	sheet generated in-game on vanilla 2.1 (tests/game/test_capture.lua), simmed on 2.1 (G7)
+tests/fixtures/sheets/vanilla-2.1-red-science-1s.ports.json	sheet	vanilla	sheet generated in-game on vanilla 2.1 (tests/game/test_capture.lua), simmed on 2.1 (G7)
+tests/fixtures/bytes_round49.txt	sheet	player	bytes baseline (sha per gated sheet)
+tests/golden/cases/player-magenta-science-10s/prepared_input.json	catalog	player	captured from player game
+tests/fixtures/bytes_round48.txt	sheet	player	bytes baseline round 48 (13 gated sheets, final int/r48 tree; gray-magenta case dropped by the player)
+tests/fixtures/r50_player_selection.lua	algo	player	player save selection (529 recipe setups) + fingerprint sha a1e31990; round 50 snapshot slices
+tests/fixtures/bytes_round51_base.txt	sheet	player	bytes baseline round 51 flag off (14 sheets == bytes_round49)
+tests/fixtures/flip_fluidboxes_2.0.txt	facts	vanilla	engine fluid box pos per Turn and Flip, headless 2.0.77 (test_flip_fluidboxes)
+tests/fixtures/flip_fluidboxes_2.1.txt	facts	vanilla	engine fluid box pos per Turn and Flip, headless 2.1.20 (test_flip_fluidboxes)
+tests/fixtures/flip_filters_2.0.txt	facts	vanilla	engine fluid box filter + connections per recipe and Flip, headless 2.0.77 (test_flip_fluidboxes)
+tests/fixtures/flip_filters_2.1.txt	facts	vanilla	engine fluid box filter + connections per recipe and Flip, headless 2.1.20 (test_flip_fluidboxes)
+tests/fixtures/dead_pair_inserter10s.bp.txt	sheet	player	drawn inserter-10s bytes round 51 (sha c3d630e6) with Dead pair at (27,16); lane_sim dead count (test_lane_sim)
+tests/fixtures/box_binding_2.0.txt	facts	vanilla	engine Box binding (fluid -> prototype box) per crafting machine x fluid recipe, headless 2.0.77 (test_box_binding)
+tests/fixtures/box_binding_2.1.txt	facts	vanilla	engine Box binding (fluid -> prototype box) per crafting machine x fluid recipe, headless 2.1.20 (test_box_binding)
+tests/fixtures/edge_input_magenta_drawn.bp.txt	sheet	player	drawn magenta bytes round 52 (sha 726dfe4b); sheet input enters through an underground at the edge (0,26): lane_sim must not call it dead (test_lane_sim)
+tests/fixtures/power_r10s_drawn_state.lua.gz	algo	player	power stage state, drawn red-10s round 52 (2 pole components, greedy repair gives up; test_power_relay_chain)
+tests/fixtures/power_s1_drawn_state.lua.gz	algo	player	power stage state, drawn inserter-10s-stack1 round 52 (2 pole components; test_power_relay_chain)
+tests/fixtures/bytes_round52.txt	sheet	player	bytes baseline round 52 layered (default): 12 == round 51; red-10s + red-10s-stack1 changed by power relay chain (faster, within Entity tie)
+tests/fixtures/bytes_round54_drawn.txt	sheet	player	bytes baseline round 54 drawn pack (RRC_PACK=sugiyama), 14 sheets: gate13 at cc8739d == main d0da1ca == head 2e3b443 (A/B 2026-10-02); rrc-code RC-11
+tests/fixtures/bytes_round56.txt	sheet	player	bytes baseline round 56 layered at game rate (4000 ops/tick), 13 sheets == bound main df9ca6e (gate 2026-10-04); blue moved by engine box binding; magenta line kept from round 52 (tests skipped)
+tests/fixtures/bytes_round56_drawn.txt	sheet	player	bytes baseline round 56 drawn pack (RRC_PACK=sugiyama) at 4000 ops/tick, 13 sheets == bound main df9ca6e; inserter-10s-stack1 moved by binding; magenta line kept from round 54
+tests/fixtures/material_cost_2.0.txt	facts	vanilla	seed material costs from Draftsman data for 2.0, replaced by headless probe at merge
+tests/fixtures/material_cost_2.1.txt	facts	vanilla	seed material costs from Draftsman data for 2.1, replaced by headless probe at merge
+tests/fixtures/groups_em4_bound.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/route_foundry4_lane.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/turn_flip_cases_2.0.json	sheet	vanilla	Turn and Flip census cases probed in the game (tests/game/test_turn_flip_cases.lua); their sheets are built and run
+tests/fixtures/turn_flip_cases_2.1.json	sheet	vanilla	Turn and Flip census cases probed in the game (tests/game/test_turn_flip_cases.lua); their sheets are built and run
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-1-electronic-circuit-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/assembling-machine-2-concrete-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-plastic-bar-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/chemical-plant-sulfuric-acid-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/cryogenic-plant-fluoroketone-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/electromagnetic-plant-electrolyte-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-casting-iron-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/foundry-iron-ore-melting-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.0/oil-refinery-advanced-oil-processing-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-1-electronic-circuit-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/assembling-machine-2-concrete-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-plastic-bar-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/chemical-plant-sulfuric-acid-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/cryogenic-plant-fluoroketone-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/electromagnetic-plant-electrolyte-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-casting-iron-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/foundry-iron-ore-melting-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-1_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_0_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_0_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_0_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_0_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_12_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_12_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_12_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_12_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_4_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_4_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_4_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_4_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_8_0.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_8_0.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_8_1.bp.txt	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/turn_flip_sheets/2.1/oil-refinery-advanced-oil-processing-4_8_1.ports.json	sheet	vanilla	Turn and Flip census sheet (round 54); built and run by tests/game/test_turn_flip_sims.lua
+tests/fixtures/validate_cryo4_bound_mix.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/validate_cryo4_turn4.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/validate_em1_exit_sideload.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/validate_plastic4_lane_ok.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/validate_plastic4_lane_overload.json	algo	-	stage input captured from a Turn and Flip census case (round 54); its sheet is built and run by the census sims
+tests/fixtures/r56/blue_bound_groups.json	algo	-	round 56 frozen stage input, blue bound (engine box binding), first Groups call; stage state is algo
+tests/fixtures/r56/blue_bound_pack.json	algo	-	round 56 frozen stage input, blue bound, first Pack call
+tests/fixtures/r56/blue_bound_power.json	algo	-	round 56 frozen stage input, blue bound, first Power call
+tests/fixtures/r56/blue_bound_route.json	algo	-	round 56 frozen stage input, blue bound, first Route call
+tests/fixtures/r56/310/blue_bound_groups.json	algo	-	lane 310 copy of the blue bound Groups input (GS tests)
+tests/fixtures/r56/310/groups_am2.json	algo	-	lane 310 copy of groups_am2.json (GS4 digest)
+tests/fixtures/r56/310/groups_tick_cost.lua	algo	-	GS8 probe: worst Groups.step weighted instructions in a clean lua5.2
+tests/fixtures/r56/311/pack_base.json	algo	-	round-56-base pack placements on the blue bound pack input (PR2/PR3)
+tests/fixtures/r56/311/power_base.json	algo	-	round-56-base power result on the blue bound power input (PF1)
+tests/fixtures/r56/311/r10_base.json	algo	-	round-56-base power result on power_r10s_drawn_state (PF1)
+tests/fixtures/r56/312/codes_base.txt	algo	-	round-56-base validate codes sha per fixture (VS1)
+tests/fixtures/r56/312/validate_codes.lua	algo	-	VS1 probe: validate codes, ids and verdict in a clean lua5.2
+tests/fixtures/r56/312/validate_tick_cost.lua	algo	-	VS6 probe: worst Validate.step weighted instructions in a clean lua5.2
+tests/fixtures/r56/313/canonical_sha256.txt	algo	-	round-56-base canonical digest for the engine-test path (PC3)
+tests/fixtures/r56/315/tiny.lua	algo	-	tiny harness suite for split-unit collect vs JUnit (SU2)
+tests/fixtures/r56/308/gate_stub.sh	algo	-	gate56 stub runner (GT1-GT3)
+tests/fixtures/sheets/player-magenta-science-10s.bp.txt	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7; magenta joins round 56)
+tests/fixtures/sheets/player-magenta-science-10s.ports.json	sheet	player	delivered sheet bytes + ports for the headless sheet sim (D7; magenta joins round 56)
+tests/fixtures/sheets/player-am2-chain-repaired.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-blue-science-10s.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-green-science-1s.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-inserter-10s-bulk.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-inserter-10s-stack1.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-inserter-10s.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-green-science-10s.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-science-10s-bulk.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-science-10s-stack1.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-science-10s.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-science-1s-bulk.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-science-1s-foundry.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-red-science-1s.entities.json	sheet	player	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/vanilla-2.1-green-science-1s.entities.json	sheet	vanilla	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/vanilla-2.1-red-science-1s.entities.json	sheet	vanilla	built entities of the delivered sheet for the Lua port finder tests (Player run, lane 317)
+tests/fixtures/sheets/player-am2-chain-repaired.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-blue-science-10s.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-green-science-1s.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-inserter-10s-bulk.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-inserter-10s-stack1.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-inserter-10s.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-green-science-10s.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-science-10s-bulk.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-science-10s-stack1.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-science-10s.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-science-1s-bulk.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-science-1s-foundry.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/player-red-science-1s.refs.json	sheet	player	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/vanilla-2.1-green-science-1s.refs.json	sheet	vanilla	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/sheets/vanilla-2.1-red-science-1s.refs.json	sheet	vanilla	calculation refs (target outputs, calc input rates) for Sheet sim and Player run (lane 316)
+tests/fixtures/r56/309/blue_prune_work.lua.gz	algo	-	round 56 gate: blue route work at its biggest PipeRuns.prune_redundant call (PR-COST)
+tests/fixtures/r56/309/prune_tick_cost.lua	algo	-	PR-COST probe: prune_redundant weighted cost + removed count + kept-segment digest, clean lua5.2
+tests/fixtures/r56/311/power_tick_cost.lua	algo	-	PF4 probe: worst Power.step weighted cost on a mid-run power state + sliced == one-shot
+tests/fixtures/r56/312/blue_val_beacon.lua.gz	algo	-	round 56 gate: blue validate state at the beacon pass (VS9, VS10)
+tests/fixtures/r56/312/blue_val_physical.lua.gz	algo	-	round 56 gate: blue validate state at the physical pass (VS11)
+tests/fixtures/r56/312/validate_phase_cost.lua	algo	-	VS9 probe: one Validate phase call weighted cost + codes/effects digest, clean lua5.2
+tests/fixtures/r56/312/validate_physical_cost.lua	algo	-	VS11 probe: worst Validate.step weighted cost in one phase, clean lua5.2
+tests/fixtures/r56/312/validate_state_tick_cost.lua	algo	-	VS8 probe: worst Validate.step weighted cost on a mid-run validate state, clean lua5.2
+tests/fixtures/r56/rg_power_t312.lua.gz	algo	-	round 56 gate: red-green layered power state at tick 312 (PF4)
+tests/fixtures/r56/rg_validate_t812.lua.gz	algo	-	round 56 gate: red-green layered validate state at tick 812 (VS8)

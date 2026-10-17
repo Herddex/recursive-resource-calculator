@@ -1,0 +1,93 @@
+--ST1 red on round-49-base: belt-shape validation must restart the same grid with strict route ends.
+local H = require "tests.harness"
+local Search = require "logic.bp.search"
+local D = require "tests.fixtures.search_doubles"
+local Route = require "logic.bp.route"
+local Validate = require "logic.bp.validate"
+
+local function scenario(codes, always_fail)
+    local route_inputs, validations = {}, 0
+    local originals = {Route.begin, Route.step, Validate.begin, Validate.step}
+    local function restore()
+        Route.begin, Route.step, Validate.begin, Validate.step = originals[1], originals[2], originals[3], originals[4]
+    end
+    local ok, state = pcall(function()
+        return D.run({}, function()
+            Route.begin = function(input)
+                route_inputs[#route_inputs + 1] = {strict_ends = input.strict_ends, lane_cap = input.lane_cap, grid = input.grid}
+                return {done = true, ok = true, result = {entities = {}, wires = {}, segments = {}, bindings = {}}, cursor = {}, progress = {}}
+            end
+            Route.step = function(s) return s end
+            Validate.begin = function(input)
+                validations = validations + 1
+                local code = codes[validations] or (always_fail and "BP_V_BELT_BLEED")
+                return {done = true, ok = code == nil, errors = code and {{code = code}} or nil,
+                    result = {score = {beacon_count = 0}, metrics = {}}, cursor = {}, progress = {}}
+            end
+            Validate.step = function(s) return s end
+            local result = Search.begin(D.input())
+            local ticks = 0
+            while not result.done and ticks < 600 do ticks = ticks + 1; Search.step(result, {ops = 100}) end
+            return result
+        end)
+    end)
+    restore()
+    if not ok then error(state, 0) end
+    -- D.run returns state, log; pcall callback result preserves only first return.
+    return state, route_inputs
+end
+
+local function bounded_finish(state, phase)
+    local ticks = 0
+    while not state.done and ticks < 600 do ticks = ticks + 1; Search.step(state, {ops = 100}) end
+    H.equal(state.done, true, "not stuck in phase " .. tostring(state.phase or phase))
+    return state
+end
+
+--Round 56 lever B (ticket 06/13, player 2026-10-04): every route runs strict ends from the start, so a belt
+--refusal never triggers a same-grid strict redo (the redo cost magenta a second whole route).
+H.test("ST1 belt refusal: routes are strict from the start, no strict redo, delivers", function()
+    local state, routes = scenario({[1] = "BP_V_BELT_BLEED"})
+    H.equal(state.ok, true, "delivered")
+    H.equal(#routes, 2, "two route inputs (refused candidate, then the next one)")
+    H.equal(routes[1].strict_ends, true, "first route strict")
+    H.equal(routes[2].strict_ends, true, "next route strict")
+end)
+
+--Round 54: plastic x4 Turn 8 in Factorio 2.0.77 gave 7.5/s of 7.992/s (two branches on one lane).
+H.test("ST6 a lane overload reroutes the same grid with lane capacity counted", function()
+    local state, routes = scenario({[1] = "BP_V_LANE_OVERLOAD"})
+    H.equal(state.ok, true, "delivered")
+    H.equal(#routes, 2, "two route inputs")
+    H.equal(routes[1].lane_cap, nil, "first route counts no lanes")
+    H.equal(routes[2].lane_cap, true, "redo counts lanes")
+    H.equal(routes[2].strict_ends, true, "strict ends on every route (lever B)")
+    H.equal(routes[1].grid.w, routes[2].grid.w, "same grid")
+end)
+
+H.test("ST7 a second lane overload drops the candidate and the next one starts without the lane rule", function()
+    local state, routes = scenario({[1] = "BP_V_LANE_OVERLOAD", [2] = "BP_V_LANE_OVERLOAD"})
+    H.equal(state.ok, true, "eventually delivered")
+    H.equal(routes[2].lane_cap, true, "redo counts lanes")
+    H.equal(routes[3].lane_cap, nil, "next candidate starts plain")
+end)
+
+H.test("ST2 non-shape refusal follows ordinary retry", function()
+    local state, routes = scenario({[1] = "BP_V_COLLISION"})
+    H.equal(state.ok, true, "eventually delivered")
+    H.equal(routes[1].strict_ends, true, "initial route strict (lever B)")
+    H.equal(routes[2].strict_ends, true, "next candidate strict")
+end)
+
+H.test("ST3 belt refusals: one route per candidate, all strict, no redo", function()
+    local state, routes = scenario({}, true)
+    state = bounded_finish(state, state.phase)
+    H.equal(state.ok, false, "search fails")
+    H.equal(state.errors[1].code, "BP_FAIL_NO_LAYOUT", "no layout")
+    --Round 54: three last-resort inset rounds (3, 6, 9) follow the four ordinary candidates. Round 56: each routes once.
+    H.equal(#routes, 7, "four candidates and three inset rounds each route once")
+    for i = 1, #routes do H.equal(routes[i].strict_ends, true, "route strict " .. i) end
+end)
+
+print("ST1 ST2 ST3")
+H.done("test_search_strict")

@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "note": "Cases kept as history and as negative evidence. A case listed here is EXCLUDED from release corpus discovery and is REQUIRED to fail structurally with its named outcome. Removing a required production case by listing it here is refused: an unregistered missing case still fails, and production coverage must be transferred explicitly, never dropped.",
+  "cases": []
+}

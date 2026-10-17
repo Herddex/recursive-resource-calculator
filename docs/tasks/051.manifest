@@ -1,0 +1,4 @@
+tools/release_gate.py
+tests/tools/test_release_gate.py
+!tests/tools/test_evidence_contract.py
+docs/release-preparation.md

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "case_id": "unsupported-cycles",
+  "factorio_branch": "2.0",
+  "versions": {
+    "mod": "1.1.36",
+    "rrc_version": "1.1.36",
+    "factorio": "2.0",
+    "factorio_branch": "2.0",
+    "base_game_version": "2.0"
+  },
+  "targets": [],
+  "setup": {
+    "selection": [],
+    "settings": {
+      "current": {
+        "input_edge": "left",
+        "output_edge": "top"
+      }
+    },
+    "options": {
+      "round_up": true
+    }
+  },
+  "engine_scenario": {
+    "initial_state": {
+      "research": [],
+      "surface": "nauvis",
+      "game_speed": 1
+    },
+    "supply": [],
+    "drain": [],
+    "warm_up_ticks": 60,
+    "sampling_window_ticks": 600,
+    "expected_rates": {},
+    "allowed_discrete_error": 0.02,
+    "timeout_seconds": 10
+  },
+  "expected_outcome": "rejection",
+  "reason_codes": [
+    "BP_REJ_CYCLE"
+  ],
+  "stage": "preflight",
+  "state": "draft",
+  "independent_assertions": {
+    "conservation": true
+  },
+  "capture_pending": "Capture the unsupported dependency-cycle sheet through the real preparation path."
+}

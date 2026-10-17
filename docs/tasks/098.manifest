@@ -1,0 +1,6 @@
+tests/golden/lib/runner.py
+tests/golden/accept
+tests/golden/required-matrix.json
+tests/golden/setup/
+tests/tools/test_capture_workflow.py
+docs/golden-case-authoring.md

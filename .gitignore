@@ -1,1 +1,6 @@
 .vscode
+__pycache__/
+*.pyc
+docs/audit/
+build/
+tools/ft/node_modules/

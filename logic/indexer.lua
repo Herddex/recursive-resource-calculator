@@ -1,3 +1,5 @@
+local Burners = require "logic.burners"
+
 local Indexer = {}
 
 local function insert_multimap(multimap, key, value)
@@ -18,12 +20,27 @@ local function index_recipes()
         end
     end
     storage.recipe_lists_by_product_full_name = recipes
+
+    --every recipe once per item or fluid it takes, hidden ones included, so a recycle recipe is found without knowing its name
+    local recipes_by_ingredient = {}
+    for _, recipe_prototype in pairs(prototypes.recipe) do
+        local seen = {}
+        for _, ingredient in ipairs(recipe_prototype.ingredients) do
+            local full_name = ingredient.type .. "/" .. ingredient.name
+            if not seen[full_name] then
+                seen[full_name] = true
+                insert_multimap(recipes_by_ingredient, full_name, recipe_prototype)
+            end
+        end
+    end
+    storage.recipe_lists_by_ingredient_full_name = recipes_by_ingredient
 end
 
 local function compute_pollution(entity_prototype)
     local energy_source = entity_prototype.electric_energy_source_prototype or entity_prototype.burner_prototype or entity_prototype.heat_energy_source_prototype or entity_prototype.fluid_energy_source_prototype or entity_prototype.void_energy_source_prototype
     if energy_source then
-      return entity_prototype.get_max_energy_usage() * energy_source.emissions_per_joule.pollution * 60
+      --emissions are keyed by pollutant, and a machine may emit none of the "pollution" kind
+      return entity_prototype.get_max_energy_usage() * (energy_source.emissions_per_joule.pollution or 0) * 60
     end
     return 0
 end
@@ -46,26 +63,28 @@ local function index_crafting_machine_pollution()
     storage.pollution_by_crafting_machine = pollution_by_crafting_machine
 end
 
-local function index_allowed_modules_by_recipe()
-    local names_of_allowed_module_by_recipe_name = {}
-    local module_prototypes = prototypes.get_item_filtered({{filter="type", type="module"}})
-    for recipe_name, recipe in pairs(prototypes.recipe) do
-        local allowed_module_names = {}
-        for _, module_prototype in pairs(module_prototypes) do
-            if not recipe.allowed_module_categories or recipe.allowed_module_categories[module_prototype.category] then
-                table.insert(allowed_module_names, module_prototype.name)
-            end
-        end
-        names_of_allowed_module_by_recipe_name[recipe_name] = allowed_module_names
+--Names of every module and every beacon, so a stored name is checked before anything is read from its prototype
+local function index_modules()
+    local module_names = {}
+    for module_name, _ in pairs(prototypes.get_item_filtered({{filter="type", type="module"}})) do
+        module_names[module_name] = true
     end
-    storage.names_of_allowed_modules_by_recipe_name = names_of_allowed_module_by_recipe_name
+    storage.module_names = module_names
+    storage.names_of_allowed_modules_by_recipe_name = nil --kept by versions before module slots
+
+    local beacon_names = {}
+    for beacon_name, _ in pairs(prototypes.get_entity_filtered({{filter="type", type="beacon"}})) do
+        beacon_names[beacon_name] = true
+    end
+    storage.beacon_names = beacon_names
 end
 
 function Indexer.run()
     index_recipes()
     index_crafting_machines()
     index_crafting_machine_pollution()
-    index_allowed_modules_by_recipe()
+    index_modules()
+    Burners.index()
 end
 
 return Indexer

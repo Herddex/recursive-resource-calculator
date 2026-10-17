@@ -1,0 +1,346 @@
+{
+ "cases": [
+  {
+   "branches": [
+    "2.0"
+   ],
+   "case_id": "basic-canonical",
+   "clauses": [
+    "BP-14",
+    "GOLD-04"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "accepted"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "assembler-chain-example",
+   "clauses": [
+    "BP-A1"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "captured"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "fluid-byproduct-chain",
+   "clauses": [
+    "BP-A4"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "captured"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "belt-inserter-bottleneck",
+   "clauses": [
+    "BP-A9"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "rejection",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "multi-pole-connectivity",
+   "clauses": [
+    "BP-A10"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "import-build-round-trip",
+   "clauses": [
+    "BP-A14"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "export-decode",
+   "clauses": [
+    "EX-A9"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "export",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "base-only-crafting-smelting",
+   "clauses": [
+    "GOLD-09-BASE"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "captured"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "shared-intermediate-multi-target",
+   "clauses": [
+    "GOLD-09-SHARED"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "captured"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "shared-beacon-loadouts",
+   "clauses": [
+    "GOLD-09-BEACON"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "grid-growth-beacon-improvement",
+   "clauses": [
+    "GOLD-09-GRID"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "quality-machines-infrastructure",
+   "clauses": [
+    "GOLD-09-QUALITY"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "modded-machine-interface",
+   "clauses": [
+    "GOLD-09-MODDED"
+   ],
+   "mods": [
+    "base",
+    "standard-mod"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "repeatability",
+   "clauses": [
+    "GOLD-09-REPEAT"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "captured"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "unsupported-cycles",
+   "clauses": [
+    "GOLD-09-REJECT"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "rejection",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "unsupported-quality-changing",
+   "clauses": [
+    "GOLD-09-REJECT"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "rejection",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "unsupported-spoilage",
+   "clauses": [
+    "GOLD-09-REJECT"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "rejection",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "unsupported-probabilistic",
+   "clauses": [
+    "GOLD-09-REJECT"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "rejection",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "unsupported-custom-behaviour",
+   "clauses": [
+    "GOLD-09-REJECT"
+   ],
+   "mods": [
+    "base",
+    "standard-mod"
+   ],
+   "outcome_kind": "rejection",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0",
+    "2.1"
+   ],
+   "case_id": "boundary-100-machines-30-steps",
+   "clauses": [
+    "GOLD-09-BOUNDARY"
+   ],
+   "mods": [
+    "base"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": null,
+   "state": "draft"
+  },
+  {
+   "branches": [
+    "2.0"
+   ],
+   "case_id": "player-red-science-1s",
+   "clauses": [
+    "PLAYER-RED-SCIENCE"
+   ],
+   "mods": [
+    "base",
+    "space-age",
+    "quality",
+    "modded-54"
+   ],
+   "outcome_kind": "production",
+   "prepared_input": "prepared_input.json",
+   "state": "captured"
+  }
+ ],
+ "note": "Release verification reads this file. A draft case fails the release gate; it is never a skipped success.",
+ "schema_version": 1
+}

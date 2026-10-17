@@ -1,4 +1,375 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.52
+Date: 2026.09.20
+  Info:
+    - Same code as 1.1.51, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.51
+Date: 2026.09.20
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.52).
+    - Test build of round 9, not a portal release. Nothing in it has been measured in a running game.
+  Bugfixes:
+    - A machine holding ordinary speed modules is no longer refused as quality-changing production. A speed
+      module lowers quality slightly, and the check asked whether that effect was non-zero instead of whether
+      it was above zero. Quality-changing production stays unsupported, and is still refused.
+    - A machine forbids speed beacons because it holds a quality module, never because speed beacons stand
+      beside it.
+    - The blueprint checker now receives the recipe and machine facts it needs. Before, a chance-based product
+      could pass as supported because those facts never reached it. A sheet whose facts are incomplete is now
+      refused by name instead of being quietly accepted.
+    - A machine that ignores module effects is no longer treated as quality production.
+  Changes:
+    - One rule decides quality for the whole blueprint path, and the planner and the pre-check now ask it the
+      same three questions rather than each keeping its own answer.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.50
+Date: 2026.09.20
+  Info:
+    - Same code as 1.1.49, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.49
+Date: 2026.09.20
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.50).
+    - Test build of round 8, not a portal release. It is the first build in which the Generate blueprint
+      action produces a blueprint: three chains now reach a delivered, independently checked layout offline.
+      Nothing in this build has been measured in a running game, so throughput is still unproven.
+  Features:
+    - Generate blueprint: an action on every sheet that lays out the calculated factory and hands over a
+      blueprint. The layout is checked against the physical rules before it is published: collisions from real
+      collision boxes, beacon coverage, power coverage and pole wiring, port edges and reachability, flow
+      conservation and capacities. A run that finds no valid layout within its work allowance says so and
+      never publishes an unchecked one.
+  Bugfixes:
+    - Ordinary belts, underground belts, splitters and pipes no longer ask for electric poles. They have no
+      energy source, and counting them made the pole search pay for every route tile.
+    - A blueprint's own checker now reads the placed layout: ports are found by their identity, a rotated
+      block's port approach follows the placed direction, an entity is powered when its collision box overlaps
+      a pole's supply area, and an edge input is no longer asked to have a producer inside the factory.
+    - Two beacons of one loadout in different blocks no longer share one identity.
+    - A search budget written by the caller is honoured instead of silently dropped.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.38
+Date: 2026.09.18
+  Info:
+    - Same code as 1.1.37, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.37
+Date: 2026.09.18
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.38).
+    - Test build of round 8, not a portal release. Blueprint generation is not finished: its button reports
+      that it is unavailable.
+  Features:
+    - Export debug: an action on every sheet that turns the sheet, its calculation and the prototype values
+      behind it into one text string, shown in a selectable box. It works on an empty, failed or stale sheet
+      too, and it never recalculates. The string is compressed JSON in Base64; it decodes offline and is not a
+      blueprint string.
+    - Reset recipe setups: a calculator action that puts recipe bindings, chosen machines, modules, beacon
+      groups and quality loops back to the defaults a new player starts with, on every sheet at once. Target
+      rows, tabs, rates, units and display settings stay. Only the player who presses it is affected, and work
+      already running cannot put the old choices back.
+  Changes:
+    - Sheets carry an identity of their own, so a calculation, an export and a blueprint setting can name the
+      sheet they belong to across a save.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.36
+Date: 2026.09.16
+  Info:
+    - Same code as 1.1.35, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+    - Quality is not calculated in Factorio 2.1 yet, so quality ore stays a raw input there.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.35
+Date: 2026.09.16
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.36).
+  Features:
+    - Items no recipe makes, such as ores, can be targets at a higher quality: normal items are taken from
+      outside and recycled into themselves until they reach the quality. Their rows show what is taken, the
+      recyclers at each quality and the recycler pool. No recipe needs to be picked for them.
+    - A quality loop that needs quality ore gets that ore from such a loop.
+  Changes:
+    - Normal ore bound to its own recycling recipe is a raw input again instead of a recipe that could only
+      run backwards.
+    - The recipe button of such a loop always shows normal: picking a quality there is refused.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.34
+Date: 2026.09.16
+  Info:
+    - Same code as 1.1.33, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.33
+Date: 2026.09.16
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.34).
+    - The original Recursive Resource Calculator is marked incompatible: both open on ALT + X, so only one can
+      be enabled.
+  Changes:
+    - The mod lists quality (Factorio 2.0) and recycler (Factorio 2.1) as optional dependencies; they provide
+      the recycle icon.
+    - Shorter mod description in the mod list.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.32
+Date: 2026.09.16
+  Info:
+    - Same code as 1.1.31, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+    - Quality is not calculated in Factorio 2.1 yet, so the base-quality row stays hidden there; the pickers
+      and the pipette key work as in 1.1.31.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.31
+Date: 2026.09.16
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.32). 1.1.25 to 1.1.30 were
+      test builds only; their changes are listed here.
+    - Reports are rebuilt when the save loads, so machine and beacon buttons of older reports become picker
+      buttons.
+    - The pipette key follows the player's own binding (Q by default) and still pipettes in the world as before.
+    - The recycle icon needs the quality mod (Factorio 2.0) or the recycler mod (Factorio 2.1); without it the
+      two rows show their text as before.
+    - A copied machine or beacon setup lasts while its item stays in the hand untouched; putting it down and
+      picking it up again forgets the setup.
+  Features:
+    - Module slots open a module picker: every module the slot accepts in one grid with no groups, and the
+      unlocked qualities below. One click selects; a double click on a module (or on a quality once a module is
+      chosen), the green tick or Enter stores it. "No module" empties the slot; a right click on a slot does too.
+    - Picking a module into a slot row that holds no module fills every slot of that row, for machines and
+      beacons alike. A row that already holds a module takes only the picked slot.
+    - The pipette key over a module slot puts that module, with its quality, in the hand; over another slot it
+      pastes the module in the hand (an empty row fills).
+    - The pipette key over a machine button copies the machine with all its modules and beacon groups; over
+      another row's or loop stage's machine button it pastes them. Modules the new recipe refuses are left out,
+      with a message.
+    - The pipette key over a beacon button copies the whole beacon group; over another group it replaces it,
+      over the add button it adds it.
+    - Machine buttons open a machine picker and beacon buttons a beacon picker, the same window as the module
+      picker. A right click on a beacon group removes it; the picker's trash button does too.
+    - A left click on a module slot while holding a module (or its ghost) puts that module in the slot. A left
+      click on a machine or beacon button while holding the copied machine or beacon pastes, as the pipette key
+      does. With anything else in the hand, a left click opens no picker.
+    - The pipette key pastes a machine or beacon setup onto one that shows the same machine or beacon, and the
+      copied item stays in the hand.
+  Changes:
+    - The base-quality choice (left over, crafted by another recipe, recycled) is a labelled row, label and
+      drop-down side by side, that shows only when the sheet targets an item above normal quality. Sheets saved
+      with the old drop-down keep their choice.
+    - The pickers show qualities as icons; "No module" shows the empty module slot icon. The picker's buttons
+      are all the same size.
+    - Long messages in the report wrap instead of widening their column.
+    - The round-up checkbox and Compute share a row, lined up under the base-quality label and drop-down.
+    - A quality loop stage that runs no machines says why (e.g. no uncommon iron ore available to it) in a short
+      wrapped text, keeping its controls.
+    - The recycler pool and returned-items rows show the recycling icon, with their old text as its tooltip.
+    - Module lists leave out hidden and parameter modules; a hidden module already set keeps its slot and can
+      be removed.
+  Locale:
+    - New texts for the base-quality label, the module, machine and beacon pickers, the pipette and its
+      messages (English in all three languages).
+---------------------------------------------------------------------------------------------------
+Version: 1.1.24
+Date: 2026.09.15
+  Info:
+    - Same code as 1.1.23, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+    - Quality is not calculated in Factorio 2.1 yet: none of the 1.1.23 quality changes apply there.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.23
+Date: 2026.09.15
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.24).
+    - A recipe that takes no items (e.g. casting from molten metal) crafts only normal quality, so it can start
+      a loop but not craft its higher tiers.
+    - When higher-quality items are shared by several loops, each loop may cover the same share of its target
+      from them; a loop held back by another missing item leaves its part to the others. If the calculator
+      cannot settle the shares it says so; the sheet may still be possible.
+    - Sheets with several loops using the same higher-quality items take longer to compute.
+  Features:
+    - Each tier of a quality loop above its start quality has its own recipe: casting gears from molten iron at
+      normal quality and assembling higher-quality gears from recycled plates now works. The recipe is picked
+      automatically and can be changed on each tier row.
+    - Loops use higher-quality items made elsewhere on the sheet, e.g. uncommon plates from a foundry with
+      quality modules go into the uncommon gear tier instead of showing as byproducts. The tier row's tooltip
+      shows what it takes from other rows. A loop that needs such items to reach its target at all uses them.
+    - Each sheet chooses what happens to items a loop gets back at its start quality when its start recipe
+      takes no items: left over, crafted into the item by another recipe (an extra row after the start tier),
+      or recycled into themselves in the recycler pool until gone or upgraded.
+  Bugfixes:
+    - The recycle recipe control lists only recipes that can recycle the item, instead of every recipe using
+      it (such as the recycler building). It is disabled when no recipe can.
+    - The byproduct row of a loop's own item offers that loop's recycle recipe instead of a consumer or burner,
+      which replaced the item's recipe and broke the loop.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.22
+Date: 2026.09.15
+  Info:
+    - Same code as 1.1.21, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+    - Quality is not calculated in Factorio 2.1 yet: quality targets say so on their row, and quality modules
+      do not change rates.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.21
+Date: 2026.09.15
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.22).
+    - Loops saved by 1.1.19 get their crafting modules copied to every tier, including the target tier; remove
+      the quality modules there if that tier should craft without them.
+  Features:
+    - The recipe button of a quality loop also picks the recipe's quality: the loop crafts from that quality up
+      to the target (legendary from legendary parts is one tier), and its ingredients are asked for at that
+      quality. An ingredient above normal quality is made by its own loop when its item has a recipe.
+    - Every tier of a quality loop has its own machine and modules, so the tiers below the target can use
+      quality modules and the target tier something else.
+    - Recyclers of a loop are one pool: a total row holds their machine, modules and recycle recipe, and each
+      tier row shows the recyclers running at that quality.
+  Changes:
+    - Quality modules now change the rates of every recipe row: a row's normal output shrinks by the share
+      that comes out at higher quality, and those items show as byproducts. Modules count at their own quality.
+    - A quality loop that cannot be solved shows all its tiers and the recycler pool with their editors.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.20
+Date: 2026.09.15
+  Info:
+    - Same code as 1.1.19, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+    - Quality targets are not calculated in Factorio 2.1 yet, as its quality mechanics are not verified:
+      a target above normal quality says so on its row.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.19
+Date: 2026.09.15
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.20).
+    - Quality loops assume each tier crafts as many sets as its returned ingredients allow and recycles
+      everything below the target. Chances after a first upgrade use the reached quality's next_probability
+      (10% in the base game); modded quality chains are not verified in game. Items the loop leaves above
+      normal quality show as byproducts without a consumer or burner control.
+  Features:
+    - Targets can have a quality. A target above normal quality is made by a quality loop: crafting with
+      quality modules, and recycling what misses the target quality back into its ingredients. The report
+      shows a row per quality tier with the crafting machines and recyclers running there, their counts
+      and upgrade chances, and the loop's module and recycle recipe controls. The recycle recipe is
+      picked automatically when only one recipe fits; without one, nothing is recycled.
+    - Loop settings are kept per item and quality and shared by every sheet.
+  Changes:
+    - The module effects label shows a quality effect as the chance to upgrade from normal quality
+      (Factorio 2.0), instead of the raw effect.
+    - A recipe with a single possible machine can still pick that machine's quality.
+    - Sheets saved by older versions keep their targets; their item buttons now also pick a quality.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.18
+Date: 2026.09.15
+  Info:
+    - Same code as 1.1.17, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.17
+Date: 2026.09.15
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.18).
+    - Burner counts assume full load. Boilers and generators burn fuel only while their output is used.
+      In Factorio 2.1, fluid energy sources with an output fluid box are not offered.
+  Features:
+    - Excess products can be reprocessed: byproduct rows have a recipe button listing recipes that
+      consume the product (cracking, recycling, venting, modded recipes). The chosen recipe takes all
+      of the excess, and its own outputs join the sheet, where they can be consumed in turn.
+    - Excess fuel can be burnt: byproduct rows offer the reactors (such as the heating tower), boilers
+      and burner generators that accept it. The row shows how many burn it at their maximum draw and
+      their pollution; burnt results such as spent fuel join the sheet. Fluids with a fuel value can be
+      burnt by fluid-burning energy sources.
+  Changes:
+    - A sheet whose bindings would need a recipe or burner to run backwards, or a consumer that no
+      longer consumes its product (for example after productivity research), no longer shows wrong
+      totals. The rows at fault say why, energy and pollution show as unavailable, and every machine,
+      module, recipe and burner control stays usable to fix it.
+    - A sheet that cannot be solved no longer keeps the previous report on screen: it lists the recipes
+      it uses so a binding can be undone.
+    - Machine buttons remember their own row, so a report left from before a recipe change refuses edits
+      instead of changing another recipe's machine.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.16
+Date: 2026.09.13
+  Info:
+    - Same code as 1.1.15, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.15
+Date: 2026.09.13
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.16).
+    - First release as RRC-Fork, a fork of RecursiveResourceCalculator by Herddex. The game treats it as a
+      different mod: sheets saved with RecursiveResourceCalculator do not carry over. Disable the original
+      while this one is enabled, since both open on the same key.
+  Features:
+    - Each report row shows exactly the chosen machine's module slots at the machine's quality, and
+      each slot offers only modules that both the machine and the recipe accept. Modules can have quality.
+    - Beacon groups: each group sets a beacon and its quality, how many beacons reach one machine, how
+      many machines share each beacon, and the modules inside the beacon. Effects follow the beacon's
+      distribution effectivity, quality bonus, profile and beacon counter.
+    - Energy consumption includes beacons, counted once per physical beacon.
+  Changes:
+    - Module counts from older saves are converted once into whole slots in their stored order.
+      Fractions, modules the machine or recipe refuses, and modules past the machine's slots are
+      dropped, so machine counts in old sheets change.
+    - Beacon effects are computed exactly. Factorio 2.0 rounds them internally, so its machine tooltip
+      can differ slightly.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.14
+Date: 2026.09.13
+  Info:
+    - Same code as 1.1.13, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.13
+Date: 2026.09.13
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.14).
+  Features:
+    - Sheets can target fluids: each input row has a fluid button next to the item button.
+    - Each sheet has a "Round up machines" checkbox that shows machine counts as whole machines.
+      Rates, energy and pollution stay exact; the exact count is shown in the tooltip.
+  Changes:
+    - Recipes with additional crafting categories can use machines of any of their categories.
+    - Queued recomputations run oldest first, so the calculator is centered after its sheets.
+    - When a pivot is missing the solver reorders rows, and it cross-checks its answer with a
+      largest-pivot elimination, keeping the answer that fits the equations better.
+  Bugfixes:
+    - Fixed some solvable systems being reported as having no solution.
+    - Fixed systems mixing tiny and huge amounts getting wrong machine counts, depending on the
+      order in which recipes were processed.
+    - Fixed a crash on configuration change when a mod turned a chosen crafting machine into
+      another kind of entity.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.12
+Date: 2026.09.13
+  Info:
+    - Same code as 1.1.11, released for Factorio 2.1. Not yet tested in a Factorio 2.1 game.
+  Bugfixes:
+    - Fixed products with a chance being counted at 100% on Factorio 2.1, where the probability
+      of a product is described by independent and shared probabilities.
+---------------------------------------------------------------------------------------------------
+Version: 1.1.11
+Date: 2026.09.13
+  Info:
+    - Released for Factorio 2.0. The same code also runs on Factorio 2.1 (see 1.1.12).
+  Changes:
+    - Items and fluids produced by one recipe and consumed by another are now shown at their net
+      rate (consumption minus production), not only when production exceeds consumption.
+    - Rows of intermediate products show the output rate of their recipe.
+    - The same item entered in several input rows of a sheet is now summed.
+  Bugfixes:
+    - Fixed recipes listing the same product several times (e.g. spoilage variants) needing many
+      times too many machines and showing a negative production rate.
+    - Fixed catalysts (e.g. Kovarex enrichment process) being computed as if the ingredient
+      replaced the product.
+    - Fixed productivity bonuses being multiplied instead of added, and not being capped at the
+      recipe's maximum productivity.
+    - Fixed productivity being applied to catalyst amounts, and to randomized amounts before
+      averaging.
+    - Fixed extra count fractions not being weighted by product probability.
+    - Fixed the quality of the chosen crafting machine being ignored for machine counts and lost
+      from the machine button.
+    - Fixed byproducts whose recipe is selected but unused missing from the report.
+    - Fixed empty sheets showing an empty report.
+    - Fixed small recipe amounts crashing the solver or being rejected as unsolvable.
+    - Fixed a crash on configuration change after a mod adding modules was removed.
+    - Fixed productivity research recomputing the wrong players, which crashed in multiplayer.
+    - Fixed the calculator's count of pending computations never decreasing.
+    - Fixed a crash when a player with pending computations is removed.
+    - Fixed crashes with crafting machines that have no effect receiver or emit no pollution.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.10
 Date: 2026.08.19
   Info:
